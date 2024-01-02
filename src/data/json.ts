@@ -19,6 +19,10 @@ import {
 } from "./types";
 
 /**
+ * Code to print the elements content to a json format when exported as .dojima file
+ * */
+
+/**
  * Strips out files which are only referenced by deleted elements
  */
 const filterOutDeletedFiles = (
@@ -46,7 +50,8 @@ export const serializeAsJSON = (
   type: "local" | "database",
 ): string => {
   const data: ExportedDataState = {
-    type: EXPORT_DATA_TYPES.excalidraw,
+    // type: EXPORT_DATA_TYPES.excalidraw,
+    type: EXPORT_DATA_TYPES.dojima,
     version: VERSIONS.excalidraw,
     source: EXPORT_SOURCE,
     elements:
@@ -79,8 +84,10 @@ export const saveAsJSON = async (
 
   const fileHandle = await fileSave(blob, {
     name: appState.name,
-    extension: "excalidraw",
-    description: "Excalidraw file",
+    // extension: "excalidraw",
+    // description: "Excalidraw file",
+    extension: "dojima",
+    description: "Dojima file",
     fileHandle: isImageFileHandle(appState.fileHandle)
       ? null
       : appState.fileHandle,
@@ -112,7 +119,8 @@ export const isValidExcalidrawData = (data?: {
   appState?: any;
 }): data is ImportedDataState => {
   return (
-    data?.type === EXPORT_DATA_TYPES.excalidraw &&
+    // data?.type === EXPORT_DATA_TYPES.excalidraw &&
+    data?.type === EXPORT_DATA_TYPES.dojima &&
     (!data.elements ||
       (Array.isArray(data.elements) &&
         (!data.appState || typeof data.appState === "object")))

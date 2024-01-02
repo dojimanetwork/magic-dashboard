@@ -140,7 +140,9 @@ export const loadSceneOrLibraryFromBlob = async (
     }
     if (isValidExcalidrawData(data)) {
       return {
-        type: MIME_TYPES.excalidraw,
+        /** Changed to take .dojima extension file instead of .excalidraw */
+        // type: MIME_TYPES.excalidraw,
+        type: MIME_TYPES.dojima,
         data: restore(
           {
             elements: clearElementsForExport(data.elements || []),
@@ -188,7 +190,9 @@ export const loadFromBlob = async (
     localElements,
     fileHandle,
   );
-  if (ret.type !== MIME_TYPES.excalidraw) {
+  /** Changed to take .dojima extension file instead of .excalidraw */
+  // if (ret.type !== MIME_TYPES.excalidraw) {
+  if (ret.type !== MIME_TYPES.dojima) {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
   return ret.data;
@@ -432,6 +436,7 @@ export const createFile = (
  * Note: doesn't handle missing .excalidraw/.excalidrawlib extension  */
 export const normalizeFile = async (file: File) => {
   if (!file.type) {
+    /** Added to take valid .dojima extension file */
     if (file?.name?.endsWith(".excalidrawlib")) {
       file = createFile(
         await blobToArrayBuffer(file),
@@ -442,6 +447,12 @@ export const normalizeFile = async (file: File) => {
       file = createFile(
         await blobToArrayBuffer(file),
         MIME_TYPES.excalidraw,
+        file.name,
+      );
+    } else if (file?.name?.endsWith(".dojima")) {
+      file = createFile(
+        await blobToArrayBuffer(file),
+        MIME_TYPES.dojima,
         file.name,
       );
     } else {

@@ -32,6 +32,8 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 
+/** Duplicate actions */
+
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
   trackEvent: { category: "element" },

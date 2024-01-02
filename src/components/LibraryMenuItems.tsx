@@ -16,8 +16,8 @@ import {
 import { arrayToMap } from "../utils";
 import Stack from "./Stack";
 import { MIME_TYPES } from "../constants";
-import Spinner from "./Spinner";
-import { duplicateElements } from "../element/newElement";
+// import Spinner from "./Spinner";
+// import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import {
@@ -28,6 +28,9 @@ import { useScrollPosition } from "../hooks/useScrollPosition";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
+import { useUserDetails } from "../context/user-appState";
+
+/** Library component with items displayed on click of Library button */
 
 // using an odd number of items per batch so the rendering creates an irregular
 // pattern which looks more organic
@@ -61,6 +64,7 @@ export default function LibraryMenuItems({
 }) {
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
+  const { userDetails } = useUserDetails();
 
   // This effect has to be called only on first render, therefore  `scrollPosition` isn't in the dependency array
   useEffect(() => {
@@ -80,12 +84,34 @@ export default function LibraryMenuItems({
     [libraryItems],
   );
 
+  const dojimaLibraryItems = useMemo(
+    () =>
+      libraryItems.filter(
+        (item) =>
+          item.id.startsWith("dojima") &&
+          item.status === "published" &&
+          item.id.includes(`${userDetails.type}`),
+      ),
+    [libraryItems, userDetails.type],
+  );
+
+  const ethereumLibraryItems = useMemo(
+    () =>
+      libraryItems.filter(
+        (item) =>
+          item.id.startsWith("ethereum") &&
+          item.status === "published" &&
+          item.id.includes(`${userDetails.type}`),
+      ),
+    [libraryItems, userDetails.type],
+  );
+
   const showBtn = !libraryItems.length && !pendingElements.length;
 
-  const isLibraryEmpty =
-    !pendingElements.length &&
-    !unpublishedItems.length &&
-    !publishedItems.length;
+  // const isLibraryEmpty =
+  //   !pendingElements.length &&
+  //   !unpublishedItems.length &&
+  //   !publishedItems.length;
 
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
@@ -157,7 +183,7 @@ export default function LibraryMenuItems({
           ...item,
           // duplicate each library item before inserting on canvas to confine
           // ids and bindings to each library item. See #6465
-          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+          // elements: duplicateElements(item.elements, { randomizeSeed: true }),
         };
       });
     },
@@ -174,6 +200,7 @@ export default function LibraryMenuItems({
     [getInsertedElements],
   );
 
+  /** Get selected item from library data */
   const isItemSelected = useCallback(
     (id: LibraryItem["id"] | null) => {
       if (!id) {
@@ -189,6 +216,7 @@ export default function LibraryMenuItems({
     onAddToLibrary(pendingElements);
   }, [pendingElements, onAddToLibrary]);
 
+  /** When user clicks a library item insert it to canvas */
   const onItemClick = useCallback(
     (id: LibraryItem["id"] | null) => {
       if (id) {
@@ -214,13 +242,13 @@ export default function LibraryMenuItems({
           : { borderBottom: 0 }
       }
     >
-      {!isLibraryEmpty && (
-        <LibraryDropdownMenu
-          selectedItems={selectedItems}
-          onSelectItems={onSelectItems}
-          className="library-menu-dropdown-container--in-heading"
-        />
-      )}
+      {/*{!isLibraryEmpty && (*/}
+      {/*  <LibraryDropdownMenu*/}
+      {/*    selectedItems={selectedItems}*/}
+      {/*    onSelectItems={onSelectItems}*/}
+      {/*    className="library-menu-dropdown-container--in-heading"*/}
+      {/*  />*/}
+      {/*)}*/}
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
@@ -231,74 +259,106 @@ export default function LibraryMenuItems({
         }}
         ref={libraryContainerRef}
       >
-        <>
-          {!isLibraryEmpty && (
-            <div className="library-menu-items-container__header">
-              {t("labels.personalLib")}
-            </div>
-          )}
-          {isLoading && (
-            <div
-              style={{
-                position: "absolute",
-                top: "var(--container-padding-y)",
-                right: "var(--container-padding-x)",
-                transform: "translateY(50%)",
-              }}
-            >
-              <Spinner />
-            </div>
-          )}
-          {!pendingElements.length && !unpublishedItems.length ? (
-            <div className="library-menu-items__no-items">
-              <div className="library-menu-items__no-items__label">
-                {t("library.noItems")}
-              </div>
-              <div className="library-menu-items__no-items__hint">
-                {publishedItems.length > 0
-                  ? t("library.hint_emptyPrivateLibrary")
-                  : t("library.hint_emptyLibrary")}
-              </div>
-            </div>
-          ) : (
-            <LibraryMenuSectionGrid>
-              {pendingElements.length > 0 && (
-                <LibraryMenuSection
-                  itemsRenderedPerBatch={itemsRenderedPerBatch}
-                  items={[{ id: null, elements: pendingElements }]}
-                  onItemSelectToggle={onItemSelectToggle}
-                  onItemDrag={onItemDrag}
-                  onClick={onAddToLibraryClick}
-                  isItemSelected={isItemSelected}
-                  svgCache={svgCache}
-                />
-              )}
-              <LibraryMenuSection
-                itemsRenderedPerBatch={itemsRenderedPerBatch}
-                items={unpublishedItems}
-                onItemSelectToggle={onItemSelectToggle}
-                onItemDrag={onItemDrag}
-                onClick={onItemClick}
-                isItemSelected={isItemSelected}
-                svgCache={svgCache}
-              />
-            </LibraryMenuSectionGrid>
-          )}
-        </>
+        {/** On click of an element display them in personal library section */}
+        {/*<>*/}
+        {/*  {!isLibraryEmpty && (*/}
+        {/*    <div className="library-menu-items-container__header">*/}
+        {/*      {t("labels.personalLib")}*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*  {isLoading && (*/}
+        {/*    <div*/}
+        {/*      style={{*/}
+        {/*        position: "absolute",*/}
+        {/*        top: "var(--container-padding-y)",*/}
+        {/*        right: "var(--container-padding-x)",*/}
+        {/*        transform: "translateY(50%)",*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      <Spinner />*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*  {!pendingElements.length && !unpublishedItems.length ? (*/}
+        {/*    <div className="library-menu-items__no-items">*/}
+        {/*      <div className="library-menu-items__no-items__label">*/}
+        {/*        {t("library.noItems")}*/}
+        {/*      </div>*/}
+        {/*      <div className="library-menu-items__no-items__hint">*/}
+        {/*        {publishedItems.length > 0*/}
+        {/*          ? t("library.hint_emptyPrivateLibrary")*/}
+        {/*          : t("library.hint_emptyLibrary")}*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  ) : (*/}
+        {/*    <LibraryMenuSectionGrid>*/}
+        {/*      {pendingElements.length > 0 && (*/}
+        {/*        <LibraryMenuSection*/}
+        {/*          itemsRenderedPerBatch={itemsRenderedPerBatch}*/}
+        {/*          items={[{ id: null, elements: pendingElements }]}*/}
+        {/*          onItemSelectToggle={onItemSelectToggle}*/}
+        {/*          onItemDrag={onItemDrag}*/}
+        {/*          onClick={onAddToLibraryClick}*/}
+        {/*          isItemSelected={isItemSelected}*/}
+        {/*          svgCache={svgCache}*/}
+        {/*        />*/}
+        {/*      )}*/}
+        {/*      <LibraryMenuSection*/}
+        {/*        itemsRenderedPerBatch={itemsRenderedPerBatch}*/}
+        {/*        items={unpublishedItems}*/}
+        {/*        onItemSelectToggle={onItemSelectToggle}*/}
+        {/*        onItemDrag={onItemDrag}*/}
+        {/*        onClick={onItemClick}*/}
+        {/*        isItemSelected={isItemSelected}*/}
+        {/*        svgCache={svgCache}*/}
+        {/*      />*/}
+        {/*    </LibraryMenuSectionGrid>*/}
+        {/*  )}*/}
+        {/*</>*/}
+
+        {/** Add default required templates during first render */}
+        {/*<>*/}
+        {/*  {!isLibraryEmpty && (*/}
+        {/*    <div className="library-menu-items-container__header">*/}
+        {/*      DOJIMA Library*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*  {isLoading && (*/}
+        {/*    <div*/}
+        {/*      style={{*/}
+        {/*        position: "absolute",*/}
+        {/*        top: "var(--container-padding-y)",*/}
+        {/*        right: "var(--container-padding-x)",*/}
+        {/*        transform: "translateY(50%)",*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      <Spinner />*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+
+        {/*  <LibraryMenuSectionGrid>*/}
+        {/*    <LibraryMenuSection*/}
+        {/*      itemsRenderedPerBatch={itemsRenderedPerBatch}*/}
+        {/*      items={unpublishedItems}*/}
+        {/*      onItemSelectToggle={onItemSelectToggle}*/}
+        {/*      onItemDrag={onItemDrag}*/}
+        {/*      onClick={onItemClick}*/}
+        {/*      isItemSelected={isItemSelected}*/}
+        {/*      svgCache={svgCache}*/}
+        {/*    />*/}
+        {/*  </LibraryMenuSectionGrid>*/}
+        {/*</>*/}
 
         <>
-          {(publishedItems.length > 0 ||
-            pendingElements.length > 0 ||
-            unpublishedItems.length > 0) && (
+          {dojimaLibraryItems.length > 0 && (
             <div className="library-menu-items-container__header library-menu-items-container__header--excal">
-              {t("labels.excalidrawLib")}
+              {`DOJ ${userDetails.type} Library`}
             </div>
           )}
-          {publishedItems.length > 0 ? (
+          {dojimaLibraryItems.length > 0 ? (
             <LibraryMenuSectionGrid>
               <LibraryMenuSection
                 itemsRenderedPerBatch={itemsRenderedPerBatch}
-                items={publishedItems}
+                items={dojimaLibraryItems}
                 onItemSelectToggle={onItemSelectToggle}
                 onItemDrag={onItemDrag}
                 onClick={onItemClick}
@@ -306,7 +366,7 @@ export default function LibraryMenuItems({
                 svgCache={svgCache}
               />
             </LibraryMenuSectionGrid>
-          ) : unpublishedItems.length > 0 ? (
+          ) : (
             <div
               style={{
                 margin: "1rem 0",
@@ -320,8 +380,117 @@ export default function LibraryMenuItems({
             >
               {t("library.noItems")}
             </div>
-          ) : null}
+          )}
         </>
+
+        <>
+          {ethereumLibraryItems.length > 0 && (
+            <div className="library-menu-items-container__header library-menu-items-container__header--excal">
+              {`ETH ${userDetails.type} Library`}
+            </div>
+          )}
+          {ethereumLibraryItems.length > 0 ? (
+            <LibraryMenuSectionGrid>
+              <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
+                items={ethereumLibraryItems}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={onItemClick}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            </LibraryMenuSectionGrid>
+          ) : (
+            <div
+              style={{
+                margin: "1rem 0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                fontSize: ".9rem",
+              }}
+            >
+              {t("library.noItems")}
+            </div>
+          )}
+        </>
+
+        {/*<>*/}
+        {/*  {(publishedItems.length > 0 ||*/}
+        {/*    pendingElements.length > 0 ||*/}
+        {/*    unpublishedItems.length > 0) && (*/}
+        {/*    <div className="library-menu-items-container__header library-menu-items-container__header--excal">*/}
+        {/*      ETHEREUM Library*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*  {publishedItems.length > 0 ? (*/}
+        {/*    <LibraryMenuSectionGrid>*/}
+        {/*      <LibraryMenuSection*/}
+        {/*        itemsRenderedPerBatch={itemsRenderedPerBatch}*/}
+        {/*        items={publishedItems}*/}
+        {/*        onItemSelectToggle={onItemSelectToggle}*/}
+        {/*        onItemDrag={onItemDrag}*/}
+        {/*        onClick={onItemClick}*/}
+        {/*        isItemSelected={isItemSelected}*/}
+        {/*        svgCache={svgCache}*/}
+        {/*      />*/}
+        {/*    </LibraryMenuSectionGrid>*/}
+        {/*  ) : unpublishedItems.length > 0 ? (*/}
+        {/*    <div*/}
+        {/*      style={{*/}
+        {/*        margin: "1rem 0",*/}
+        {/*        display: "flex",*/}
+        {/*        flexDirection: "column",*/}
+        {/*        alignItems: "center",*/}
+        {/*        justifyContent: "center",*/}
+        {/*        width: "100%",*/}
+        {/*        fontSize: ".9rem",*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      {t("library.noItems")}*/}
+        {/*    </div>*/}
+        {/*  ) : null}*/}
+        {/*</>*/}
+
+        {/*<>*/}
+        {/*  {(publishedItems.length > 0 ||*/}
+        {/*    pendingElements.length > 0 ||*/}
+        {/*    unpublishedItems.length > 0) && (*/}
+        {/*    <div className="library-menu-items-container__header library-menu-items-container__header--excal">*/}
+        {/*      {t("labels.excalidrawLib")}*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*  {publishedItems.length > 0 ? (*/}
+        {/*    <LibraryMenuSectionGrid>*/}
+        {/*      <LibraryMenuSection*/}
+        {/*        itemsRenderedPerBatch={itemsRenderedPerBatch}*/}
+        {/*        items={publishedItems}*/}
+        {/*        onItemSelectToggle={onItemSelectToggle}*/}
+        {/*        onItemDrag={onItemDrag}*/}
+        {/*        onClick={onItemClick}*/}
+        {/*        isItemSelected={isItemSelected}*/}
+        {/*        svgCache={svgCache}*/}
+        {/*      />*/}
+        {/*    </LibraryMenuSectionGrid>*/}
+        {/*  ) : unpublishedItems.length > 0 ? (*/}
+        {/*    <div*/}
+        {/*      style={{*/}
+        {/*        margin: "1rem 0",*/}
+        {/*        display: "flex",*/}
+        {/*        flexDirection: "column",*/}
+        {/*        alignItems: "center",*/}
+        {/*        justifyContent: "center",*/}
+        {/*        width: "100%",*/}
+        {/*        fontSize: ".9rem",*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      {t("library.noItems")}*/}
+        {/*    </div>*/}
+        {/*  ) : null}*/}
+        {/*</>*/}
 
         {showBtn && (
           <LibraryMenuControlButtons

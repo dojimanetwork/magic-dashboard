@@ -5,6 +5,8 @@ import { jotaiScope } from "../jotai";
 import { useExcalidrawActionManager } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
 
+/** action to Reset library items */
+
 export const activeConfirmDialogAtom = atom<"clearCanvas" | null>(null);
 
 export const ActiveConfirmDialog = () => {

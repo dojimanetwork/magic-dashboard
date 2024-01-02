@@ -31,6 +31,7 @@ const getSelectedItems = (
   selectedItems: LibraryItem["id"][],
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
 
+/** Library sidebar options(save, delete, import) dropdown */
 export const LibraryDropdownMenuButton: React.FC<{
   setAppState: React.Component<any, UIAppState>["setState"];
   selectedItems: LibraryItem["id"][];

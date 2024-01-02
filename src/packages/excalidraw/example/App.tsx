@@ -176,7 +176,9 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const loadSceneOrLibrary = async () => {
     const file = await fileOpen({ description: "Excalidraw or library file" });
     const contents = await loadSceneOrLibraryFromBlob(file, null, null);
-    if (contents.type === MIME_TYPES.excalidraw) {
+    /** Changed to take .dojima extension file instead of .excalidraw */
+    // if (contents.type === MIME_TYPES.excalidraw) {
+    if (contents.type === MIME_TYPES.dojima) {
       excalidrawAPI?.updateScene(contents.data as any);
     } else if (contents.type === MIME_TYPES.excalidrawlib) {
       excalidrawAPI?.updateLibrary({

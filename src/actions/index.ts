@@ -1,3 +1,4 @@
+/** Export all actions functions */
 export { actionDeleteSelected } from "./actionDeleteSelected";
 export {
   actionBringForward,
@@ -45,6 +46,7 @@ export {
   actionToggleCanvasMenu,
   actionToggleEditMenu,
   actionShortcuts,
+  actionDeploy,
 } from "./actionMenu";
 
 export { actionGroup, actionUngroup } from "./actionGroup";

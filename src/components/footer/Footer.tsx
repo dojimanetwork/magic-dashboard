@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { actionShortcuts } from "../../actions";
+// import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
 import {
   ExitZenModeAction,
@@ -8,12 +8,14 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
-import { useTunnels } from "../../context/tunnels";
-import { HelpButton } from "../HelpButton";
+// import { useTunnels } from "../../context/tunnels";
+// import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
 import { UIAppState } from "../../types";
-
+import { DeployButton } from "../DeployButton";
+import { actionDeploy } from "../../actions";
+/** Footer component with zoom in, out, deploy and help buttons */
 const Footer = ({
   appState,
   actionManager,
@@ -25,7 +27,7 @@ const Footer = ({
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
 }) => {
-  const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
+  // const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
 
   const device = useDevice();
   const showFinalize =
@@ -70,18 +72,23 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      <FooterCenterTunnel.Out />
+      {/*<FooterCenterTunnel.Out />*/}
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right": appState.zenModeEnabled,
         })}
       >
         <div style={{ position: "relative" }}>
-          {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
-          <HelpButton
-            onClick={() => actionManager.executeAction(actionShortcuts)}
+          <DeployButton
+            onClick={() => actionManager.executeAction(actionDeploy)}
           />
         </div>
+        {/*<div style={{ position: "relative" }}>*/}
+        {/*  {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}*/}
+        {/*  <HelpButton*/}
+        {/*    onClick={() => actionManager.executeAction(actionShortcuts)}*/}
+        {/*  />*/}
+        {/*</div>*/}
       </div>
       <ExitZenModeAction
         actionManager={actionManager}

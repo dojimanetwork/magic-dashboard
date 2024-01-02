@@ -7,7 +7,10 @@ import {
 import { clearElementsForLocalStorage } from "../../src/element";
 import { STORAGE_KEYS } from "../app_constants";
 import { ImportedDataState } from "../../src/data/types";
+import { AvailableChains, templateType } from "../dojima-templates/types";
+import { retrieveTemplates } from "../dojima-templates/retrieveTemplates";
 
+/** Local storage functions */
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
@@ -34,12 +37,24 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const importFromLocalStorage = () => {
+/**
+ * Get elements saved to local storage (Restore previous state)
+ * Modified to display templates passed during  */
+export const importFromLocalStorage = (
+  chains?: AvailableChains[],
+  templateType?: templateType,
+) => {
   let savedElements = null;
   let savedState = null;
 
   try {
-    savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+    /** Retrieve initial elements based on passed template and chains */
+    savedElements = retrieveTemplates(
+      chains ? chains : ["dojima"],
+      templateType ? templateType : "erc20",
+    );
+    /** Instead of taking from previous state */
+    // savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
   } catch (error: any) {
     // Unable to access localStorage
@@ -49,7 +64,9 @@ export const importFromLocalStorage = () => {
   let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
-      elements = clearElementsForLocalStorage(JSON.parse(savedElements));
+      /** Removing previously saved elements from storage */
+      // elements = clearElementsForLocalStorage(JSON.parse(savedElements));
+      elements = clearElementsForLocalStorage(savedElements);
     } catch (error: any) {
       console.error(error);
       // Do nothing because elements array is already empty

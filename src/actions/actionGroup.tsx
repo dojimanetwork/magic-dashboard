@@ -28,6 +28,8 @@ import {
   replaceAllElementsInFrame,
 } from "../frame";
 
+/** Group selected elements */
+
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
     const groupIds = elements[0].groupIds;

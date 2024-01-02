@@ -56,6 +56,9 @@ import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
+import { DeployDialog } from "./DeployDialog";
+
+/** Main UI with left, header, library and footer components */
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -224,7 +227,9 @@ const LayerUI = ({
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
           <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
+            {/** Left menubar with global canvas actions */}
             {renderCanvasActions()}
+            {/** Display left sidebar on click of an element */}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!appState.viewModeEnabled && (
@@ -276,7 +281,7 @@ const LayerUI = ({
                             title={t("toolBar.hand")}
                             isMobile
                           />
-
+                          {/** Element shapes to display on topbar */}
                           <ShapesSwitcher
                             appState={appState}
                             activeTool={appState.activeTool}
@@ -432,8 +437,17 @@ const LayerUI = ({
           }}
         />
       )}
+      {/** Display Help dialog when (appState.openDialog === "help") anywhere */}
       {appState.openDialog === "help" && (
         <HelpDialog
+          onClose={() => {
+            setAppState({ openDialog: null });
+          }}
+        />
+      )}
+      {/** Display Deploy dialog when (appState.openDialog === "deploy") anywhere */}
+      {appState.openDialog === "deploy" && (
+        <DeployDialog
           onClose={() => {
             setAppState({ openDialog: null });
           }}

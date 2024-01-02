@@ -40,8 +40,11 @@ import { trackEvent } from "../analytics";
 import { useAppProps, useExcalidrawAppState } from "../components/App";
 import { isEmbeddableElement } from "./typeChecks";
 import { ShapeCache } from "../scene/ShapeCache";
+import ContractDialog from "../dashboard-library/ContractDialog";
+import { ToolButtonText } from "../components/ToolButtonText";
 
-const CONTAINER_WIDTH = 320;
+/** onclick of hyperlink icon displayed Hyperlink component when an element is selected */
+const CONTAINER_WIDTH = 820;
 const SPACE_BOTTOM = 85;
 const CONTAINER_PADDING = 5;
 const CONTAINER_HEIGHT = 42;
@@ -235,25 +238,26 @@ export const Hyperlink = ({
       }}
     >
       {isEditing ? (
-        <input
-          className={clsx("excalidraw-hyperlinkContainer-input")}
-          placeholder="Type or paste your link here"
-          ref={inputRef}
-          value={inputVal}
-          onChange={(event) => setInputVal(event.target.value)}
-          autoFocus
-          onKeyDown={(event) => {
-            event.stopPropagation();
-            // prevent cmd/ctrl+k shortcut when editing link
-            if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
-              event.preventDefault();
-            }
-            if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
-              handleSubmit();
-              setAppState({ showHyperlinkPopup: "info" });
-            }
-          }}
-        />
+        // <input
+        //   className={clsx("excalidraw-hyperlinkContainer-input")}
+        //   placeholder="Type or paste your link here"
+        //   ref={inputRef}
+        //   value={inputVal}
+        //   onChange={(event) => setInputVal(event.target.value)}
+        //   autoFocus
+        //   onKeyDown={(event) => {
+        //     event.stopPropagation();
+        //     // prevent cmd/ctrl+k shortcut when editing link
+        //     if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
+        //       event.preventDefault();
+        //     }
+        //     if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
+        //       handleSubmit();
+        //       setAppState({ showHyperlinkPopup: "info" });
+        //     }
+        //   }}
+        // />
+        <ContractDialog element={element} setAppState={setAppState} />
       ) : element.link ? (
         <a
           href={normalizeLink(element.link || "")}
@@ -357,7 +361,19 @@ export const actionLink = register({
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
-      <ToolButton
+      // <ToolButton
+      //   type="button"
+      //   icon={LinkIcon}
+      //   aria-label={t(getContextMenuLabel(elements, appState))}
+      //   title={`${
+      //     isEmbeddableElement(elements[0])
+      //       ? t("labels.link.labelEmbed")
+      //       : t("labels.link.label")
+      //   } - ${getShortcutKey("CtrlOrCmd+K")}`}
+      //   onClick={() => updateData(null)}
+      //   selected={selectedElements.length === 1 && !!selectedElements[0].link}
+      // />
+      <ToolButtonText
         type="button"
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
@@ -368,7 +384,9 @@ export const actionLink = register({
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}
-      />
+      >
+        Contract
+      </ToolButtonText>
     );
   },
 });

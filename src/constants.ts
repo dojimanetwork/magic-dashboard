@@ -155,12 +155,13 @@ export const IMAGE_MIME_TYPES = {
 } as const;
 
 export const ALLOWED_PASTE_MIME_TYPES = ["text/plain", "text/html"] as const;
-
+/** Added new MIME_TYPES to take .dojima extension file */
 export const MIME_TYPES = {
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
+  dojima: "application/vnd.dojima+json",
   // image-encoded excalidraw data
   "excalidraw.svg": "image/svg+xml",
   "excalidraw.png": "image/png",
@@ -176,8 +177,10 @@ export const EXPORT_IMAGE_TYPES = {
   clipboard: "clipboard",
 } as const;
 
+/** Added new EXPORT_DATA_TYPES to take .dojima extension file */
 export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
+  dojima: "dojima",
   excalidrawClipboard: "excalidraw/clipboard",
   excalidrawLibrary: "excalidrawlib",
   excalidrawClipboardWithAPI: "excalidraw-api/clipboard",

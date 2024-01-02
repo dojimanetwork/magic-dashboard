@@ -3,30 +3,33 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
+// import { useDevice } from "../components/App";
 import {
-  canChangeRoundness,
-  canHaveArrowheads,
+  // canChangeRoundness,
+  // canHaveArrowheads,
   getTargetElements,
-  hasBackground,
-  hasStrokeStyle,
-  hasStrokeWidth,
+  // hasBackground,
+  // hasStrokeStyle,
+  // hasStrokeWidth,
 } from "../scene";
 import { SHAPES } from "../shapes";
 import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
-import { capitalizeString, isTransparent } from "../utils";
+import {
+  capitalizeString,
+  // isTransparent
+} from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { hasStrokeColor } from "../scene/comparisons";
+// import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
+// import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
-import {
-  shouldAllowVerticalAlign,
-  suppportsHorizontalAlign,
-} from "../element/textElement";
+// import {
+//   shouldAllowVerticalAlign,
+//   suppportsHorizontalAlign,
+// } from "../element/textElement";
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
@@ -34,10 +37,12 @@ import {
   EmbedIcon,
   extraToolsIcon,
   frameToolIcon,
-  mermaidLogoIcon,
+  // mermaidLogoIcon,
   laserPointerToolIcon,
 } from "./icons";
 import { KEYS } from "../keys";
+
+/** Onclick of an element display left sidebar based on selected element options */
 
 export const SelectedShapeActions = ({
   appState,
@@ -53,31 +58,31 @@ export const SelectedShapeActions = ({
     appState,
   );
 
-  let isSingleElementBoundContainer = false;
-  if (
-    targetElements.length === 2 &&
-    (hasBoundTextElement(targetElements[0]) ||
-      hasBoundTextElement(targetElements[1]))
-  ) {
-    isSingleElementBoundContainer = true;
-  }
+  // let isSingleElementBoundContainer = false;
+  // if (
+  //   targetElements.length === 2 &&
+  //   (hasBoundTextElement(targetElements[0]) ||
+  //     hasBoundTextElement(targetElements[1]))
+  // ) {
+  //   isSingleElementBoundContainer = true;
+  // }
   const isEditing = Boolean(appState.editingElement);
-  const device = useDevice();
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+  // const device = useDevice();
+  // const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
-  const showChangeBackgroundIcons =
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type));
+  // const showFillIcons =
+  //   (hasBackground(appState.activeTool.type) &&
+  //     !isTransparent(appState.currentItemBackgroundColor)) ||
+  //   targetElements.some(
+  //     (element) =>
+  //       hasBackground(element.type) && !isTransparent(element.backgroundColor),
+  //   );
+  // const showChangeBackgroundIcons =
+  //   hasBackground(appState.activeTool.type) ||
+  //   targetElements.some((element) => hasBackground(element.type));
 
-  const showLinkIcon =
-    targetElements.length === 1 || isSingleElementBoundContainer;
+  // const showLinkIcon =
+  //   targetElements.length === 1 || isSingleElementBoundContainer;
 
   let commonSelectedType: string | null = targetElements[0]?.type || null;
 
@@ -90,123 +95,125 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      <div>
-        {((hasStrokeColor(appState.activeTool.type) &&
-          appState.activeTool.type !== "image" &&
-          commonSelectedType !== "image" &&
-          commonSelectedType !== "frame") ||
-          targetElements.some((element) => hasStrokeColor(element.type))) &&
-          renderAction("changeStrokeColor")}
-      </div>
-      {showChangeBackgroundIcons && (
-        <div>{renderAction("changeBackgroundColor")}</div>
-      )}
-      {showFillIcons && renderAction("changeFillStyle")}
+      {/*<div>*/}
+      {/*  {((hasStrokeColor(appState.activeTool.type) &&*/}
+      {/*    appState.activeTool.type !== "image" &&*/}
+      {/*    commonSelectedType !== "image" &&*/}
+      {/*    commonSelectedType !== "frame") ||*/}
+      {/*    targetElements.some((element) => hasStrokeColor(element.type))) &&*/}
+      {/*    renderAction("changeStrokeColor")}*/}
+      {/*</div>*/}
+      {/*{showChangeBackgroundIcons && (*/}
+      {/*  <div>{renderAction("changeBackgroundColor")}</div>*/}
+      {/*)}*/}
+      {/*{showFillIcons && renderAction("changeFillStyle")}*/}
 
-      {(hasStrokeWidth(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeWidth(element.type))) &&
-        renderAction("changeStrokeWidth")}
+      {/*{(hasStrokeWidth(appState.activeTool.type) ||*/}
+      {/*  targetElements.some((element) => hasStrokeWidth(element.type))) &&*/}
+      {/*  renderAction("changeStrokeWidth")}*/}
 
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeStrokeShape")}
+      {/*{(appState.activeTool.type === "freedraw" ||*/}
+      {/*  targetElements.some((element) => element.type === "freedraw")) &&*/}
+      {/*  renderAction("changeStrokeShape")}*/}
 
-      {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
-        <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
-      )}
+      {/*{(hasStrokeStyle(appState.activeTool.type) ||*/}
+      {/*  targetElements.some((element) => hasStrokeStyle(element.type))) && (*/}
+      {/*  <>*/}
+      {/*    {renderAction("changeStrokeStyle")}*/}
+      {/*    {renderAction("changeSloppiness")}*/}
+      {/*  </>*/}
+      {/*)}*/}
 
-      {(canChangeRoundness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <>{renderAction("changeRoundness")}</>
-      )}
+      {/*{(canChangeRoundness(appState.activeTool.type) ||*/}
+      {/*  targetElements.some((element) => canChangeRoundness(element.type))) && (*/}
+      {/*  <>{renderAction("changeRoundness")}</>*/}
+      {/*)}*/}
 
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
-        <>
-          {renderAction("changeFontSize")}
+      {/*{(appState.activeTool.type === "text" ||*/}
+      {/*  targetElements.some(isTextElement)) && (*/}
+      {/*  <>*/}
+      {/*    {renderAction("changeFontSize")}*/}
 
-          {renderAction("changeFontFamily")}
+      {/*    {renderAction("changeFontFamily")}*/}
 
-          {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements)) &&
-            renderAction("changeTextAlign")}
-        </>
-      )}
+      {/*    {(appState.activeTool.type === "text" ||*/}
+      {/*      suppportsHorizontalAlign(targetElements)) &&*/}
+      {/*      renderAction("changeTextAlign")}*/}
+      {/*  </>*/}
+      {/*)}*/}
 
-      {shouldAllowVerticalAlign(targetElements) &&
-        renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type))) && (
-        <>{renderAction("changeArrowhead")}</>
-      )}
+      {/*{shouldAllowVerticalAlign(targetElements) &&*/}
+      {/*  renderAction("changeVerticalAlign")}*/}
+      {/*{(canHaveArrowheads(appState.activeTool.type) ||*/}
+      {/*  targetElements.some((element) => canHaveArrowheads(element.type))) && (*/}
+      {/*  <>{renderAction("changeArrowhead")}</>*/}
+      {/*)}*/}
 
-      {renderAction("changeOpacity")}
+      {/*{renderAction("changeOpacity")}*/}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringToFront")}
-          {renderAction("bringForward")}
-        </div>
-      </fieldset>
+      {/*<fieldset>*/}
+      {/*  <legend>{t("labels.layers")}</legend>*/}
+      {/*  <div className="buttonList">*/}
+      {/*    {renderAction("sendToBack")}*/}
+      {/*    {renderAction("sendBackward")}*/}
+      {/*    {renderAction("bringToFront")}*/}
+      {/*    {renderAction("bringForward")}*/}
+      {/*  </div>*/}
+      {/*</fieldset>*/}
 
-      {targetElements.length > 1 && !isSingleElementBoundContainer && (
-        <fieldset>
-          <legend>{t("labels.align")}</legend>
-          <div className="buttonList">
-            {
-              // swap this order for RTL so the button positions always match their action
-              // (i.e. the leftmost button aligns left)
-            }
-            {isRTL ? (
-              <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
-              </>
-            ) : (
-              <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
-              </>
-            )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
-            {/* breaks the row ˇˇ */}
-            <div style={{ flexBasis: "100%", height: 0 }} />
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: ".5rem",
-                marginTop: "-0.5rem",
-              }}
-            >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
-              {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
-            </div>
-          </div>
-        </fieldset>
-      )}
+      {/*{targetElements.length > 1 && !isSingleElementBoundContainer && (*/}
+      {/*  <fieldset>*/}
+      {/*    <legend>{t("labels.align")}</legend>*/}
+      {/*    <div className="buttonList">*/}
+      {/*      {*/}
+      {/*        // swap this order for RTL so the button positions always match their action*/}
+      {/*        // (i.e. the leftmost button aligns left)*/}
+      {/*      }*/}
+      {/*      {isRTL ? (*/}
+      {/*        <>*/}
+      {/*          {renderAction("alignRight")}*/}
+      {/*          {renderAction("alignHorizontallyCentered")}*/}
+      {/*          {renderAction("alignLeft")}*/}
+      {/*        </>*/}
+      {/*      ) : (*/}
+      {/*        <>*/}
+      {/*          {renderAction("alignLeft")}*/}
+      {/*          {renderAction("alignHorizontallyCentered")}*/}
+      {/*          {renderAction("alignRight")}*/}
+      {/*        </>*/}
+      {/*      )}*/}
+      {/*      {targetElements.length > 2 &&*/}
+      {/*        renderAction("distributeHorizontally")}*/}
+      {/*      /!* breaks the row ˇˇ *!/*/}
+      {/*      <div style={{ flexBasis: "100%", height: 0 }} />*/}
+      {/*      <div*/}
+      {/*        style={{*/}
+      {/*          display: "flex",*/}
+      {/*          flexWrap: "wrap",*/}
+      {/*          gap: ".5rem",*/}
+      {/*          marginTop: "-0.5rem",*/}
+      {/*        }}*/}
+      {/*      >*/}
+      {/*        {renderAction("alignTop")}*/}
+      {/*        {renderAction("alignVerticallyCentered")}*/}
+      {/*        {renderAction("alignBottom")}*/}
+      {/*        {targetElements.length > 2 &&*/}
+      {/*          renderAction("distributeVertically")}*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*  </fieldset>*/}
+      {/*)}*/}
       {!isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
-            {renderAction("group")}
-            {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
+            {/** On click of an element show leftbar actions */}
+            {/*{!device.editor.isMobile && renderAction("duplicateSelection")}*/}
+            {/*{!device.editor.isMobile && renderAction("deleteSelectedElements")}*/}
+            {/*{renderAction("group")}*/}
+            {/*{renderAction("ungroup")}*/}
+            {/*{showLinkIcon && renderAction("hyperlink")}*/}
+            {renderAction("hyperlink")}
           </div>
         </fieldset>
       )}
@@ -230,7 +237,7 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
-
+  /** Element Shapes types */
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -331,13 +338,14 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog("mermaid")}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
+          {/** Mermaid to Excalidraw option in Top navbar section */}
+          {/*<DropdownMenu.Item*/}
+          {/*  onSelect={() => app.setOpenDialog("mermaid")}*/}
+          {/*  icon={mermaidLogoIcon}*/}
+          {/*  data-testid="toolbar-embeddable"*/}
+          {/*>*/}
+          {/*  {t("toolBar.mermaidToExcalidraw")}*/}
+          {/*</DropdownMenu.Item>*/}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>

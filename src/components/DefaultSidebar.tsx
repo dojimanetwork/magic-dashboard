@@ -11,6 +11,8 @@ import { LibraryMenu } from "./LibraryMenu";
 import { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 import { Sidebar } from "./Sidebar/Sidebar";
 
+/** Onclick of Library button display sidebar with library items from right */
+
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
   (

@@ -126,5 +126,52 @@
       font-family: inherit;
       line-height: 1;
     }
+
+    &__details-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 4px 0;
+      border-bottom: 1px solid #ccc; /* Horizontal line */
+    }
+
+    &__details-key {
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    &__details-value {
+      flex-grow: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Add the styles for the global button */
+    .global-button-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .global-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50; /* Green background color */
+      color: #fff; /* White text color */
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .global-button:disabled {
+      background-color: #ccc; /* Gray background color when disabled */
+      cursor: not-allowed;
+    }
+
+    .global-button:hover:not([disabled]) {
+      background-color: #45a049; /* Darker green color on hover */
+    }
   }
 }

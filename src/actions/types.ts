@@ -19,6 +19,7 @@ export type ActionResult =
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
       files?: BinaryFiles | null;
+      deployed?: boolean;
       commitToHistory: boolean;
       syncHistory?: boolean;
       replaceFiles?: boolean;
@@ -90,6 +91,7 @@ export type ActionName =
   | "changeVerticalAlign"
   | "toggleFullScreen"
   | "toggleShortcuts"
+  | "toggleDeploy"
   | "group"
   | "ungroup"
   | "goToCollaborator"

@@ -51,6 +51,8 @@ export const actionToggleEditMenu = register({
   ),
 });
 
+/** action to Display HelpDialog when clicked on help-button */
+
 export const actionShortcuts = register({
   name: "toggleShortcuts",
   viewMode: true,
@@ -63,6 +65,26 @@ export const actionShortcuts = register({
       appState: {
         ...appState,
         openDialog: appState.openDialog === "help" ? null : "help",
+      },
+      commitToHistory: false,
+    };
+  },
+  keyTest: (event) => event.key === KEYS.QUESTION_MARK,
+});
+
+/** action to Display DeployDialog when clicked on deploy-button */
+export const actionDeploy = register({
+  name: "toggleDeploy",
+  viewMode: true,
+  trackEvent: { category: "menu", action: "toggleDeployDialog" },
+  perform: (_elements, appState, _, { focusContainer }) => {
+    if (appState.openDialog === "deploy") {
+      focusContainer();
+    }
+    return {
+      appState: {
+        ...appState,
+        openDialog: appState.openDialog === "deploy" ? null : "deploy",
       },
       commitToHistory: false,
     };

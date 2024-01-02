@@ -228,6 +228,8 @@ const changeFontSize = (
 
 // -----------------------------------------------------------------------------
 
+/** Actions carried out when left sidebar displayed on click of an element */
+
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   trackEvent: false,

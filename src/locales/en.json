@@ -341,6 +341,9 @@
     "movePageUpDown": "Move page up/down",
     "movePageLeftRight": "Move page left/right"
   },
+  "deployDialog": {
+    "title": "Deploy"
+  },
   "clearCanvasDialog": {
     "title": "Clear canvas"
   },
