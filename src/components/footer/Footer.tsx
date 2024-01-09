@@ -15,6 +15,7 @@ import Stack from "../Stack";
 import { UIAppState } from "../../types";
 import { DeployButton } from "../DeployButton";
 import { actionDeploy } from "../../actions";
+import {useContractDetails} from "../../context/contract-appState";
 /** Footer component with zoom in, out, deploy and help buttons */
 const Footer = ({
   appState,
@@ -32,6 +33,7 @@ const Footer = ({
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
+  const { contractsData } = useContractDetails();
 
   return (
     <footer
@@ -80,6 +82,7 @@ const Footer = ({
       >
         <div style={{ position: "relative" }}>
           <DeployButton
+            enable={contractsData.contracts.length > 0}
             onClick={() => actionManager.executeAction(actionDeploy)}
           />
         </div>
