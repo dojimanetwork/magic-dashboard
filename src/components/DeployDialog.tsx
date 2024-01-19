@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import { t } from "../i18n";
 import { Dialog } from "./Dialog";
 import "./HelpDialog.scss";
@@ -25,6 +25,12 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const { contractsData } = useContractDetails();
   const { userDetails } = useUserDetails();
   const [isDetailsComplete, setIsDetailsComplete] = useState(false);
+
+  useEffect(() => {
+    if (contractsData.contracts.length === 1) {
+      setIsDetailsComplete(true);
+    }
+  }, []);
 
   const renderDetailsForChain = (chain: AvailableChains) => {
     const contract = contractsData.contracts.find((c) => c.chain === chain);
@@ -105,9 +111,9 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                 // Display a message or handle the case when details are not complete\
               }
             }}
-            disabled={!isDetailsComplete} // Disable the button if details are not complete
+            // disabled={!isDetailsComplete} // Disable the button if details are not complete
           >
-            Global Button
+            Deploy
           </button>
         </div>
       </Dialog>

@@ -1,29 +1,20 @@
 /** Templates retrieval code based on chains and templateType */
 import { ExcalidrawElement } from "../../src/element/types";
 import { AvailableChains, templateType } from "./types";
-import * as DojimaTemplates from "../dojima-templates/dojima";
-import * as EthereumTemplates from "../dojima-templates/ethereum";
-import * as SolanaTemplates from "../dojima-templates/solana";
+import * as DojimaTemplates from "./dojima";
+import * as EthereumTemplates from "./ethereum";
+// import * as SolanaTemplates from "./solana";
+import * as BscTemplates from "./bsc";
 
 type TemplatesMap = {
   erc20: {
     ethereum: ExcalidrawElement[];
-    solana: ExcalidrawElement[];
+    bsc: ExcalidrawElement[];
     default: ExcalidrawElement[];
   };
   nft: {
     ethereum: ExcalidrawElement[];
-    solana: ExcalidrawElement[];
-    default: ExcalidrawElement[];
-  };
-  dex: {
-    ethereum: ExcalidrawElement[];
-    solana: ExcalidrawElement[];
-    default: ExcalidrawElement[];
-  };
-  defi: {
-    ethereum: ExcalidrawElement[];
-    solana: ExcalidrawElement[];
+    bsc: ExcalidrawElement[];
     default: ExcalidrawElement[];
   };
 };
@@ -34,24 +25,14 @@ function getChainTemplate(
 ): ExcalidrawElement[] {
   const templatesMap: TemplatesMap = {
     erc20: {
-      ethereum: EthereumTemplates.erc20,
-      solana: SolanaTemplates.erc20,
-      default: DojimaTemplates.erc20,
+      ethereum: EthereumTemplates.erc20Template,
+      bsc: BscTemplates.bep20Template,
+      default: DojimaTemplates.erc20Template,
     },
     nft: {
-      ethereum: EthereumTemplates.nft,
-      solana: SolanaTemplates.nft,
-      default: DojimaTemplates.nft,
-    },
-    dex: {
-      ethereum: EthereumTemplates.dex,
-      solana: SolanaTemplates.dex,
-      default: DojimaTemplates.dex,
-    },
-    defi: {
-      ethereum: EthereumTemplates.defi,
-      solana: SolanaTemplates.defi,
-      default: DojimaTemplates.defi,
+      ethereum: EthereumTemplates.nftTemplate,
+      bsc: BscTemplates.nftTemplate,
+      default: DojimaTemplates.nftTemplate,
     },
   };
 

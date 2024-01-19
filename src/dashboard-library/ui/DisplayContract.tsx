@@ -1,13 +1,13 @@
 import { useUserDetails } from "../../context/user-appState";
 import { AvailableChains } from "../../../excalidraw-app/dojima-templates/types";
 import * as EVMContractsUI from "./evm";
-import SolanaContract from "./solana/solana";
+// import SolanaContract from "./solana/solana";
 
 const componentMapping = {
   erc20: EVMContractsUI.Erc20,
   nft: EVMContractsUI.Erc721,
-  dex: EVMContractsUI.Dex,
-  defi: EVMContractsUI.Defi,
+  // dex: EVMContractsUI.Dex,
+  // defi: EVMContractsUI.Defi,
 };
 
 export function DisplayContract({
@@ -23,16 +23,18 @@ export function DisplayContract({
 
   return (
     <>
-      {(selectedChain === "ethereum" || selectedChain === "dojima") &&
+      {(selectedChain === "ethereum" ||
+        selectedChain === "dojima" ||
+        selectedChain === "bsc") &&
         Component && (
           <Component displayCode={displayCode} selectedChain={selectedChain} />
         )}
-      {selectedChain === "solana" && (
+      {/* {selectedChain === "solana" && (
         <SolanaContract
           displayCode={displayCode}
           selectedChain={selectedChain}
         />
-      )}
+      )} */}
     </>
   );
 }

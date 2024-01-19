@@ -174,7 +174,7 @@ export default function Dex({
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-        code: contract,
+        // code: contract,
         arguments:
           deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
       };
@@ -186,7 +186,7 @@ export default function Dex({
       const updatedContract: ContractData = {
         name,
         symbol: symbol !== "" ? symbol : "",
-        code: contract,
+        // code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
         gasPrice: "",
@@ -287,7 +287,7 @@ export default function Dex({
       </div>
       <div className="py-6 border-b">
         <div className="flex flex-col gap-y-5">
-          <Text Type="16-Md"> Access control</Text>
+          {/* <Text Type="16-Md"> Access control</Text> */}
 
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
             <RadioInput
@@ -316,7 +316,7 @@ export default function Dex({
       </div>
       <div className="py-6 border-b">
         <div className="flex flex-col gap-y-5">
-          <Text Type="16-Md">Upgradeability</Text>
+          {/* <Text Type="16-Md">Upgradeability</Text> */}
 
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
             <RadioInput
@@ -341,8 +341,8 @@ export default function Dex({
       </div>
       <div className="py-6 border-b">
         <div className="flex flex-col gap-y-5">
-          <Text Type="16-Md"> INFO</Text>
-          <TextInput
+          {/* <Text Type="16-Md"> INFO</Text> */}
+          {/* <TextInput
             id="securityContract"
             label="Security Contract"
             labelClassName="text-subtext"
@@ -350,7 +350,7 @@ export default function Dex({
             value={securityContract}
             setValue={setSecurityContract}
             placeholder="security@example.com"
-          />
+          /> */}
           <TextInput
             id="license"
             label="License"

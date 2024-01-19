@@ -6,7 +6,7 @@ import {
   useExcalidrawContainer,
   useDevice,
   useExcalidrawSetAppState,
-} from "../components/App";
+} from "./App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, CloseIcon } from "./icons";

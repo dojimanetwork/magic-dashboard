@@ -169,7 +169,7 @@ export default function Erc721({
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-        code: contract,
+        // code: contract,
         arguments:
           deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
       };
@@ -181,7 +181,7 @@ export default function Erc721({
       const updatedContract: ContractData = {
         name,
         symbol: symbol !== "" ? symbol : "",
-        code: contract,
+        // code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
         gasPrice: "",
@@ -288,7 +288,7 @@ export default function Erc721({
       </div>
       <div className="py-6 border-b">
         <div className="flex flex-col gap-y-5">
-          <Text Type="16-Md"> Access control</Text>
+          {/* <Text Type="16-Md"> Access control</Text> */}
 
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
             <RadioInput
@@ -317,7 +317,7 @@ export default function Erc721({
       </div>
       <div className="py-6 border-b">
         <div className="flex flex-col gap-y-5">
-          <Text Type="16-Md">Upgradeability</Text>
+          {/* <Text Type="16-Md">Upgradeability</Text> */}
 
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
             <RadioInput
@@ -342,9 +342,9 @@ export default function Erc721({
       </div>
       <div className="py-6 border-b">
         <div className="flex flex-col gap-y-5">
-          <Text Type="16-Md"> INFO</Text>
+          {/* <Text Type="16-Md"> INFO</Text> */}
 
-          <TextInput
+          {/* <TextInput
             id="securityContract"
             label="Security Contract"
             labelClassName="text-subtext"
@@ -352,7 +352,7 @@ export default function Erc721({
             value={securityContract}
             setValue={setSecurityContract}
             placeholder="security@example.com"
-          />
+          /> */}
           <TextInput
             id="license"
             label="License"

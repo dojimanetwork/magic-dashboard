@@ -1,22 +1,22 @@
 import {
   // defi,
   // dex,
-  erc20Template,
+  bep20Template,
   nftTemplate,
-} from "../../../../excalidraw-app/dojima-templates/dojima";
+} from "../../../../excalidraw-app/dojima-templates/bsc";
 import { LibraryItem } from "../../../types";
 
-const dojErc20LibTemplate: LibraryItem = {
+const bscErc20LibTemplate: LibraryItem = {
   status: "published",
-  elements: erc20Template,
-  id: "dojima-erc20-library-template",
+  elements: bep20Template,
+  id: "bsc-erc20-library-template",
   created: 1704008568756,
 };
 
-const dojNftLibTemplate: LibraryItem = {
+const bscNftLibTemplate: LibraryItem = {
   status: "published",
   elements: nftTemplate,
-  id: "dojima-nft-library-template",
+  id: "bsc-nft-library-template",
   created: 1704008568756,
 };
 
@@ -34,9 +34,9 @@ const dojNftLibTemplate: LibraryItem = {
 //   created: 1704008568756,
 // };
 
-export const defaultDojLibraryTemplates = [
-  dojErc20LibTemplate,
+export const defaultBscLibraryTemplates = [
+  bscErc20LibTemplate,
   // dojDexLibTemplate,
   // dojDefiLibTemplate,
-  dojNftLibTemplate,
+  bscNftLibTemplate,
 ];

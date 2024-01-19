@@ -385,7 +385,7 @@ export const actionLink = register({
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}
       >
-        Contract
+        {/* Contract */}
       </ToolButtonText>
     );
   },
