@@ -13,6 +13,7 @@ import {
 import { Text } from "../common/Typography";
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../context/user-appState";
+import { ERC721Options } from "@openzeppelin/wizard/dist/erc721";
 // import DeployModal from "../deploy/page";
 // import VerifyContract from "../verifycontract/page";
 
@@ -83,7 +84,7 @@ export default function Erc721({
         license,
       },
     };
-    const finalContract = erc721.print(erc721Options);
+    const finalContract = erc721.print(erc721Options as ERC721Options);
     setContract(finalContract);
     displayCode(finalContract);
   }, []);
@@ -108,7 +109,7 @@ export default function Erc721({
         license,
       },
     };
-    const finalContract = erc721.print(erc721Options);
+    const finalContract = erc721.print(erc721Options as ERC721Options);
     setContract(finalContract);
     displayCode(finalContract);
   }, [

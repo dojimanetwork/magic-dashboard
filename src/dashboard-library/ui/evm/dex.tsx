@@ -17,6 +17,7 @@ import {
 } from "../../../context/contract-appState";
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../context/user-appState";
+import { ERC20Options } from "@openzeppelin/wizard/dist/erc20";
 
 export default function Dex({
   displayCode,
@@ -84,7 +85,7 @@ export default function Dex({
         license,
       },
     };
-    const finalContract = erc20.print(erc20Options);
+    const finalContract = erc20.print(erc20Options as ERC20Options);
     setContract(finalContract);
     displayCode(finalContract);
   }, []);
@@ -109,7 +110,7 @@ export default function Dex({
         license,
       },
     };
-    const finalContract = erc20.print(erc20Options);
+    const finalContract = erc20.print(erc20Options as ERC20Options);
     setContract(finalContract);
     displayCode(finalContract);
   }, [

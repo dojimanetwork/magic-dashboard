@@ -161,7 +161,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * Unitless line height (aligned to W3C). To get line height in px, multiply
      *  with font size (using `getLineHeightInPx` helper).
      */
-    lineHeight: number & { _brand: "unitlessLineHeight" };
+    lineHeight: number;
   }>;
 
 export type ExcalidrawBindableElement =
