@@ -41,9 +41,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     return (
       <>
         {Object.entries(contract).map(([key, value]) => (
-          <div key={key} className="HelpDialog__details-row">
-            <span className="HelpDialog__details-key">{key}:</span>
-            <span className="HelpDialog__details-value">{value}</span>
+          <div
+            key={key}
+            className="flex flex-col gap-2 text-black cursor-not-allowed"
+          >
+            <div className="text-sm font-semibold capitalize">{key}:</div>
+            <div className="text-base font-medium border rounded-lg p-3 border-[#dddddd] h-12">
+              {value}
+            </div>
           </div>
         ))}
       </>
@@ -55,14 +60,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       <Dialog
         onCloseRequest={handleClose}
         title="Deploy"
-        className={"HelpDialog"}
+        className={"HelpDialog max-w-[760px] mx-auto"}
       >
         <div className="HelpDialog__header">
           {userDetails.chains.map((item, i) => {
             const index = i + 1;
             return (
               <button
-                className="HelpDialog__btn"
+                className="p-3 flex items-center gap-x-3 border border-[#6B45CD] bg-[rgba(107,_69,_205,_0.14)] rounded-lg text-black capitalize"
                 onClick={() => {
                   setTab(index);
                   setIsDetailsComplete(!isDetailsComplete);
@@ -70,8 +75,10 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                 key={i}
               >
                 {/*{t("helpDialog.documentation")}*/}
+                <div className="w-6 h-6 grid place-items-center bg-[#CEC2FF] rounded-full p-1">
+                  {usersIcon}
+                </div>
                 {item}
-                <div className="HelpDialog__link-icon">{usersIcon}</div>
               </button>
             );
           })}
@@ -100,9 +107,15 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           {tab === 1 && renderDetailsForChain(userDetails.chains[tab - 1])}
           {tab === 2 && renderDetailsForChain(userDetails.chains[tab - 1])}
         </Section>
-        <div className="global-button-container">
+        <div className="flex mt-10 justify-between items-center">
+          <button className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl">
+            Cancel
+          </button>
+          <button className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white">
+            Next
+          </button>
           <button
-            className="global-button"
+            className="global-button hidden"
             onClick={() => {
               // Handle the click event for the global button
               if (isDetailsComplete) {
