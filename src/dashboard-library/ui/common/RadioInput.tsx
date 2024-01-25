@@ -26,7 +26,7 @@ const RadioInput = ({
   labelClassName,
 }: RadioInputProps) => {
   return (
-    <div className={`radio-container ${className || ""}`}>
+    <div className={`flex gap-3 flex-col justify-start ${className || ""}`}>
       <label className={labelClassName} htmlFor={id}>
         {label}
       </label>
@@ -34,7 +34,7 @@ const RadioInput = ({
       <div className="flex items-center gap-x-2">
         {valueOptions.map((option, index) => {
           return (
-            <div key={index} className="flex">
+            <div key={index} className="flex items-center gap-2">
               <input
                 className="radio"
                 type="radio"

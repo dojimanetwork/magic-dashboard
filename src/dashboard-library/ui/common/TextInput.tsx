@@ -44,7 +44,7 @@ const TextInput = ({
   placeholder,
 }: TextInputProps) => {
   return (
-    <div className="text-input-container">
+    <div className="flex flex-col gap-4">
       <label
         className={`text-input-label ${labelClassName || ""}`}
         htmlFor={id}
@@ -53,7 +53,7 @@ const TextInput = ({
       </label>
 
       <input
-        className={`text-input ${className || ""}`}
+        className={`p-3 border border-[#757575] rounded-lg ${className || ""}`}
         id={id}
         type={type}
         value={value}

@@ -209,8 +209,8 @@ export default function Erc20({
 
   return (
     <div className="contract-form-container">
-      <div className="contract-heading">Contract Form</div>
-      <div className="py-6 border-b">
+      {/* <div className="">Contract Form</div> */}
+      <div className="border-b">
         <div className="flex flex-col gap-y-5">
           <TextInput
             id="name"
@@ -248,6 +248,7 @@ export default function Erc20({
             value={mintable}
             setValue={setMintable}
             labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
           <CheckboxInput
             id="burnable"
@@ -255,6 +256,7 @@ export default function Erc20({
             value={burnable}
             setValue={setBurnable}
             labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
           <CheckboxInput
             id="pausable"
@@ -262,6 +264,7 @@ export default function Erc20({
             value={pausable}
             setValue={setPausable}
             labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
           <CheckboxInput
             id="permit"
@@ -269,6 +272,7 @@ export default function Erc20({
             value={permit}
             setValue={setPermit}
             labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
           <CheckboxInput
             id="votes"
@@ -276,6 +280,7 @@ export default function Erc20({
             value={votes}
             setValue={setVotes}
             labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
           <CheckboxInput
             id="flashmint"
@@ -283,6 +288,7 @@ export default function Erc20({
             value={flashmint}
             setValue={setFlashmint}
             labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
         </div>
       </div>
@@ -296,6 +302,7 @@ export default function Erc20({
               label="Access Control"
               value={access}
               setValue={setAccess}
+              className="accent-[#6B45CD]"
               valueOptions={[
                 {
                   value: "ownable",
@@ -365,7 +372,7 @@ export default function Erc20({
       <div className="flex justify-between mt-[140px] ">
         <Button
           onClick={saveDetails}
-          className="min-w-[113px]"
+          className="w-full"
           color={deployed && !verified ? "secondary" : "primary"}
         >
           Save

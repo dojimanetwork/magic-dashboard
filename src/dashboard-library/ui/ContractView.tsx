@@ -44,28 +44,41 @@ function ContractView({
   // };
 
   return (
-    <section className="contract-view">
-      <div className="contract-view-left">
-        <div className="py-6">
-          <DisplayContract
-            displayCode={displayContractCode}
-            selectedChain={selectedElementChain}
-          />
+    <section className="">
+      <div className="flex items-center text-center border-b text-[] text-xl/6 font-semibold uppercase">
+        <div className="w-1/3 cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
+          Erc20
+        </div>
+        <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
+          ERC721
+        </div>
+        <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
+          ERC1155
         </div>
       </div>
+      <div className="flex h-[600px] overflow-auto w-[810px]">
+        <div className="h-full overflow-auto w-1/3 shrink-0">
+          <div>
+            <DisplayContract
+              displayCode={displayContractCode}
+              selectedChain={selectedElementChain}
+            />
+          </div>
+        </div>
 
-      <div className="contract-view-content">
-        <SyntaxHighlighter
-          language="solidity"
-          style={monokai}
-          wrapLongLines={true}
-          customStyle={{
-            backgroundColor: "transparent",
-            color: "white",
-          }}
-        >
-          {formatSolidityCode(contractCode)}
-        </SyntaxHighlighter>
+        <div className="contract-view-content h-full w-full">
+          <SyntaxHighlighter
+            language="solidity"
+            style={monokai}
+            wrapLongLines={true}
+            customStyle={{
+              backgroundColor: "transparent",
+              color: "white",
+            }}
+          >
+            {formatSolidityCode(contractCode)}
+          </SyntaxHighlighter>
+        </div>
       </div>
     </section>
   );

@@ -1,235 +1,228 @@
 /* common.css */
 .button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 12px 24px;
-    border-radius: 12px;
-    min-width: 207px;
-    flex-shrink: 0;
-    justify-content: center;
-    transition: background-color 0.3s, color 0.3s, border 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  min-width: 207px;
+  flex-shrink: 0;
+  justify-content: center;
+  transition: background-color 0.3s, color 0.3s, border 0.3s, box-shadow 0.3s;
 }
 
-.button-primary {
-    background: linear-gradient(270deg, #A71CFF -35.09%, #8000FF 65.62%);
-    color: white;
-    box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.15);
+.button.button-primary {
+  background: linear-gradient(270deg, #a71cff -35.09%, #8000ff 65.62%);
+  color: white;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.15);
 }
 
-.button-primary:hover {
-    background: linear-gradient(270deg, #662EED -35.09%, #662EED 65.62%);
+.button.button-primary:hover {
+  background: linear-gradient(270deg, #662eed -35.09%, #662eed 65.62%);
 }
 
-.button-secondary {
-    border: 1px solid #444;
-    color: #444;
+.button.button-secondary {
+  border: 1px solid #444;
+  color: #444;
 }
 
-.button-secondary:hover {
-    color: black;
-    border-color: black;
+.button.button-secondary:hover {
+  color: black;
+  border-color: black;
 }
 
-.button-disabled {
-    background: #f2f4f7;
-    border: none;
-    box-shadow: none;
-    color: #ccc;
-    cursor: not-allowed;
+.button.button-disabled {
+  background: #f2f4f7;
+  border: none;
+  box-shadow: none;
+  color: #ccc;
+  cursor: not-allowed;
 }
-
-
 
 .checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .checkbox {
-    width: 16px;
-    height: 16px;
-    focus: ring-purple;
-    focus: ring-offset-2;
-    focus: ring-purple;
-    focus: ring-2;
-    outline: none;
-    accent: purple;
+  width: 16px;
+  height: 16px;
+  focus: ring-purple;
+  focus: ring-offset-2;
+  focus: ring-purple;
+  focus: ring-2;
+  outline: none;
+  accent: purple;
 }
 
 .checkbox-label {
-    margin-left: 4px;
-    font-size: 14px;
-    color: #444; /* Replace with your desired color */
+  margin-left: 4px;
+  font-size: 14px;
+  color: #444; /* Replace with your desired color */
 }
-
 
 /* styles.css */
 .radio-container {
-    display: flex;
-    align-items: center;
-    gap: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .radio {
-    width: 16px;
-    height: 16px;
-    focus: ring-purple;
-    focus: ring-offset-2;
-    focus: ring-purple;
-    focus: ring-2;
-    outline: none;
-    accent: purple;
+  width: 16px;
+  height: 16px;
+  focus: ring-purple;
+  focus: ring-offset-2;
+  focus: ring-purple;
+  focus: ring-2;
+  outline: none;
+  accent: purple;
 }
 
 .radio-label {
-    margin-left: 4px;
-    font-size: 14px;
-    color: #444; /* Replace with your desired color */
+  margin-left: 4px;
+  font-size: 14px;
+  color: #444; /* Replace with your desired color */
 }
 
-
-
 .text-input-container {
-    font-size: 16px;
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
 }
 
 .text-input-label {
-    font-size: 14px;
-    font-weight: bold;
-    color: black;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
 }
 
 .text-input {
-    background: transparent;
-    width: 100%;
-    outline: none;
-    padding: 12px;
-    border: 1px solid #757575;
-    border-radius: 12px;
-    color: black;
-    transition: all 0.2s;
+  background: transparent;
+  width: 100%;
+  outline: none;
+  padding: 12px;
+  border: 1px solid #757575;
+  border-radius: 12px;
+  color: black;
+  transition: all 0.2s;
 }
 
 .text-input:hover,
 .text-input:focus {
-    border-color: purple;
+  border-color: purple;
 }
 
 .text-input:focus {
-    background-color: rgba(107, 69, 205, 0.14);
-    color: black;
+  background-color: rgba(107, 69, 205, 0.14);
+  color: black;
 }
 
 .text-input::placeholder {
-    color: #757575;
+  color: #757575;
 }
 
 .text-input:disabled {
-    cursor: not-allowed;
+  cursor: not-allowed;
 }
 
-
-
 .heading {
-    color: #000606;
+  color: #000606;
 }
 
 .heading-h1 {
-    font-size: 40px;
-    font-weight: bold;
+  font-size: 40px;
+  font-weight: bold;
 }
 
 .heading-h2 {
-    font-size: 32px;
-    font-weight: bold;
+  font-size: 32px;
+  font-weight: bold;
 }
 
 .heading-h3 {
-    font-size: 24px;
-    font-weight: bold;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .heading-h4 {
-    font-size: 20px;
-    font-weight: 600; /* font-semibold */
+  font-size: 20px;
+  font-weight: 600; /* font-semibold */
 }
 
 .heading-h5 {
-    font-size: 18px;
-    font-weight: 600; /* font-semibold */
+  font-size: 18px;
+  font-weight: 600; /* font-semibold */
 }
 
 .heading-h6 {
-    font-size: 16px;
-    font-weight: 600; /* font-semibold */
+  font-size: 16px;
+  font-weight: 600; /* font-semibold */
 }
 
 .text {
-    color: #000606;
+  color: #000606;
 }
 
 .text-20-md {
-    font-size: 20px;
-    font-weight: 500; /* font-medium */
+  font-size: 20px;
+  font-weight: 500; /* font-medium */
 }
 
 .text-20-rg {
-    font-size: 20px;
-    font-weight: normal; /* font-normal */
+  font-size: 20px;
+  font-weight: normal; /* font-normal */
 }
 
 .text-18-md {
-    font-size: 18px;
-    font-weight: 500; /* font-medium */
+  font-size: 18px;
+  font-weight: 500; /* font-medium */
 }
 
 .text-18-rg {
-    font-size: 18px;
-    font-weight: normal; /* font-normal */
+  font-size: 18px;
+  font-weight: normal; /* font-normal */
 }
 
 .text-16-md {
-    font-size: 16px;
-    font-weight: 500; /* font-medium */
+  font-size: 16px;
+  font-weight: 500; /* font-medium */
 }
 
 .text-16-rg {
-    font-size: 16px;
-    font-weight: normal; /* font-normal */
+  font-size: 16px;
+  font-weight: normal; /* font-normal */
 }
 
 .text-14-sm {
-    font-size: 14px;
-    font-weight: 600; /* font-semibold */
+  font-size: 14px;
+  font-weight: 600; /* font-semibold */
 }
 
 .text-14-md {
-    font-size: 14px;
-    font-weight: 500; /* font-medium */
+  font-size: 14px;
+  font-weight: 500; /* font-medium */
 }
 
 .text-14-rg {
-    font-size: 14px;
-    font-weight: normal; /* font-normal */
+  font-size: 14px;
+  font-weight: normal; /* font-normal */
 }
 
 .text-12-sm {
-    font-size: 12px;
-    font-weight: 600; /* font-semibold */
+  font-size: 12px;
+  font-weight: 600; /* font-semibold */
 }
 
 .text-12-md {
-    font-size: 12px;
-    font-weight: 500; /* font-medium */
+  font-size: 12px;
+  font-weight: 500; /* font-medium */
 }
 
 .text-12-rg {
-    font-size: 12px;
-    font-weight: normal; /* font-normal */
+  font-size: 12px;
+  font-weight: normal; /* font-normal */
 }
