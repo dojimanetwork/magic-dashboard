@@ -4,7 +4,7 @@ import {
   templateType,
 } from "../../excalidraw-app/dojima-templates/types";
 
-export interface ContractData {
+export interface ContractDetailsData {
   name: string;
   chain: AvailableChains;
   type: templateType;
@@ -14,13 +14,18 @@ export interface ContractData {
   arguments?: Array<any>;
 }
 
+export interface ContractArguments {
+  argument1: string;
+  argument2: string
+}
+
 export interface InitialContractDetails {
-  contracts: Array<ContractData>;
+  contracts: Array<ContractDetailsData>;
 }
 
 export interface ContractDetailsContextProps {
   contractsData: InitialContractDetails;
-  updateContractDetails: (updatedContract: ContractData) => void;
+  updateContractDetails: (updatedContract: ContractDetailsData) => void;
 }
 
 export const ContractDetailsContext =

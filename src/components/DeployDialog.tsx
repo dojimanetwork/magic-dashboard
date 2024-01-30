@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 // import { t } from "../i18n";
 import { Dialog } from "./Dialog";
 import "./HelpDialog.scss";
-import { usersIcon } from "./icons";
+import { PlusIcon, usersIcon } from "./icons";
 import { useContractDetails } from "../context/contract-appState";
 import { AvailableChains } from "../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../context/user-appState";
+import AddIconImg from "../static/add_icon.svg";
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
   <>
-    <h3>{props.title}</h3>
+    <h3 >{props.title}</h3>
     <div className="HelpDialog__islands-container">{props.children}</div>
   </>
 );
@@ -55,6 +56,54 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     );
   };
 
+  const renderArgumentsForChain = (chain: AvailableChains) => {
+    return (
+      <>
+        <div className="flex flex-row gap-x-6 text-black cursor-not-allowed">
+          <div className="text-base w-1/2 font-medium border rounded-lg p-3 border-[#dddddd] h-12"></div>
+          <div className="text-base  w-1/2 font-medium border rounded-lg p-3 border-[#dddddd] h-12"></div>
+        </div>
+      </>
+    );
+  };
+
+  const renderCodeForChain = (chain: AvailableChains) => {
+    const contract = contractsData.contracts.find((c) => c.chain === chain);
+    if (!contract) {
+      return null;
+    }
+
+    return (
+      <>
+        <div className=" text-black cursor-not-allowed">
+          <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto h-12">
+            fakdjf;jakdjhf;ajsd;kfjajdhsifhasdhlfghieaknvliuhijvb,kjhdvuyabfjklvhlh
+            iufnvluhqleuibvnzljkxdhlvuiahbvdkjbvluiawnvkjand
+            fakdjf;jakdjhf;ajsd;kfjajdhsifhasdhlfghieaknvliuhijvb,kjhdvuyabfjklvhlh
+            iufnvluhqleuibvnzljkxdhlvuiahbvdkjbvluiawnvkjand
+            fakdjf;jakdjhf;ajsd;kfjajdhsifhasdhlfghieaknvliuhijvb,kjhdvuyabfjklvhlh
+            iufnvluhqleuibvnzljkxdhlvuiahbvdkjbvluiawnvkjand
+            fakdjf;jakdjhf;ajsd;kfjajdhsifhasdhlfghieaknvliuhijvb,kjhdvuyabfjklvhlh
+            iufnvluhqleuibvnzljkxdhlvuiahbvdkjbvluiawnvkjand
+            fakdjf;jakdjhf;ajsd;kfjajdhsifhasdhlfghieaknvliuhijvb,kjhdvuyabfjklvhlh
+            iufnvluhqleuibvnzljkxdhlvuiahbvdkjbvluiawnvkjand
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const AvailableChains = [
+    {
+      icon: usersIcon,
+      name: "Dojima",
+    },
+    {
+      icon: usersIcon,
+      name: "Ethereum",
+    },
+  ];
+
   return (
     <>
       <Dialog
@@ -63,7 +112,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
         className={"HelpDialog max-w-[760px] mx-auto"}
       >
         <div className="HelpDialog__header">
-          {userDetails.chains.map((item, i) => {
+          {AvailableChains.map((item, i) => {
             const index = i + 1;
             return (
               <button
@@ -76,37 +125,58 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
               >
                 {/*{t("helpDialog.documentation")}*/}
                 <div className="w-6 h-6 grid place-items-center bg-[#CEC2FF] rounded-full p-1">
-                  {usersIcon}
+                  {item.icon}
                 </div>
-                {item}
+                {item.name}
               </button>
             );
           })}
         </div>
-        <Section title={"Details"}>
-          {/*{*/}
-          {/*  tab === 1 &&*/}
-          {/*    <button*/}
-          {/*        className="HelpDialog__btn"*/}
-          {/*    >*/}
-          {/*      /!*{t("helpDialog.blog")}*!/*/}
-          {/*        {chains[tab - 1]}*/}
-          {/*      <div className="HelpDialog__link-icon">{usersIcon}</div>*/}
-          {/*    </button>*/}
-          {/*}*/}
-          {/*{*/}
-          {/*    tab === 2 &&*/}
-          {/*    <button*/}
-          {/*        className="HelpDialog__btn"*/}
-          {/*    >*/}
-          {/*      /!*{t("helpDialog.blog")}*!/*/}
-          {/*      {chains[tab - 1]}*/}
-          {/*      <div className="HelpDialog__link-icon">{DiamondIcon}</div>*/}
-          {/*    </button>*/}
-          {/*}*/}
-          {tab === 1 && renderDetailsForChain(userDetails.chains[tab - 1])}
-          {tab === 2 && renderDetailsForChain(userDetails.chains[tab - 1])}
-        </Section>
+        <div className="border-[1px] border-dashed mt-6"></div>
+        <div className="h-[500px] pb-4 pr-2 overflow-auto ">
+          <Section title={"Details"}>
+            {/*{*/}
+            {/*  tab === 1 &&*/}
+            {/*    <button*/}
+            {/*        className="HelpDialog__btn"*/}
+            {/*    >*/}
+            {/*      /!*{t("helpDialog.blog")}*!/*/}
+            {/*        {chains[tab - 1]}*/}
+            {/*      <div className="HelpDialog__link-icon">{usersIcon}</div>*/}
+            {/*    </button>*/}
+            {/*}*/}
+            {/*{*/}
+            {/*    tab === 2 &&*/}
+            {/*    <button*/}
+            {/*        className="HelpDialog__btn"*/}
+            {/*    >*/}
+            {/*      /!*{t("helpDialog.blog")}*!/*/}
+            {/*      {chains[tab - 1]}*/}
+            {/*      <div className="HelpDialog__link-icon">{DiamondIcon}</div>*/}
+            {/*    </button>*/}
+            {/*}*/}
+            {tab === 1 && renderDetailsForChain(userDetails.chains[tab - 1])}
+            {tab === 2 && renderDetailsForChain(userDetails.chains[tab - 1])}
+          </Section>
+          <div className="border-[1px] border-dashed mt-6"></div>
+          <div>
+            <div className="flex w-full items-center">
+              <h3 className="w-1/2">Arguments</h3>
+              <div className="justify-end w-1/2 flex">
+                <img src={AddIconImg} />
+              </div>
+            </div>
+
+            {tab === 1 && renderArgumentsForChain(userDetails.chains[tab - 1])}
+            {tab === 2 && renderArgumentsForChain(userDetails.chains[tab - 1])}
+          </div>
+          <div className="border-[1px] border-dashed mt-6"></div>
+          <div className="mt-6">
+            <p className="text-base text-[#757575] font-semibold ">Code</p>
+            {tab === 1 && renderCodeForChain(userDetails.chains[tab - 1])}
+            {tab === 2 && renderCodeForChain(userDetails.chains[tab - 1])}
+          </div>
+        </div>
         <div className="flex mt-10 justify-between items-center">
           <button className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl">
             Cancel
