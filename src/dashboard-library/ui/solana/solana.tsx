@@ -44,7 +44,7 @@ export default function SolanaContract({
         name: "",
         symbol: "",
         arguments: [],
-        // code: "",
+        code: "",
         chain: selectedChain,
         gasPrice: "",
         type: userDetails.type,

@@ -80,7 +80,7 @@ export default function Erc721({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContact: securityContract,
+        securityContract: securityContract,
         license,
       },
     };
@@ -105,7 +105,7 @@ export default function Erc721({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContact: securityContract,
+        securityContract: securityContract,
         license,
       },
     };
@@ -150,7 +150,7 @@ export default function Erc721({
   //       ? false
   //       : upgradeable) as upgradeable,
   //     info: {
-  //       securityContact: securityContract,
+  //       securityContract: securityContract,
   //       license,
   //     },
   //   };
@@ -170,7 +170,7 @@ export default function Erc721({
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-        // code: contract,
+        code: contract,
         arguments:
           deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
       };
@@ -182,7 +182,7 @@ export default function Erc721({
       const updatedContract: ContractData = {
         name,
         symbol: symbol !== "" ? symbol : "",
-        // code: contract,
+        code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
         gasPrice: "",

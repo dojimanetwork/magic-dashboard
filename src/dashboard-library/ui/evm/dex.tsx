@@ -81,7 +81,7 @@ export default function Dex({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContact: securityContract,
+        securityContract: securityContract,
         license,
       },
     };
@@ -106,7 +106,7 @@ export default function Dex({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContact: securityContract,
+        securityContract: securityContract,
         license,
       },
     };
@@ -154,7 +154,7 @@ export default function Dex({
   //     access: access as access,
   //     upgradeable: upgradeable as upgradeable,
   //     info: {
-  //       securityContact: securityContract,
+  //       securityContract: securityContract,
   //       license,
   //     },
   //   };
@@ -175,7 +175,7 @@ export default function Dex({
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-        // code: contract,
+        code: contract,
         arguments:
           deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
       };
@@ -187,7 +187,7 @@ export default function Dex({
       const updatedContract: ContractData = {
         name,
         symbol: symbol !== "" ? symbol : "",
-        // code: contract,
+        code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
         gasPrice: "",

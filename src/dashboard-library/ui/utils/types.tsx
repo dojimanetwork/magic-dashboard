@@ -1,7 +1,7 @@
 export type access = "false" | "ownable" | "roles" | "managed";
 export type upgradeable = "false" | "transparent" | "uups";
 export type Info = {
-  securityContact?: string;
+  securityContract?: string;
   license?: string;
 };
 export interface ERC20ContractParams {
