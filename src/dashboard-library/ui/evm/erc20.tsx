@@ -18,6 +18,7 @@ import {
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../context/user-appState";
 import { ERC20Options } from "@openzeppelin/wizard/dist/erc20";
+import { TemplateSaveContractDetailsData, useTemplateContractDetails } from "../../../context/template-contract-appState";
 
 export default function Erc20({
   displayCode,
@@ -26,18 +27,24 @@ export default function Erc20({
   displayCode: (code: string) => void;
   selectedChain: AvailableChains;
 }) {
-  const [name, setName] = useState("Token");
-  const [symbol, setSymbol] = useState("TKN");
-  const [burnable, setBurnable] = useState(false);
-  const [pausable, setPausable] = useState(false);
-  const [premint, setPremint] = useState("");
-  const [mintable, setMintable] = useState(false);
-  const [permit, setPermit] = useState(false);
-  const [votes, setVotes] = useState(false);
-  const [flashmint, setFlashmint] = useState(false);
-  const [access, setAccess] = useState("");
-  const [upgradeable, setUpgradeable] = useState("false");
-  const [securityContract, setSecurityContract] = useState("");
+  const { contractsData, updateContractDetails } = useContractDetails();
+  const { templateContractDetails, updateTemplateContractDetail } = useTemplateContractDetails();
+  const { userDetails } = useUserDetails();
+
+  const selectedContractDetails = templateContractDetails.contracts.find((data) => data.chain === selectedChain);
+  
+  const [name, setName] = useState(selectedContractDetails?.name === "" ? "Token" : selectedContractDetails?.name as string);
+  const [symbol, setSymbol] = useState(selectedContractDetails?.symbol === "" ? "Tkn" : selectedContractDetails?.symbol as string);
+  const [burnable, setBurnable] = useState(selectedContractDetails?.burnable === false ? false : selectedContractDetails?.burnable as boolean);
+  const [pausable, setPausable] = useState(selectedContractDetails?.pausable === false ? false : selectedContractDetails?.pausable as boolean);
+  const [premint, setPremint] = useState(selectedContractDetails?.premint === "" ? "" : selectedContractDetails?.premint as string);
+  const [mintable, setMintable] = useState(selectedContractDetails?.mintable === false ? false : selectedContractDetails?.mintable as boolean);
+  const [permit, setPermit] = useState(selectedContractDetails?.permit === false ? false : selectedContractDetails?.permit as boolean);
+  const [votes, setVotes] = useState(selectedContractDetails?.votes === false ? false : selectedContractDetails?.votes as boolean);
+  const [flashmint, setFlashmint] = useState(selectedContractDetails?.flashmint === false ? false : selectedContractDetails?.flashmint as boolean);
+  const [access, setAccess] = useState(selectedContractDetails?.access === "" ? "" : selectedContractDetails?.access as string);
+  const [upgradeable, setUpgradeable] = useState(selectedContractDetails?.upgradeable === "" ? "false" : selectedContractDetails?.upgradeable as string);
+  const [securityContract, setSecurityContract] = useState(selectedContractDetails?.info?.securityContract === "" ? "" : selectedContractDetails?.info?.securityContract as string);
   const [license, setLicense] = useState(getLicences()[2].value);
   const [contract, setContract] = useState("");
 
@@ -47,9 +54,6 @@ export default function Erc20({
   const [verified, setVerified] = useState(false);
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
-
-  const { contractsData, updateContractDetails } = useContractDetails();
-  const { userDetails } = useUserDetails();
 
   // const isDeployed = (deploy: boolean) => {
   //   setDeployed(deploy);
@@ -81,7 +85,7 @@ export default function Erc20({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContact: securityContract,
+        securityContract,
         license,
       },
     };
@@ -106,7 +110,7 @@ export default function Erc20({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContact: securityContract,
+        securityContract,
         license,
       },
     };
@@ -154,7 +158,7 @@ export default function Erc20({
   //     access: access as access,
   //     upgradeable: upgradeable as upgradeable,
   //     info: {
-  //       securityContact: securityContract,
+  //       securityContract: securityContract,
   //       license,
   //     },
   //   };
@@ -175,7 +179,7 @@ export default function Erc20({
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-        // code: contract,
+        code: contract,
         arguments:
           deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
       };
@@ -187,7 +191,7 @@ export default function Erc20({
       const updatedContract: ContractData = {
         name,
         symbol: symbol !== "" ? symbol : "",
-        // code: contract,
+        code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
         gasPrice: "",
@@ -196,6 +200,36 @@ export default function Erc20({
 
       // Update the contract details using the context
       updateContractDetails(updatedContract);
+    }
+
+    // Find the templateContract with the selected chain
+    const selectedTemplateContract = templateContractDetails.contracts.find(
+      (contract) => contract.chain === selectedChain,
+    );
+
+    if(selectedTemplateContract) {
+      // Create an updated contract with only the changed fields
+      const updatedTemplateContract: TemplateSaveContractDetailsData = {
+        ...selectedTemplateContract,
+        name,
+        symbol,
+        premint,
+        mintable,
+        burnable,
+        pausable,
+        permit,
+        votes,
+        flashmint,
+        access,
+        upgradeable,
+        info: {
+          securityContract,
+          license,
+        },
+      };
+
+      // Update the contract details using the context
+      updateTemplateContractDetail(selectedChain, updatedTemplateContract);
     }
   }
 

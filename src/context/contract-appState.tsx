@@ -9,7 +9,7 @@ export interface ContractDetailsData {
   chain: AvailableChains;
   type: templateType;
   gasPrice: string;
-  // code: string;
+  code: string;
   symbol?: string;
   arguments?: Array<any>;
 }
