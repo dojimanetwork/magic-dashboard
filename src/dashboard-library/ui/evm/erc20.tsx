@@ -242,149 +242,150 @@ export default function Erc20({
   // }
 
   return (
-    <div className="contract-form-container">
-      {/* <div className="">Contract Form</div> */}
-      <div className="border-b">
-        <div className="flex flex-col gap-y-5">
-          <TextInput
-            id="name"
-            label="Contract Name*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={name}
-            setValue={setName}
-          />
-          <TextInput
-            id="symbol"
-            label="Contract Symbol*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={symbol}
-            setValue={setSymbol}
-          />
-          <TextInput
-            id="premint"
-            label="Premint"
-            labelClassName="text-subtext"
-            type={TextInputTypes.NUMBER}
-            value={premint}
-            setValue={setPremint}
-            minNum={0}
-          />
+    <div>
+      <div className=" h-[515px] overflow-auto contract-form-container">
+        {/* <div className="">Contract Form</div> */}
+        <div className="border-b ">
+          <div className="flex flex-col gap-y-5">
+            <TextInput
+              id="name"
+              label="Contract Name*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={name}
+              setValue={setName}
+            />
+            <TextInput
+              id="symbol"
+              label="Contract Symbol*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={symbol}
+              setValue={setSymbol}
+            />
+            <TextInput
+              id="premint"
+              label="Premint"
+              labelClassName="text-subtext"
+              type={TextInputTypes.NUMBER}
+              value={premint}
+              setValue={setPremint}
+              minNum={0}
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-y-5 py-6 border-b">
-        <Text Type="16-Md"> Features</Text>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-          <CheckboxInput
-            id="mintable"
-            label="Mintable"
-            value={mintable}
-            setValue={setMintable}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-          <CheckboxInput
-            id="burnable"
-            label="Burnable"
-            value={burnable}
-            setValue={setBurnable}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-          <CheckboxInput
-            id="pausable"
-            label="Pausable"
-            value={pausable}
-            setValue={setPausable}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-          <CheckboxInput
-            id="permit"
-            label="Permit"
-            value={permit}
-            setValue={setPermit}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-          <CheckboxInput
-            id="votes"
-            label="Votes"
-            value={votes}
-            setValue={setVotes}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-          <CheckboxInput
-            id="flashmint"
-            label="Flash Minting"
-            value={flashmint}
-            setValue={setFlashmint}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-        </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md"> Access control</Text> */}
-
+        <div className="flex flex-col gap-y-5 py-6 border-b">
+          <Text Type="16-Md"> Features</Text>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-            <RadioInput
-              id="accesss"
-              label="Access Control"
-              value={access}
-              setValue={setAccess}
+            <CheckboxInput
+              id="mintable"
+              label="Mintable"
+              value={mintable}
+              setValue={setMintable}
+              labelClassName="text-subtext"
               className="accent-[#6B45CD]"
-              valueOptions={[
-                {
-                  value: "ownable",
-                  label: "Ownable",
-                },
-                {
-                  value: "roles",
-                  label: "Roles",
-                },
-                {
-                  value: "managed",
-                  label: "Managed",
-                },
-              ]}
+            />
+            <CheckboxInput
+              id="burnable"
+              label="Burnable"
+              value={burnable}
+              setValue={setBurnable}
               labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="pausable"
+              label="Pausable"
+              value={pausable}
+              setValue={setPausable}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="permit"
+              label="Permit"
+              value={permit}
+              setValue={setPermit}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="votes"
+              label="Votes"
+              value={votes}
+              setValue={setVotes}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="flashmint"
+              label="Flash Minting"
+              value={flashmint}
+              setValue={setFlashmint}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
             />
           </div>
         </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md">Upgradeability</Text> */}
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md"> Access control</Text> */}
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-            <RadioInput
-              id="upgradeable"
-              label="Upgradeability"
-              value={upgradeable}
-              setValue={setUpgradeable}
-              valueOptions={[
-                {
-                  value: "transparent",
-                  label: "Transparent",
-                },
-                {
-                  value: "uups",
-                  label: "UUPS",
-                },
-              ]}
-              labelClassName="text-subtext"
-            />
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+              <RadioInput
+                id="accesss"
+                label="Access Control"
+                value={access}
+                setValue={setAccess}
+                className="accent-[#6B45CD]"
+                valueOptions={[
+                  {
+                    value: "ownable",
+                    label: "Ownable",
+                  },
+                  {
+                    value: "roles",
+                    label: "Roles",
+                  },
+                  {
+                    value: "managed",
+                    label: "Managed",
+                  },
+                ]}
+                labelClassName="text-subtext"
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md"> INFO</Text> */}
-          {/* <TextInput
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md">Upgradeability</Text> */}
+
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+              <RadioInput
+                id="upgradeable"
+                label="Upgradeability"
+                value={upgradeable}
+                setValue={setUpgradeable}
+                valueOptions={[
+                  {
+                    value: "transparent",
+                    label: "Transparent",
+                  },
+                  {
+                    value: "uups",
+                    label: "UUPS",
+                  },
+                ]}
+                labelClassName="text-subtext"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md"> INFO</Text> */}
+            {/* <TextInput
             id="securityContract"
             label="Security Contract"
             labelClassName="text-subtext"
@@ -393,20 +394,21 @@ export default function Erc20({
             setValue={setSecurityContract}
             placeholder="security@example.com"
           /> */}
-          <TextInput
-            id="license"
-            label="License"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={license}
-            setValue={setLicense}
-          />
+            <TextInput
+              id="license"
+              label="License"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={license}
+              setValue={setLicense}
+            />
+          </div>
         </div>
       </div>
-      <div className="flex justify-between mt-[140px] ">
+      <div className="flex justify-center mt-6 ">
         <Button
           onClick={saveDetails}
-          className="w-full"
+          className="w-3/4"
           color={deployed && !verified ? "secondary" : "primary"}
         >
           Save
