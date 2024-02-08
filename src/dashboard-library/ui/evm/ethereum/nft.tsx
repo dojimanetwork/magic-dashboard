@@ -7,7 +7,10 @@ import {
 } from "../../../../context/contract-appState";
 import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../../context/user-appState";
-import { TemplateSaveContractDetailsData, useTemplateContractDetails } from "../../../../context/template-contract-appState";
+import {
+  TemplateSaveContractDetailsData,
+  useTemplateContractDetails,
+} from "../../../../context/template-contract-appState";
 import { EthereumCrossChainNftTemplate } from "../../../template-contracts/contracts/ethereum/nft/EthereumCrossChainNft";
 
 export default function EthereumNftTemplateView({
@@ -18,13 +21,24 @@ export default function EthereumNftTemplateView({
   selectedChain: AvailableChains;
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
-  const { templateContractDetails, updateTemplateContractDetail } = useTemplateContractDetails();
+  const { templateContractDetails, updateTemplateContractDetail } =
+    useTemplateContractDetails();
   const { userDetails } = useUserDetails();
 
-  const selectedContractDetails = templateContractDetails.contracts.find((data) => data.chain === selectedChain);
-  
-  const [name, setName] = useState(selectedContractDetails?.name === "" ? "Token" : selectedContractDetails?.name as string);
-  const [symbol, setSymbol] = useState(selectedContractDetails?.symbol === "" ? "Tkn" : selectedContractDetails?.symbol as string);
+  const selectedContractDetails = templateContractDetails.contracts.find(
+    (data) => data.chain === selectedChain,
+  );
+
+  const [name, setName] = useState(
+    selectedContractDetails?.name === ""
+      ? "Token"
+      : (selectedContractDetails?.name as string),
+  );
+  const [symbol, setSymbol] = useState(
+    selectedContractDetails?.symbol === ""
+      ? "Tkn"
+      : (selectedContractDetails?.symbol as string),
+  );
   const [contract, setContract] = useState("");
 
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
@@ -40,11 +54,7 @@ export default function EthereumNftTemplateView({
     const finalContract = EthereumCrossChainNftTemplate;
     setContract(finalContract);
     displayCode(finalContract);
-  }, [
-    displayCode,
-    name,
-    symbol,
-  ]);
+  }, [displayCode, name, symbol]);
 
   function saveDetails() {
     // Find the contract with the selected chain
@@ -86,7 +96,7 @@ export default function EthereumNftTemplateView({
       (contract) => contract.chain === selectedChain,
     );
 
-    if(selectedTemplateContract) {
+    if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
       const updatedTemplateContract: TemplateSaveContractDetailsData = {
         ...selectedTemplateContract,
@@ -123,11 +133,7 @@ export default function EthereumNftTemplateView({
         </div>
       </div>
       <div className="flex justify-between mt-[140px] ">
-        <Button
-          onClick={saveDetails}
-          className="w-full"
-          color={"secondary"}
-        >
+        <Button onClick={saveDetails} className="w-full" color={"secondary"}>
           Save
         </Button>
       </div>

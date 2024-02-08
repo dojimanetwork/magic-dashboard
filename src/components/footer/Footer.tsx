@@ -15,7 +15,7 @@ import Stack from "../Stack";
 import { UIAppState } from "../../types";
 import { DeployButton } from "../DeployButton";
 import { actionDeploy } from "../../actions";
-import {useContractDetails} from "../../context/contract-appState";
+import { useContractDetails } from "../../context/contract-appState";
 /** Footer component with zoom in, out, deploy and help buttons */
 const Footer = ({
   appState,

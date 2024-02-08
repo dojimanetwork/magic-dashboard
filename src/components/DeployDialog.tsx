@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 // import { t } from "../i18n";
 import { Dialog } from "./Dialog";
 import "./HelpDialog.scss";
-import { PlusIcon, usersIcon } from "./icons";
+import { usersIcon } from "./icons";
 import { useContractDetails } from "../context/contract-appState";
 import { AvailableChains } from "../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../context/user-appState";
@@ -12,7 +12,7 @@ import AddIconImg from "../static/add_icon.svg";
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
   <>
-    <h3 >{props.title}</h3>
+    <h3>{props.title}</h3>
     <div className="HelpDialog__islands-container">{props.children}</div>
   </>
 );
@@ -93,8 +93,6 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       contractName: contractsData.contracts[0].name,
       args: [],
     };
-
-    console.log("Data : ", data);
 
     // Make Axios POST request with DeployEVMContractParams in the request body
     axios
@@ -234,7 +232,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
             <div className="flex w-full items-center">
               <h3 className="w-1/2">Arguments</h3>
               <div className="justify-end w-1/2 flex">
-                <img src={AddIconImg} />
+                <img src={AddIconImg} alt="" />
               </div>
             </div>
 
@@ -253,9 +251,9 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
             Cancel
           </button>
           <button
-           className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white"
-           onClick={handleDeploy}
-           >
+            className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white"
+            onClick={handleDeploy}
+          >
             Next
           </button>
           <button

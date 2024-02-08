@@ -212,9 +212,9 @@ export default function LibraryMenuItems({
     [selectedItems],
   );
 
-  const onAddToLibraryClick = useCallback(() => {
-    onAddToLibrary(pendingElements);
-  }, [pendingElements, onAddToLibrary]);
+  // const onAddToLibraryClick = useCallback(() => {
+  //   onAddToLibrary(pendingElements);
+  // }, [pendingElements, onAddToLibrary]);
 
   /** When user clicks a library item insert it to canvas */
   const onItemClick = useCallback(

@@ -80,7 +80,7 @@ export default function Erc721({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContract: securityContract,
+        securityContract,
         license,
       },
     };
@@ -105,7 +105,7 @@ export default function Erc721({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContract: securityContract,
+        securityContract,
         license,
       },
     };

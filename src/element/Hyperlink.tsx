@@ -21,9 +21,8 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
+  // useState,
 } from "react";
-import clsx from "clsx";
 import { KEYS } from "../keys";
 import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
@@ -80,7 +79,7 @@ export const Hyperlink = ({
 
   const linkVal = element.link || "";
 
-  const [inputVal, setInputVal] = useState(linkVal);
+  // const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
   const isEditing = appState.showHyperlinkPopup === "editor";
 

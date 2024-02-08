@@ -10,7 +10,7 @@ const apiInstance = axios.create({
 });
 
 async function handleRequest<T>(
-  request: () => Promise<AxiosResponse<T>>
+  request: () => Promise<AxiosResponse<T>>,
 ): Promise<T> {
   try {
     const response = await request();
@@ -33,7 +33,7 @@ function handleRequestError(error: AxiosError): never {
 export async function postEVMContractData(
   email: string,
   chain: ContractsChain,
-  deployedDetails: EVMContractDeployedObject
+  deployedDetails: EVMContractDeployedObject,
 ): Promise<boolean> {
   const contractsAddDetails: ChainContractsObject[] = [
     {
@@ -53,7 +53,7 @@ export async function postEVMContractData(
     apiInstance.post("/add", {
       email,
       chainContractsData: contractsAddDetails,
-    })
+    }),
   );
 }
 
@@ -61,7 +61,7 @@ export async function postEVMContractVerifiedStatus(
   email: string,
   chain: ContractsChain,
   contractAddress: string,
-  verified: boolean
+  verified: boolean,
 ): Promise<boolean> {
   return handleRequest<boolean>(() =>
     apiInstance.post("/update/verify", {
@@ -69,6 +69,6 @@ export async function postEVMContractVerifiedStatus(
       chain,
       contractAddress,
       verified,
-    })
+    }),
   );
 }

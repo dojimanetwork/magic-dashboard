@@ -18,7 +18,10 @@ import {
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../context/user-appState";
 import { ERC20Options } from "@openzeppelin/wizard/dist/erc20";
-import { TemplateSaveContractDetailsData, useTemplateContractDetails } from "../../../context/template-contract-appState";
+import {
+  TemplateSaveContractDetailsData,
+  useTemplateContractDetails,
+} from "../../../context/template-contract-appState";
 
 export default function Erc20({
   displayCode,
@@ -28,23 +31,74 @@ export default function Erc20({
   selectedChain: AvailableChains;
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
-  const { templateContractDetails, updateTemplateContractDetail } = useTemplateContractDetails();
+  const { templateContractDetails, updateTemplateContractDetail } =
+    useTemplateContractDetails();
   const { userDetails } = useUserDetails();
 
-  const selectedContractDetails = templateContractDetails.contracts.find((data) => data.chain === selectedChain);
-  
-  const [name, setName] = useState(selectedContractDetails?.name === "" ? "Token" : selectedContractDetails?.name as string);
-  const [symbol, setSymbol] = useState(selectedContractDetails?.symbol === "" ? "Tkn" : selectedContractDetails?.symbol as string);
-  const [burnable, setBurnable] = useState(selectedContractDetails?.burnable === false ? false : selectedContractDetails?.burnable as boolean);
-  const [pausable, setPausable] = useState(selectedContractDetails?.pausable === false ? false : selectedContractDetails?.pausable as boolean);
-  const [premint, setPremint] = useState(selectedContractDetails?.premint === "" ? "" : selectedContractDetails?.premint as string);
-  const [mintable, setMintable] = useState(selectedContractDetails?.mintable === false ? false : selectedContractDetails?.mintable as boolean);
-  const [permit, setPermit] = useState(selectedContractDetails?.permit === false ? false : selectedContractDetails?.permit as boolean);
-  const [votes, setVotes] = useState(selectedContractDetails?.votes === false ? false : selectedContractDetails?.votes as boolean);
-  const [flashmint, setFlashmint] = useState(selectedContractDetails?.flashmint === false ? false : selectedContractDetails?.flashmint as boolean);
-  const [access, setAccess] = useState(selectedContractDetails?.access === "" ? "" : selectedContractDetails?.access as string);
-  const [upgradeable, setUpgradeable] = useState(selectedContractDetails?.upgradeable === "" ? "false" : selectedContractDetails?.upgradeable as string);
-  const [securityContract, setSecurityContract] = useState(selectedContractDetails?.info?.securityContract === "" ? "" : selectedContractDetails?.info?.securityContract as string);
+  const selectedContractDetails = templateContractDetails.contracts.find(
+    (data) => data.chain === selectedChain,
+  );
+
+  const [name, setName] = useState(
+    selectedContractDetails?.name === ""
+      ? "Token"
+      : (selectedContractDetails?.name as string),
+  );
+  const [symbol, setSymbol] = useState(
+    selectedContractDetails?.symbol === ""
+      ? "Tkn"
+      : (selectedContractDetails?.symbol as string),
+  );
+  const [burnable, setBurnable] = useState(
+    selectedContractDetails?.burnable === false
+      ? false
+      : (selectedContractDetails?.burnable as boolean),
+  );
+  const [pausable, setPausable] = useState(
+    selectedContractDetails?.pausable === false
+      ? false
+      : (selectedContractDetails?.pausable as boolean),
+  );
+  const [premint, setPremint] = useState(
+    selectedContractDetails?.premint === ""
+      ? ""
+      : (selectedContractDetails?.premint as string),
+  );
+  const [mintable, setMintable] = useState(
+    selectedContractDetails?.mintable === false
+      ? false
+      : (selectedContractDetails?.mintable as boolean),
+  );
+  const [permit, setPermit] = useState(
+    selectedContractDetails?.permit === false
+      ? false
+      : (selectedContractDetails?.permit as boolean),
+  );
+  const [votes, setVotes] = useState(
+    selectedContractDetails?.votes === false
+      ? false
+      : (selectedContractDetails?.votes as boolean),
+  );
+  const [flashmint, setFlashmint] = useState(
+    selectedContractDetails?.flashmint === false
+      ? false
+      : (selectedContractDetails?.flashmint as boolean),
+  );
+  const [access, setAccess] = useState(
+    selectedContractDetails?.access === ""
+      ? ""
+      : (selectedContractDetails?.access as string),
+  );
+  const [upgradeable, setUpgradeable] = useState(
+    selectedContractDetails?.upgradeable === ""
+      ? "false"
+      : (selectedContractDetails?.upgradeable as string),
+  );
+  const [securityContract, setSecurityContract] = useState(
+    selectedContractDetails?.info?.securityContract === ""
+      ? ""
+      : (selectedContractDetails?.info?.securityContract as string),
+  );
   const [license, setLicense] = useState(getLicences()[2].value);
   const [contract, setContract] = useState("");
 
@@ -207,7 +261,7 @@ export default function Erc20({
       (contract) => contract.chain === selectedChain,
     );
 
-    if(selectedTemplateContract) {
+    if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
       const updatedTemplateContract: TemplateSaveContractDetailsData = {
         ...selectedTemplateContract,

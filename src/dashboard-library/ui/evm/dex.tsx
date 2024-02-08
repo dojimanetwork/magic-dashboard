@@ -81,7 +81,7 @@ export default function Dex({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContract: securityContract,
+        securityContract,
         license,
       },
     };
@@ -106,7 +106,7 @@ export default function Dex({
         ? false
         : upgradeable) as upgradeable,
       info: {
-        securityContract: securityContract,
+        securityContract,
         license,
       },
     };

@@ -69,17 +69,14 @@ export const TemplateContractProvider: React.FC<{
       // If the contract with the same chain exists, update it
       let updatedContracts = [...templateContractDetails.contracts];
       updatedContracts[index] = updatedContract;
-      updatedContracts = updatedContracts.map(
-        (contract) => {
-          
-          return {
-            ...contract,
-            name: updatedContract.name,
-            symbol: updatedContract.symbol || contract.symbol,
-          };
-        },
-      );
-      
+      updatedContracts = updatedContracts.map((contract) => {
+        return {
+          ...contract,
+          name: updatedContract.name,
+          symbol: updatedContract.symbol || contract.symbol,
+        };
+      });
+
       setTemplateContractDetails({ contracts: updatedContracts });
     } else {
       // If the contract with the same chain doesn't exist, add the new contract
@@ -87,15 +84,13 @@ export const TemplateContractProvider: React.FC<{
         ...templateContractDetails.contracts,
         updatedContract,
       ];
-      latestContracts.map(
-        (contract) => {
-          return {
-            ...contract,
-            name: updatedContract.name,
-            symbol: updatedContract.symbol || contract.symbol,
-          };
-        },
-      );
+      latestContracts.map((contract) => {
+        return {
+          ...contract,
+          name: updatedContract.name,
+          symbol: updatedContract.symbol || contract.symbol,
+        };
+      });
       setTemplateContractDetails({ contracts: latestContracts });
     }
   };

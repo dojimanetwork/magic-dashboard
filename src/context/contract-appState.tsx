@@ -16,7 +16,7 @@ export interface ContractDetailsData {
 
 export interface ContractArguments {
   argument1: string;
-  argument2: string
+  argument2: string;
 }
 
 export interface InitialContractDetails {

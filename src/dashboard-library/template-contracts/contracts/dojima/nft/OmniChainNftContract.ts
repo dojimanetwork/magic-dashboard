@@ -95,4 +95,4 @@ contract OmniChainNFTContract is Initializable, UUPSUpgradeable, IStateReceiver,
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
         return super.supportsInterface(interfaceId);
     }
-}`
+}`;
