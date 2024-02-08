@@ -7,7 +7,7 @@ import CheckboxInput from "../common/CheckboxInput";
 import RadioInput from "../common/RadioInput";
 import Button from "../common/Button";
 import {
-  ContractData,
+  ContractDetailsData,
   useContractDetails,
 } from "../../../context/contract-appState";
 import { Text } from "../common/Typography";
@@ -166,7 +166,7 @@ export default function Erc721({
 
     if (selectedContract) {
       // Create an updated contract with only the changed fields
-      const updatedContract: ContractData = {
+      const updatedContract: ContractDetailsData = {
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
@@ -179,7 +179,7 @@ export default function Erc721({
       updateContractDetails(updatedContract);
     } else {
       // Create an updated contract with only the changed fields
-      const updatedContract: ContractData = {
+      const updatedContract: ContractDetailsData = {
         name,
         symbol: symbol !== "" ? symbol : "",
         code: contract,

@@ -42,7 +42,7 @@ export const ContractDetailsProvider: React.FC<{
       contracts: [],
     });
 
-  const updateContractDetails = (updatedContract: ContractData) => {
+  const updateContractDetails = (updatedContract: ContractDetailsData) => {
     // Find the index of the contract with the same chain in the contracts array
     const index = contractsData.contracts.findIndex(
       (contract) => contract.chain === updatedContract.chain,

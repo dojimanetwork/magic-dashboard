@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import Button from "../common/Button";
 import {
-  ContractData,
+  ContractDetailsData,
   useContractDetails,
 } from "../../../context/contract-appState";
 import { useUserDetails } from "../../../context/user-appState";
@@ -29,7 +29,7 @@ export default function SolanaContract({
 
     if (selectedContract) {
       // Create an updated contract with only the changed fields
-      const updatedContract: ContractData = {
+      const updatedContract: ContractDetailsData = {
         ...selectedContract,
         name: "",
         symbol: "",
@@ -40,7 +40,7 @@ export default function SolanaContract({
       updateContractDetails(updatedContract);
     } else {
       // Create an updated contract with only the changed fields
-      const updatedContract: ContractData = {
+      const updatedContract: ContractDetailsData = {
         name: "",
         symbol: "",
         arguments: [],

@@ -12,7 +12,7 @@ import CheckboxInput from "../common/CheckboxInput";
 import RadioInput from "../common/RadioInput";
 import { access, ERC20ContractParams, upgradeable } from "../utils/types";
 import {
-  ContractData,
+  ContractDetailsData,
   useContractDetails,
 } from "../../../context/contract-appState";
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
@@ -171,7 +171,7 @@ export default function Defi({
 
     if (selectedContract) {
       // Create an updated contract with only the changed fields
-      const updatedContract: ContractData = {
+      const updatedContract: ContractDetailsData = {
         ...selectedContract,
         name,
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
@@ -184,7 +184,7 @@ export default function Defi({
       updateContractDetails(updatedContract);
     } else {
       // Create an updated contract with only the changed fields
-      const updatedContract: ContractData = {
+      const updatedContract: ContractDetailsData = {
         name,
         symbol: symbol !== "" ? symbol : "",
         code: contract,
