@@ -18,6 +18,15 @@ export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 const handlerColor = (theme: Theme) =>
   theme === THEME.LIGHT ? oc.white : "#1e1e1e";
 
+export interface iconProps {
+  width?: string;
+  height?: string;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: string;
+  className?: string;
+}
+
 type Opts = {
   width?: number;
   height?: number;

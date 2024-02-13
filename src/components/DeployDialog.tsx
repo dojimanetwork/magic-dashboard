@@ -12,6 +12,8 @@ import AddIconImg from "../static/add_icon.svg";
 import { XTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/XTokenContract";
 import { OmniChainTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/OmniChainTokenContract";
 import { EthereumCrossChainTokenTemplate } from "../dashboard-library/template-contracts/contracts/ethereum/token/EthereumCrossChainToken";
+import SuccessIcon from "./success.icon";
+import ErrorIcon from "./ErrorIcon";
 
 export type ContractsData = {
   fileName: string;
@@ -35,6 +37,7 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
 
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [tab, setTab] = useState(1);
+  const [isDeployed, setIsDeployed] = useState(false);
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
@@ -109,41 +112,42 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     //   contractName: contractsData.contracts[0].name,
     //   args: [],
     // };
+    setIsDeployed(true);
 
-    const data: Array<DeployableChainsData> = [
-      {
-        chainName: "dojima",
-        contracts: [
-          {
-            fileName: "XTokenContract",
-            contractCode: XTokenContractTemplate,
-            contractName: "XTokenContract",
-            contractSymbol: "XTK",
-          },
-          {
-            fileName: "OmniChainTokenContract",
-            contractCode: OmniChainTokenContractTemplate,
-            contractName: "XTokenContract",
-            contractSymbol: "XTK",
-          },
-        ],
-      },
-      {
-        chainName: "ethereum",
-        contracts: [
-          {
-            fileName: "EthereumCrossChainToken",
-            contractCode: EthereumCrossChainTokenTemplate,
-            contractName: "XTokenContract",
-            contractSymbol: "XTK",
-          },
-        ],
-      },
-    ];
-    // Make Axios POST request with DeployEVMContractParams in the request body
-    axios.post("http://localhost:3002/deploy", { data }).then((response) => {
-      console.log(response);
-    });
+    // const data: Array<DeployableChainsData> = [
+    //   {
+    //     chainName: "dojima",
+    //     contracts: [
+    //       {
+    //         fileName: "XTokenContract",
+    //         contractCode: XTokenContractTemplate,
+    //         contractName: "XTokenContract",
+    //         contractSymbol: "XTK",
+    //       },
+    //       {
+    //         fileName: "OmniChainTokenContract",
+    //         contractCode: OmniChainTokenContractTemplate,
+    //         contractName: "XTokenContract",
+    //         contractSymbol: "XTK",
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     chainName: "ethereum",
+    //     contracts: [
+    //       {
+    //         fileName: "EthereumCrossChainToken",
+    //         contractCode: EthereumCrossChainTokenTemplate,
+    //         contractName: "XTokenContract",
+    //         contractSymbol: "XTK",
+    //       },
+    //     ],
+    //   },
+    // ];
+    // // Make Axios POST request with DeployEVMContractParams in the request body
+    // axios.post("http://localhost:3002/deploy", { data }).then((response) => {
+    //   console.log(response);
+    // });
   }
 
   const renderDetailsForChain = (chain: AvailableChains) => {
@@ -201,89 +205,135 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
 
   return (
     <>
-      <Dialog
-        onCloseRequest={handleClose}
-        title="Deploy"
-        className={"HelpDialog max-w-[760px] mx-auto"}
-      >
-        <div className="HelpDialog__header">
-          {contractsData.contracts.map((item, i) => {
-            const index = i + 1;
-
-            return (
-              <button
-                className={`p-3 flex items-center gap-x-3 border ${
-                  i + 1 === tab ? "border-[#6B45CD] bg-[rgba(107,_69,_205,_0.14)]" : ""
-                }   rounded-lg text-black capitalize`}
-                onClick={() => {
-                  setTab(index);
-                  // setIsDetailsComplete(!isDetailsComplete);
-                }}
-                key={i}
-              >
-                {/*{t("helpDialog.documentation")}*/}
-                <div className="w-6 h-6 grid place-items-center bg-[#CEC2FF] rounded-full p-1">
-                  {usersIcon}
-                </div>
-                {item.chain}
-              </button>
-            );
-          })}
-        </div>
-        <div className="border-[1px] border-dashed mt-6"></div>
-        <div className="h-[500px] pb-4 pr-2 overflow-auto ">
-          <Section title={"Details"}>
-            {tab === 1 && renderDetailsForChain(userDetails.chains[tab - 1])}
-            {tab === 2 && renderDetailsForChain(userDetails.chains[tab - 1])}
-          </Section>
-          <div className="border-[1px] border-dashed mt-6"></div>
-          <div>
-            <div className="flex w-full items-center">
-              <h3 className="w-1/2">Arguments</h3>
-              <div className="justify-end w-1/2 flex">
-                <img src={AddIconImg} alt="" />
+      {isDeployed ? (
+        <Dialog
+          onCloseRequest={handleClose}
+          title="Deploy Status"
+          className={"HelpDialog max-w-[760px] mx-auto"}
+        >
+          <div className="w-ful text-center">
+            <div>
+              <div className=" flex justify-center items-center ">
+                <SuccessIcon />
+                <strong className="text-2xl ">Success</strong>
+              </div>
+              <div className="flex justify-center items-center ">
+                <ErrorIcon />
+                <strong className="text-2xl ">Error</strong>
               </div>
             </div>
+            <div className=" mt-4 mb-4  p-4">
+              <div className="flex items-center">
+                <p className="text-start text-sm w-20 ">Chain </p>
+                <p className="w-10">:</p>
+                <strong className="font-semibold">Dojima</strong>
+              </div>
+              <div className="flex items-center">
+                <p className="text-start text-sm w-20">Address </p>
+                <p className="w-10">:</p>
+                <strong className="font-semibold">
+                  klajjhghjagjkhgdkfjadhgkjafhgjkdgf
+                </strong>
+              </div>
+            </div>
+            <div className="w-full h-[1px] bg-[#CEC2FF]"> </div>
+            <div className=" p-4">
+              <div className="flex items-center">
+                <p className="text-start text-sm w-20 ">Chain </p>
+                <p className="w-10">:</p>
+                <strong className="font-semibold">Dojima</strong>
+              </div>
+              <div className="flex items-center">
+                <p className="text-start text-sm w-20">Address </p>
+                <p className="w-10">:</p>
+                <strong className="font-semibold">
+                  klajjhghjagjkhgdkfjadhgkjafhgjkdgf
+                </strong>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      ) : (
+        <Dialog
+          onCloseRequest={handleClose}
+          title="Deploy"
+          className={"HelpDialog max-w-[760px] mx-auto"}
+        >
+          <div className="HelpDialog__header">
+            {contractsData.contracts.map((item, i) => {
+              const index = i + 1;
 
-            {/* {tab === 1 &&
-                    renderArgumentsForChain(userDetails.chains[tab - 1])}
-                  {tab === 2 &&
-                    renderArgumentsForChain(userDetails.chains[tab - 1])} */}
+              return (
+                <button
+                  className={`p-3 flex items-center gap-x-3 border ${
+                    i + 1 === tab
+                      ? "border-[#6B45CD] bg-[rgba(107,_69,_205,_0.14)]"
+                      : ""
+                  }   rounded-lg text-black capitalize`}
+                  onClick={() => {
+                    setTab(index);
+                    // setIsDetailsComplete(!isDetailsComplete);
+                  }}
+                  key={i}
+                >
+                  <div className="w-6 h-6 grid place-items-center bg-[#CEC2FF] rounded-full p-1">
+                    {usersIcon}
+                  </div>
+                  {item.chain}
+                </button>
+              );
+            })}
           </div>
           <div className="border-[1px] border-dashed mt-6"></div>
-          <div className="mt-6">
-            <p className="text-base text-[#757575] font-semibold ">Code</p>
-            {tab === 1 && renderCodeForChain(userDetails.chains[tab - 1])}
-            {tab === 2 && renderCodeForChain(userDetails.chains[tab - 1])}
+          <div className="h-[500px] pb-4 pr-2 overflow-auto ">
+            <Section title={"Details"}>
+              {tab === 1 && renderDetailsForChain(userDetails.chains[tab - 1])}
+              {tab === 2 && renderDetailsForChain(userDetails.chains[tab - 1])}
+            </Section>
+            <div className="border-[1px] border-dashed mt-6"></div>
+            <div>
+              <div className="flex w-full items-center">
+                <h3 className="w-1/2">Arguments</h3>
+                <div className="justify-end w-1/2 flex">
+                  <img src={AddIconImg} alt="" />
+                </div>
+              </div>
+            </div>
+            <div className="border-[1px] border-dashed mt-6"></div>
+            <div className="mt-6">
+              <p className="text-base text-[#757575] font-semibold ">Code</p>
+              {tab === 1 && renderCodeForChain(userDetails.chains[tab - 1])}
+              {tab === 2 && renderCodeForChain(userDetails.chains[tab - 1])}
+            </div>
           </div>
-        </div>
-        <div className="flex mt-10 justify-between items-center">
-          <button
-            className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl"
-            onClick={
-              tab === 1
-                ? handleClose
-                : () => {
-                    setTab(tab - 1);
-                  }
-            }
-          >
-            {tab === 1 ? "Close" : "Back"}
-          </button>
-          <button
-            className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white"
-            onClick={
-              tab === contractsData.contracts.length
-                ? handleDeploy
-                : () => {
-                    setTab(tab + 1);
-                  }
-            }
-          >
-            {tab === contractsData.contracts.length ? "Deploy" : "Next"}
-          </button>
-        </div>
-      </Dialog>
+          <div className="flex mt-10 justify-between items-center">
+            <button
+              className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl"
+              onClick={
+                tab === 1
+                  ? handleClose
+                  : () => {
+                      setTab(tab - 1);
+                    }
+              }
+            >
+              {tab === 1 ? "Close" : "Back"}
+            </button>
+            <button
+              className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white"
+              onClick={
+                tab === contractsData.contracts.length
+                  ? handleDeploy
+                  : () => {
+                      setTab(tab + 1);
+                    }
+              }
+            >
+              {tab === contractsData.contracts.length ? "Deploy" : "Next"}
+            </button>
+          </div>
+        </Dialog>
+      )}
     </>
   );
 };
