@@ -191,7 +191,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     return (
       <>
         <div className=" text-black cursor-not-allowed">
-          <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto h-12">
+          <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
             {contract.code}
           </div>
         </div>
@@ -209,9 +209,12 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
         <div className="HelpDialog__header">
           {contractsData.contracts.map((item, i) => {
             const index = i + 1;
+
             return (
               <button
-                className="p-3 flex items-center gap-x-3 border border-[#6B45CD] bg-[rgba(107,_69,_205,_0.14)] rounded-lg text-black capitalize"
+                className={`p-3 flex items-center gap-x-3 border ${
+                  i + 1 === tab ? "border-[#6B45CD] bg-[rgba(107,_69,_205,_0.14)]" : ""
+                }   rounded-lg text-black capitalize`}
                 onClick={() => {
                   setTab(index);
                   // setIsDetailsComplete(!isDetailsComplete);

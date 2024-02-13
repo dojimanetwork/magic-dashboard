@@ -55,7 +55,7 @@ function ContractView({
         <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
           ERC1155
         </div> */}
-        <div className="cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
+        <div className="cursor-pointer text-center w-full py-6 text-[#6B45CD] border-r last:border-r-0">
           {selectedElementChain}
         </div>
       </div>
