@@ -1,18 +1,18 @@
 {
     "urls": {
         "dojima": {
-            "api": "https://api-test.d11k.dojima.network/",
+            "api": "http://localhost:8545",
             "blockscout": "https://doj-bex-test.dojima.network/",
             "blockscout_api": "https://doj-bex-test.dojima.network/api"
         },
         "ethereum": {
-            "goerli_alchemy": "https://eth-goerli.g.alchemy.com/v2/TIMeEU-fdUdyD-YijUoB_AbdtlVfEcl2"
+            "goerli_alchemy": "http://localhost:9545"
         }
     },
     "state_contracts": {
-        "INBOUND_STATE_SENDER_CONTRACT_ADDRESS": "",
-        "OUTBOUND_STATE_SENDER_CONTRACT_ADDRESS": "",
-        "STATE_SYNCER_VERIFIER_CONTRACT_ADDRESS": ""
+        "INBOUND_STATE_SENDER_CONTRACT_ADDRESS": "0x646Dda3a6Ea1E75717e9D3fFc4fff811ED74D6De",
+        "OUTBOUND_STATE_SENDER_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000001100",
+        "STATE_SYNCER_VERIFIER_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000001001"
     },
     "token_decimal": {
         "dojima": 18,

@@ -11,14 +11,13 @@ const promisifiedExec = promisify(exec);
 async function compile(contract: string, contractName: string) {
   const code = formatSolidityCode(contract);
   //   createFile(code, `contracts/${contractName}.sol`);
-  writeFileSync(`contracts/${contractName}-doj.sol`, code);
+  writeFileSync(`contracts/${contractName}-bsc.sol`, code);
 
   const command = `yarn hardhat compile`;
 
   try {
-    console.log("compile try : ");
     const { stdout, stderr } = await promisifiedExec(command);
-    console.log("compiled doj : ", stdout);
+    console.log("compiled bsc : ", stdout);
     if (stderr) {
       throw new Error(stderr);
     }
@@ -33,11 +32,11 @@ async function deploy(
   contractName: string,
   args: Array<any>,
 ): Promise<EVMContractDeployedObject> {
-  console.log("Url : ", process.env.VITE_APP_DOJIMA_API_URL);
+  console.log("Url : ", process.env.VITE_APP_BSC_TESTNET_API_URL);
   console.log("phrase : ", process.env.VITE_APP_TEST_ACCOUNT_PHRASE);
   const provider = new ethers.JsonRpcProvider(
-    process.env.VITE_APP_DOJIMA_API_URL as string,
-    // "https://api-test.d11k.dojima.network/"
+    process.env.VITE_APP_BSC_TESTNET_API_URL as string,
+    // "https://eth-goerli.g.alchemy.com/v2/TIMeEU-fdUdyD-YijUoB_AbdtlVfEcl2"
   );
   // const signer = new ethers.Wallet(process.env.VITE_APP_TEST_ACCOUNT_PVTKEY as string, provider);
   const signer = ethers.Wallet.fromPhrase(
@@ -47,9 +46,11 @@ async function deploy(
   try {
     const jsonData = JSON.parse(
       readFileSync(
-        `artifacts/contracts/${contractName}-doj.sol/${contractName}.json`,
+        `artifacts/contracts/${contractName}-bsc.sol/${contractName}.json`,
       ).toString(),
     );
+
+    console.log("signer : ", signer);
 
     // const data = readFile(`artifacts/contracts/${contractName}.sol/${contractName}.json`, 'utf8');
     // const jsonData = JSON.parse(data);
@@ -63,7 +64,9 @@ async function deploy(
       jsonData.bytecode,
       signer,
     );
+    console.log("factory : ", factory);
     const contract = await factory.deploy(...args);
+    console.log("contrct : ", contract);
     await contract.waitForDeployment();
     const contractAddress = await contract.getAddress();
     return {
@@ -76,7 +79,7 @@ async function deploy(
   }
 }
 
-export async function deployDOJContractHandler(
+export async function deployBSCContractHandler(
   deployParams: DeployEVMContractParams,
 ) {
   try {
@@ -91,7 +94,7 @@ export async function deployDOJContractHandler(
     try {
       // Call compileHandler
       const compiled = await compile(contractCode, contractName);
-
+      console.log("compile : ", compiled);
       // Check if compilation was successful
       if (
         compiled.includes("successfully") ||

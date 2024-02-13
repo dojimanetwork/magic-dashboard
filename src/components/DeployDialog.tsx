@@ -12,7 +12,7 @@ import AddIconImg from "../static/add_icon.svg";
 import { XTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/XTokenContract";
 import { OmniChainTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/OmniChainTokenContract";
 import { EthereumCrossChainTokenTemplate } from "../dashboard-library/template-contracts/contracts/ethereum/token/EthereumCrossChainToken";
-import SuccessIcon from "./success.icon";
+import SuccessIcon from "./Success.icon";
 import ErrorIcon from "./ErrorIcon";
 
 export type ContractsData = {
@@ -28,6 +28,17 @@ export type DeployableChainsData = {
   contracts: Array<ContractsData>;
 };
 
+export type EVMContractDeployedObject = {
+  contractAddress: string;
+  contractABI: string;
+  contractByteCode: string;
+};
+
+export type DeployedDetails = {
+  chain: AvailableChains;
+  details: EVMContractDeployedObject;
+};
+
 const Section = (props: { title: string; children: React.ReactNode }) => (
   <>
     <h3>{props.title}</h3>
@@ -38,7 +49,13 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [tab, setTab] = useState(1);
   const [isDeployed, setIsDeployed] = useState(false);
+  const [deploymentStatus, setDeploymentStatus] = useState<
+    "success" | "failed" | ""
+  >("");
   const handleClose = React.useCallback(() => {
+    setDeploymentStatus("");
+    setIsDeployed(false);
+    setDeployedDetails([]);
     if (onClose) {
       onClose();
     }
@@ -46,73 +63,43 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
 
   const { contractsData } = useContractDetails();
   const { userDetails } = useUserDetails();
-  // const [isDetailsComplete, setIsDetailsComplete] = useState(false);
-
-  // useEffect(() => {
-  //   if (contractsData.contracts.length === 1) {
-  //     setIsDetailsComplete(true);
-  //   }
-  // }, []);
-
-  useEffect(() => {
-    // (async () => {
-    //   const res = await axios.get(`http://localhost:3002`);
-    //   if(res.status === 200) {
-    //     console.log(res.data);
-    //   }
-    // })();
-    // (async () => {
-    //   // const res = await axios.post(`http://localhost:3002/compile`, {
-    //   //   contractCode: contractsData.contracts[0].code,
-    //   //   contractName: contractsData.contracts[0].name,
-    //   //   args: []
-    //   // });
-    //   // if(res.status === 200) {
-    //   //   console.log(res.data);
-    //   // } else {
-    //   //   console.log("compile eror in dialog");
-    //   // }
-    //   const data: DeployEVMContractParams = {
-    //     contractCode: contractsData.contracts[0].code,
-    //     contractName: contractsData.contracts[0].name,
-    //     args: [],
-    //   };
-    //   console.log("Data : ", data);
-    //   // Make Axios POST request with DeployEVMContractParams in the request body
-    //   const response = await axios.post('http://localhost:3002/deployEVMContract', data);
-    //   console.log(response.data);
-    // })();
-    // (async () => {
-    //   const contractName = "Test";
-    //   const code = `// SPDX-License-Identifier: MIT
-    //   pragma solidity ^0.8.19;
-    //   import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-    //   import "@openzeppelin/contracts/access/AccessControl.sol";
-    //   contract Sample is ERC20, AccessControl {
-    //       bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    //       constructor(address defaultAdmin, address minter) ERC20("Sample", "SML") {
-    //           _mint(msg.sender, 20 * 10 ** decimals());
-    //           _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
-    //           _grantRole(MINTER_ROLE, minter);
-    //       }
-    //       function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
-    //           _mint(to, amount);
-    //       }
-    //   }`;
-    //   const res = await axios.get(`http://localhost:3002/read?contractName=${contractName}&code=${code}`, {});
-    //   if(res.status === 200) {
-    //     console.log(res.data);
-    //   }
-    // })()
-  }, []);
+  const [deployedDetails, setDeployedDetails] = useState<
+    Array<DeployedDetails>
+  >([]);
 
   function handleDeploy() {
-    // const data: DeployEVMContractParams = {
-    //   contractCode: contractsData.contracts[0].code,
-    //   contractName: contractsData.contracts[0].name,
-    //   args: [],
-    // };
-    setIsDeployed(true);
+    const data: Array<DeployableChainsData> = [];
+
+    contractsData.contracts.map((contract) => {
+      const addContract: DeployableChainsData = {
+        chainName: contract.chain,
+        contracts: [
+          {
+            fileName: contract.name,
+            contractCode: contract.code,
+            contractName: contract.name,
+            contractSymbol: contract.symbol ? contract.symbol : "",
+            args: contract.arguments ? contract.arguments : [],
+          },
+        ],
+      };
+      data.push(addContract);
+    });
+
+    console.log("Data contrcts : ", data);
+
+    // Make Axios POST request with DeployEVMContractParams in the request body
+    axios.post("http://localhost:3002/deploy", { data }).then((response) => {
+      if (response.status === 200) {
+        const result: Array<DeployedDetails> = response.data;
+        setDeployedDetails(result);
+        setDeploymentStatus("success");
+        setIsDeployed(true);
+      } else {
+        setDeploymentStatus("failed");
+        setIsDeployed(true);
+      }
+    });
 
     // const data: Array<DeployableChainsData> = [
     //   {
@@ -213,16 +200,40 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
         >
           <div className="w-ful text-center">
             <div>
-              <div className=" flex justify-center items-center ">
-                <SuccessIcon />
-                <strong className="text-2xl ">Success</strong>
-              </div>
-              <div className="flex justify-center items-center ">
-                <ErrorIcon />
-                <strong className="text-2xl ">Error</strong>
-              </div>
+              {deploymentStatus === "success" ? (
+                <div className=" flex justify-center items-center ">
+                  <SuccessIcon />
+                  <strong className="text-2xl ">Success</strong>
+                </div>
+              ) : (
+                <div className="flex justify-center items-center ">
+                  <ErrorIcon />
+                  <strong className="text-2xl ">Error</strong>
+                </div>
+              )}
             </div>
-            <div className=" mt-4 mb-4  p-4">
+            {deployedDetails.map((detail) => {
+              return (
+                <>
+                  <div className=" mt-4 mb-4  p-4">
+                    <div className="flex items-center">
+                      <p className="text-start text-sm w-20 ">Chain </p>
+                      <p className="w-10">:</p>
+                      <strong className="font-semibold">{detail.chain}</strong>
+                    </div>
+                    <div className="flex items-center">
+                      <p className="text-start text-sm w-20">Contract </p>
+                      <p className="w-10">:</p>
+                      <strong className="font-semibold">
+                        {detail.details.contractAddress}
+                      </strong>
+                    </div>
+                  </div>
+                  <div className="w-full h-[1px] bg-[#CEC2FF]" />
+                </>
+              );
+            })}
+            {/* <div className=" mt-4 mb-4  p-4">
               <div className="flex items-center">
                 <p className="text-start text-sm w-20 ">Chain </p>
                 <p className="w-10">:</p>
@@ -250,7 +261,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                   klajjhghjagjkhgdkfjadhgkjafhgjkdgf
                 </strong>
               </div>
-            </div>
+            </div> */}
           </div>
         </Dialog>
       ) : (

@@ -5,7 +5,7 @@ import Erc721 from "./nft";
 
 import { DojimaErc20TemplateView, DojimaNftTemplateView } from "./dojima";
 import { EthereumErc20TemplateView, EthereumNftTemplateView } from "./ethereum";
-import { BscErc20TemplateView, BscNftTemplateView } from "./bsc";
+import { BscErc20TemplateView, BscNftTemplateView, BscBep20View } from "./bsc";
 
 export {
   Erc20,
@@ -16,4 +16,5 @@ export {
   EthereumNftTemplateView,
   BscErc20TemplateView,
   BscNftTemplateView,
+  BscBep20View,
 };
