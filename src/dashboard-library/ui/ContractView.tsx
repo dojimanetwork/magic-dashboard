@@ -46,7 +46,7 @@ function ContractView({
   return (
     <section className="">
       <div className="flex items-center text-center border-b text-[] text-xl/6 font-semibold uppercase">
-        <div className="w-1/3 cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
+        {/* <div className="w-1/3 cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
           Erc20
         </div>
         <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
@@ -54,6 +54,9 @@ function ContractView({
         </div>
         <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
           ERC1155
+        </div> */}
+        <div className="cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
+          {selectedElementChain}
         </div>
       </div>
       <div className="flex h-[600px] overflow-auto w-[810px]">

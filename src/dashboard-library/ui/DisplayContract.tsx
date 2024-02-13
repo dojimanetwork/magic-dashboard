@@ -20,8 +20,8 @@ const componentMapping = {
     nft: EVMContractsUI.EthereumNftTemplateView,
   },
   bsc: {
-    erc20: EVMContractsUI.Erc20,
-    nft: EVMContractsUI.Erc721,
+    erc20: EVMContractsUI.BscErc20TemplateView,
+    nft: EVMContractsUI.BscNftTemplateView,
   },
   solana: {
     erc20: EVMContractsUI.Erc20,

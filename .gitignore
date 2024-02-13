@@ -28,3 +28,7 @@ src/packages/excalidraw/example/public/excalidraw.development.js
 coverage
 dev-dist
 html
+
+backend/artifacts
+backend/cache
+backend/typechain-types

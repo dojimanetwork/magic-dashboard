@@ -77,7 +77,7 @@ contract OmniChainTokenContract is  Initializable, UUPSUpgradeable, ReentrancyGu
     }
 
     function onStateReceive(uint256 /* id */, bytes calldata data) external onlyStateSyncer {
-        (bytes memory userBytes, uint256 amount, uint256 depositId ) = abi.decode(data, (bytes, uint256, uint256));
+        (bytes memory userBytes, uint256 amount, /* uint256 depositId */ ) = abi.decode(data, (bytes, uint256, uint256));
 
         // Ensure the bytes array for the address is of the correct length
         require(userBytes.length == 20, "OmniChainTokenContract: Invalid address length");
