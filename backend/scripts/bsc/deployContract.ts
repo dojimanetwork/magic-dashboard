@@ -17,7 +17,6 @@ async function compile(contract: string, contractName: string) {
 
   try {
     const { stdout, stderr } = await promisifiedExec(command);
-    console.log("compiled bsc : ", stdout);
     if (stderr) {
       throw new Error(stderr);
     }
@@ -32,8 +31,6 @@ async function deploy(
   contractName: string,
   args: Array<any>,
 ): Promise<EVMContractDeployedObject> {
-  console.log("Url : ", process.env.VITE_APP_BSC_TESTNET_API_URL);
-  console.log("phrase : ", process.env.VITE_APP_TEST_ACCOUNT_PHRASE);
   const provider = new ethers.JsonRpcProvider(
     process.env.VITE_APP_BSC_TESTNET_API_URL as string,
     // "https://eth-goerli.g.alchemy.com/v2/TIMeEU-fdUdyD-YijUoB_AbdtlVfEcl2"
@@ -50,8 +47,6 @@ async function deploy(
       ).toString(),
     );
 
-    console.log("signer : ", signer);
-
     // const data = readFile(`artifacts/contracts/${contractName}.sol/${contractName}.json`, 'utf8');
     // const jsonData = JSON.parse(data);
 
@@ -64,9 +59,7 @@ async function deploy(
       jsonData.bytecode,
       signer,
     );
-    console.log("factory : ", factory);
     const contract = await factory.deploy(...args);
-    console.log("contrct : ", contract);
     await contract.waitForDeployment();
     const contractAddress = await contract.getAddress();
     return {
@@ -94,7 +87,6 @@ export async function deployBSCContractHandler(
     try {
       // Call compileHandler
       const compiled = await compile(contractCode, contractName);
-      console.log("compile : ", compiled);
       // Check if compilation was successful
       if (
         compiled.includes("successfully") ||

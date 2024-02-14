@@ -26,7 +26,7 @@ export async function DeployChainScript(
         result = await deployDOJContractHandler({
           contractCode: contract.contracts[0].contractCode,
           contractName: contract.contracts[0].contractName,
-          args: ["0x0577e1E35C4f30cA8379269B7Fd85cBCE7F084f4"],
+          args: contract.contracts[0].args,
         });
       } else if (contract.chainName === "ethereum") {
         result = await deployETHContractHandler({

@@ -81,7 +81,6 @@ app.options('*', cors()); // Enable preflight for all routes
 
 app.post('/deploy', async (req, res) => {
   const { data } = req.body;
-  console.log("Data : ", data)
   const result = await DeployChainScript(data as Array<DeployableChainsData>);
   res.send(result);
 });

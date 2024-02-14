@@ -9,12 +9,7 @@ async function deployOmnichainTokenContracts(tokenName, tokenSymbol, omniChainDe
 		process.exitCode = 1;
 		return;
 	}
-	console.log("Token name : ", tokenName);
-	console.log("Token symbol : ", tokenSymbol);
-	console.log("Acc key : ", omniChainDeployerAccPrvKey);
-	console.log("Globals : ", globalValues);
 	const dojimaProvider = new ethers.JsonRpcProvider("http://localhost:8545");
-	console.log("provider : ", dojimaProvider);
 	// const FEE_DATA = {
 	// 	maxFeePerGas:         ethers.parseUnits('100', 'gwei'),
 	// 	maxPriorityFeePerGas: ethers.parseUnits('5',   'gwei'),
@@ -24,14 +19,12 @@ async function deployOmnichainTokenContracts(tokenName, tokenSymbol, omniChainDe
 	// const provider = new ethers.providers.FallbackProvider([ethers.provider], 1);
 	// dojimaProvider.getFeeData = async () => FEE_DATA;
 	const omniChainDeployerWallet = new ethers.Wallet(omniChainDeployerAccPrvKey, dojimaProvider);
-	console.log("omniChainDeployerWallet : ", omniChainDeployerWallet);
 	// deploy cross-chain token 'contract
-	// const xTokenContract = await ethers.deployContract("XTokenContract", [tokenName, tokenSymbol, globalValues.token_decimal.dojima], omniChainDeployerWallet);
-	// await xTokenContract.waitForDeployment();
+	const xTokenContract = await ethers.deployContract("XTokenContract", [tokenName, tokenSymbol, globalValues.token_decimal.dojima], omniChainDeployerWallet);
+	await xTokenContract.waitForDeployment();
 
 	const OmniChainTokenContract = await ethers.getContractFactory("OmniChainTokenContract", omniChainDeployerWallet);
 	const OmniChainAttachContract = await OmniChainTokenContract.attach("0x1715cBDCe62A95e9360e0655b0CaA0805947AD65");
-	console.log("OmniChainAttachContract : ", OmniChainAttachContract);
 	const omniChainContract = await upgrades.deployProxy(OmniChainAttachContract, [
 		"0x37886387ba73300E80697A121E4794426a545545", "0x0000000000000000000000000000000000001100", "0x0000000000000000000000000000000000001001"
 	], { initializer: 'initialize', txOverrides: { maxFeePerGas: 10e9 },
@@ -39,7 +32,6 @@ async function deployOmnichainTokenContracts(tokenName, tokenSymbol, omniChainDe
 	// const omniChainContract = await upgrades.deployProxy(OmniChainTokenContract, [xTokenContract.target, globalValues.state_contracts.OUTBOUND_STATE_SENDER_CONTRACT_ADDRESS, globalValues.state_contracts.STATE_SYNCER_VERIFIER_CONTRACT_ADDRESS], { initializer: 'initialize', 
 	// 	gasPrice: (await dojimaProvider.getGasPrice()).mul(120).div(100),
 	//    });
-	console.log("omniChainContract : ", omniChainContract);
 	await omniChainContract.waitForDeployment();
 	console.log(`OmniChainContract deployed to: ${await omniChainContract.target}`);
 

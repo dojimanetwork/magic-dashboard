@@ -48,6 +48,7 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
 
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [tab, setTab] = useState(1);
+  const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deploymentStatus, setDeploymentStatus] = useState<
     "success" | "failed" | ""
@@ -68,6 +69,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   >([]);
 
   function handleDeploy() {
+    setIsDeploying(true);
     const data: Array<DeployableChainsData> = [];
 
     contractsData.contracts.map((contract) => {
@@ -86,12 +88,11 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       data.push(addContract);
     });
 
-    console.log("Data contrcts : ", data);
-
     // Make Axios POST request with DeployEVMContractParams in the request body
     axios.post("http://localhost:3002/deploy", { data }).then((response) => {
       if (response.status === 200) {
         const result: Array<DeployedDetails> = response.data;
+        setIsDeploying(false);
         setDeployedDetails(result);
         setDeploymentStatus("success");
         setIsDeployed(true);
@@ -99,6 +100,11 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
         setDeploymentStatus("failed");
         setIsDeployed(true);
       }
+    }).catch((error) => {
+      setIsDeploying(false);
+      setDeploymentStatus("failed");
+      setIsDeployed(true);
+      console.error(error);
     });
 
     // const data: Array<DeployableChainsData> = [
@@ -298,8 +304,11 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           <div className="border-[1px] border-dashed mt-6"></div>
           <div className="h-[500px] pb-4 pr-2 overflow-auto ">
             <Section title={"Details"}>
-              {tab === 1 && renderDetailsForChain(userDetails.chains[tab - 1])}
-              {tab === 2 && renderDetailsForChain(userDetails.chains[tab - 1])}
+              {userDetails.chains.map((chain, index) => (
+                <React.Fragment key={index}>
+                  {tab === index + 1 && renderDetailsForChain(chain)}
+                </React.Fragment>
+              ))}
             </Section>
             <div className="border-[1px] border-dashed mt-6"></div>
             <div>
@@ -313,8 +322,11 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
             <div className="border-[1px] border-dashed mt-6"></div>
             <div className="mt-6">
               <p className="text-base text-[#757575] font-semibold ">Code</p>
-              {tab === 1 && renderCodeForChain(userDetails.chains[tab - 1])}
-              {tab === 2 && renderCodeForChain(userDetails.chains[tab - 1])}
+              {userDetails.chains.map((chain, index) => (
+                <React.Fragment key={index}>
+                  {tab === index + 1 && renderCodeForChain(chain)}
+                </React.Fragment>
+              ))}
             </div>
           </div>
           <div className="flex mt-10 justify-between items-center">
@@ -331,7 +343,9 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
               {tab === 1 ? "Close" : "Back"}
             </button>
             <button
-              className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white"
+              className={`py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white ${
+                isDeploying && "cursor-not-allowed"
+              }`}
               onClick={
                 tab === contractsData.contracts.length
                   ? handleDeploy
@@ -340,7 +354,11 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                     }
               }
             >
-              {tab === contractsData.contracts.length ? "Deploy" : "Next"}
+              {tab === contractsData.contracts.length
+                ? isDeploying
+                  ? "Deploying..."
+                  : "Deploy"
+                : "Next"}
             </button>
           </div>
         </Dialog>

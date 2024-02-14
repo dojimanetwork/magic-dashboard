@@ -16,9 +16,7 @@ async function compile(contract: string, contractName: string) {
   const command = `yarn hardhat compile`;
 
   try {
-    console.log("compile try : ");
     const { stdout, stderr } = await promisifiedExec(command);
-    console.log("compiled doj : ", stdout);
     if (stderr) {
       throw new Error(stderr);
     }
@@ -33,8 +31,6 @@ async function deploy(
   contractName: string,
   args: Array<any>,
 ): Promise<EVMContractDeployedObject> {
-  console.log("Url : ", process.env.VITE_APP_DOJIMA_API_URL);
-  console.log("phrase : ", process.env.VITE_APP_TEST_ACCOUNT_PHRASE);
   const provider = new ethers.JsonRpcProvider(
     process.env.VITE_APP_DOJIMA_API_URL as string,
     // "https://api-test.d11k.dojima.network/"
