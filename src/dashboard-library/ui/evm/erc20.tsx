@@ -19,7 +19,7 @@ import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/typ
 import { useUserDetails } from "../../../context/user-appState";
 import { ERC20Options } from "@openzeppelin/wizard/dist/erc20";
 import {
-  TemplateSaveContractDetailsData,
+  Erc20TemplateSaveContractDetailsData,
   useTemplateContractDetails,
 } from "../../../context/template-contract-appState";
 
@@ -31,11 +31,12 @@ export default function Erc20({
   selectedChain: AvailableChains;
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
-  const { templateContractDetails, updateTemplateContractDetail } =
+  const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
+  const [isSaving, setIsSaving] = useState(false);
 
-  const selectedContractDetails = templateContractDetails.contracts.find(
+  const selectedContractDetails = erc20TemplateContractDetails.contracts.find(
     (data) => data.chain === selectedChain,
   );
 
@@ -222,6 +223,7 @@ export default function Erc20({
   // }
 
   function saveDetails() {
+    setIsSaving(true);
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -257,13 +259,13 @@ export default function Erc20({
     }
 
     // Find the templateContract with the selected chain
-    const selectedTemplateContract = templateContractDetails.contracts.find(
+    const selectedTemplateContract = erc20TemplateContractDetails.contracts.find(
       (contract) => contract.chain === selectedChain,
     );
 
     if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
-      const updatedTemplateContract: TemplateSaveContractDetailsData = {
+      const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
         ...selectedTemplateContract,
         name,
         symbol,
@@ -283,8 +285,9 @@ export default function Erc20({
       };
 
       // Update the contract details using the context
-      updateTemplateContractDetail(selectedChain, updatedTemplateContract);
+      updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
     }
+    setIsSaving(false);
   }
 
   // function handleDeployModalClose() {
@@ -462,10 +465,10 @@ export default function Erc20({
       <div className="flex justify-center mt-6 ">
         <Button
           onClick={saveDetails}
-          className="w-3/4"
+          className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
           color={deployed && !verified ? "secondary" : "primary"}
         >
-          Save
+          {isSaving ? "Saving..." : "Save"}
         </Button>
         {/*<Button*/}
         {/*  onClick={() => setDeployModal(true)}*/}

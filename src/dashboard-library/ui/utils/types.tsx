@@ -27,6 +27,7 @@ export interface ERC721ContractParams {
   pausable: boolean;
   incremental: boolean;
   votes: boolean;
+  enumerable: boolean;
   uriStorage: boolean;
   access: access;
   upgradeable: upgradeable;

@@ -18,6 +18,10 @@ import {
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../context/user-appState";
 import { ERC20Options } from "@openzeppelin/wizard/dist/erc20";
+import {
+  Erc20TemplateSaveContractDetailsData,
+  useTemplateContractDetails,
+} from "../../../context/template-contract-appState";
 
 export default function Defi({
   displayCode,
@@ -26,18 +30,76 @@ export default function Defi({
   displayCode: (code: string) => void;
   selectedChain: AvailableChains;
 }) {
-  const [name, setName] = useState("Token");
-  const [symbol, setSymbol] = useState("TKN");
-  const [burnable, setBurnable] = useState(false);
-  const [pausable, setPausable] = useState(false);
-  const [premint, setPremint] = useState("");
-  const [mintable, setMintable] = useState(false);
-  const [permit, setPermit] = useState(false);
-  const [votes, setVotes] = useState(false);
-  const [flashmint, setFlashmint] = useState(false);
-  const [access, setAccess] = useState("");
-  const [upgradeable, setUpgradeable] = useState("false");
-  const [securityContract, setSecurityContract] = useState("");
+  const { contractsData, updateContractDetails } = useContractDetails();
+  const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
+    useTemplateContractDetails();
+  const { userDetails } = useUserDetails();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const selectedContractDetails = erc20TemplateContractDetails.contracts.find(
+    (data) => data.chain === selectedChain,
+  );
+
+  const [name, setName] = useState(
+    selectedContractDetails?.name === ""
+      ? "Token"
+      : (selectedContractDetails?.name as string),
+  );
+  const [symbol, setSymbol] = useState(
+    selectedContractDetails?.symbol === ""
+      ? "Tkn"
+      : (selectedContractDetails?.symbol as string),
+  );
+  const [burnable, setBurnable] = useState(
+    selectedContractDetails?.burnable === false
+      ? false
+      : (selectedContractDetails?.burnable as boolean),
+  );
+  const [pausable, setPausable] = useState(
+    selectedContractDetails?.pausable === false
+      ? false
+      : (selectedContractDetails?.pausable as boolean),
+  );
+  const [premint, setPremint] = useState(
+    selectedContractDetails?.premint === ""
+      ? ""
+      : (selectedContractDetails?.premint as string),
+  );
+  const [mintable, setMintable] = useState(
+    selectedContractDetails?.mintable === false
+      ? false
+      : (selectedContractDetails?.mintable as boolean),
+  );
+  const [permit, setPermit] = useState(
+    selectedContractDetails?.permit === false
+      ? false
+      : (selectedContractDetails?.permit as boolean),
+  );
+  const [votes, setVotes] = useState(
+    selectedContractDetails?.votes === false
+      ? false
+      : (selectedContractDetails?.votes as boolean),
+  );
+  const [flashmint, setFlashmint] = useState(
+    selectedContractDetails?.flashmint === false
+      ? false
+      : (selectedContractDetails?.flashmint as boolean),
+  );
+  const [access, setAccess] = useState(
+    selectedContractDetails?.access === ""
+      ? ""
+      : (selectedContractDetails?.access as string),
+  );
+  const [upgradeable, setUpgradeable] = useState(
+    selectedContractDetails?.upgradeable === ""
+      ? "false"
+      : (selectedContractDetails?.upgradeable as string),
+  );
+  const [securityContract, setSecurityContract] = useState(
+    selectedContractDetails?.info?.securityContract === ""
+      ? ""
+      : (selectedContractDetails?.info?.securityContract as string),
+  );
   const [license, setLicense] = useState(getLicences()[2].value);
   const [contract, setContract] = useState("");
 
@@ -47,9 +109,6 @@ export default function Defi({
   const [verified, setVerified] = useState(false);
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
-
-  const { contractsData, updateContractDetails } = useContractDetails();
-  const { userDetails } = useUserDetails();
 
   // const isDeployed = (deploy: boolean) => {
   //   setDeployed(deploy);
@@ -164,6 +223,7 @@ export default function Defi({
   // }
 
   function saveDetails() {
+    setIsSaving(true);
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -197,6 +257,37 @@ export default function Defi({
       // Update the contract details using the context
       updateContractDetails(updatedContract);
     }
+
+    // Find the templateContract with the selected chain
+    const selectedTemplateContract = erc20TemplateContractDetails.contracts.find(
+      (contract) => contract.chain === selectedChain,
+    );
+
+    if (selectedTemplateContract) {
+      // Create an updated contract with only the changed fields
+      const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
+        ...selectedTemplateContract,
+        name,
+        symbol,
+        premint,
+        mintable,
+        burnable,
+        pausable,
+        permit,
+        votes,
+        flashmint,
+        access,
+        upgradeable,
+        info: {
+          securityContract,
+          license,
+        },
+      };
+
+      // Update the contract details using the context
+      updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
+    }
+    setIsSaving(false);
   }
 
   // function handleDeployModalClose() {
@@ -208,142 +299,150 @@ export default function Defi({
   // }
 
   return (
-    <div className="contract-form-container">
-      <div className="contract-heading">Contract Form</div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          <TextInput
-            id="name"
-            label="Contract Name*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={name}
-            setValue={setName}
-          />
-          <TextInput
-            id="symbol"
-            label="Contract Symbol*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={symbol}
-            setValue={setSymbol}
-          />
-          <TextInput
-            id="premint"
-            label="Premint"
-            labelClassName="text-subtext"
-            type={TextInputTypes.NUMBER}
-            value={premint}
-            setValue={setPremint}
-            minNum={0}
-          />
-        </div>
-      </div>
-      <div className="flex flex-col gap-y-5 py-6 border-b">
-        <Text Type="16-Md"> Features</Text>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-          <CheckboxInput
-            id="mintable"
-            label="Mintable"
-            value={mintable}
-            setValue={setMintable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="burnable"
-            label="Burnable"
-            value={burnable}
-            setValue={setBurnable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="pausable"
-            label="Pausable"
-            value={pausable}
-            setValue={setPausable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="permit"
-            label="Permit"
-            value={permit}
-            setValue={setPermit}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="votes"
-            label="Votes"
-            value={votes}
-            setValue={setVotes}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="flashmint"
-            label="Flash Minting"
-            value={flashmint}
-            setValue={setFlashmint}
-            labelClassName="text-subtext"
-          />
-        </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md"> Access control</Text> */}
-
-          <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-            <RadioInput
-              id="accesss"
-              label="Access Control"
-              value={access}
-              setValue={setAccess}
-              valueOptions={[
-                {
-                  value: "ownable",
-                  label: "Ownable",
-                },
-                {
-                  value: "roles",
-                  label: "Roles",
-                },
-                {
-                  value: "managed",
-                  label: "Managed",
-                },
-              ]}
+    <div>
+      <div className=" h-[515px] overflow-auto contract-form-container">
+        {/* <div className="">Contract Form</div> */}
+        <div className="border-b ">
+          <div className="flex flex-col gap-y-5">
+            <TextInput
+              id="name"
+              label="Contract Name*"
               labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={name}
+              setValue={setName}
+            />
+            <TextInput
+              id="symbol"
+              label="Contract Symbol*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={symbol}
+              setValue={setSymbol}
+            />
+            <TextInput
+              id="premint"
+              label="Premint"
+              labelClassName="text-subtext"
+              type={TextInputTypes.NUMBER}
+              value={premint}
+              setValue={setPremint}
+              minNum={0}
             />
           </div>
         </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md">Upgradeability</Text> */}
-
+        <div className="flex flex-col gap-y-5 py-6 border-b">
+          <Text Type="16-Md"> Features</Text>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-            <RadioInput
-              id="upgradeable"
-              label="Upgradeability"
-              value={upgradeable}
-              setValue={setUpgradeable}
-              valueOptions={[
-                {
-                  value: "transparent",
-                  label: "Transparent",
-                },
-                {
-                  value: "uups",
-                  label: "UUPS",
-                },
-              ]}
+            <CheckboxInput
+              id="mintable"
+              label="Mintable"
+              value={mintable}
+              setValue={setMintable}
               labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="burnable"
+              label="Burnable"
+              value={burnable}
+              setValue={setBurnable}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="pausable"
+              label="Pausable"
+              value={pausable}
+              setValue={setPausable}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="permit"
+              label="Permit"
+              value={permit}
+              setValue={setPermit}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="votes"
+              label="Votes"
+              value={votes}
+              setValue={setVotes}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="flashmint"
+              label="Flash Minting"
+              value={flashmint}
+              setValue={setFlashmint}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
             />
           </div>
         </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md"> INFO</Text>
-          <TextInput
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md"> Access control</Text> */}
+
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+              <RadioInput
+                id="accesss"
+                label="Access Control"
+                value={access}
+                setValue={setAccess}
+                className="accent-[#6B45CD]"
+                valueOptions={[
+                  {
+                    value: "ownable",
+                    label: "Ownable",
+                  },
+                  {
+                    value: "roles",
+                    label: "Roles",
+                  },
+                  {
+                    value: "managed",
+                    label: "Managed",
+                  },
+                ]}
+                labelClassName="text-subtext"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md">Upgradeability</Text> */}
+
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+              <RadioInput
+                id="upgradeable"
+                label="Upgradeability"
+                value={upgradeable}
+                setValue={setUpgradeable}
+                valueOptions={[
+                  {
+                    value: "transparent",
+                    label: "Transparent",
+                  },
+                  {
+                    value: "uups",
+                    label: "UUPS",
+                  },
+                ]}
+                labelClassName="text-subtext"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md"> INFO</Text> */}
+            {/* <TextInput
             id="securityContract"
             label="Security Contract"
             labelClassName="text-subtext"
@@ -352,23 +451,24 @@ export default function Defi({
             setValue={setSecurityContract}
             placeholder="security@example.com"
           /> */}
-          <TextInput
-            id="license"
-            label="License"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={license}
-            setValue={setLicense}
-          />
+            <TextInput
+              id="license"
+              label="License"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={license}
+              setValue={setLicense}
+            />
+          </div>
         </div>
       </div>
-      <div className="flex justify-between mt-[140px] ">
+      <div className="flex justify-center mt-6 ">
         <Button
           onClick={saveDetails}
-          className="min-w-[113px]"
+          className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
           color={deployed && !verified ? "secondary" : "primary"}
         >
-          Save
+          {isSaving ? "Saving..." : "Save"}
         </Button>
         {/*<Button*/}
         {/*  onClick={() => setDeployModal(true)}*/}

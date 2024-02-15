@@ -14,6 +14,10 @@ import { Text } from "../common/Typography";
 import { AvailableChains } from "../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../context/user-appState";
 import { ERC721Options } from "@openzeppelin/wizard/dist/erc721";
+import {
+  Erc721TemplateSaveContractDetailsData,
+  useTemplateContractDetails,
+} from "../../../context/template-contract-appState";
 // import DeployModal from "../deploy/page";
 // import VerifyContract from "../verifycontract/page";
 
@@ -24,19 +28,81 @@ export default function Erc721({
   displayCode: (code: string) => void;
   selectedChain: AvailableChains;
 }) {
-  const [name, setName] = useState("Token");
-  const [symbol, setSymbol] = useState("TKN");
-  const [burnable, setBurnable] = useState(false);
-  const [incremental, setIncremental] = useState(false);
-  const [pausable, setPausable] = useState(false);
-  const [baseUri, setBaseUri] = useState("");
-  const [mintable, setMintable] = useState(false);
-  const [votes, setVotes] = useState(false);
-  const [enumerable, setEnumerable] = useState(false);
-  const [uriStorage, setUriStorage] = useState(false);
-  const [access, setAccess] = useState("");
-  const [upgradeable, setUpgradeable] = useState("false");
-  const [securityContract, setSecurityContract] = useState("");
+  const { contractsData, updateContractDetails } = useContractDetails();
+  const { erc721TemplateContractDetails, updateErc721TemplateContractDetail } =
+    useTemplateContractDetails();
+  const { userDetails } = useUserDetails();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const selectedContractDetails = erc721TemplateContractDetails.contracts.find(
+    (data) => data.chain === selectedChain,
+  );
+
+  const [name, setName] = useState(
+    selectedContractDetails?.name === ""
+      ? "Nft"
+      : (selectedContractDetails?.name as string),
+  );
+  const [symbol, setSymbol] = useState(
+    selectedContractDetails?.symbol === ""
+      ? "Nft"
+      : (selectedContractDetails?.symbol as string),
+  );
+  const [burnable, setBurnable] = useState(
+    selectedContractDetails?.burnable === false
+      ? false
+      : (selectedContractDetails?.burnable as boolean),
+  );
+  const [incremental, setIncremental] = useState(
+    selectedContractDetails?.incremental === false
+      ? false
+      : (selectedContractDetails?.incremental as boolean),
+  );
+  const [pausable, setPausable] = useState(
+    selectedContractDetails?.pausable === false
+      ? false
+      : (selectedContractDetails?.pausable as boolean),
+  );
+  const [baseUri, setBaseUri] = useState(
+    selectedContractDetails?.baseUri === ""
+      ? ""
+      : (selectedContractDetails?.baseUri as string),
+  );
+  const [mintable, setMintable] = useState(
+    selectedContractDetails?.mintable === false
+      ? false
+      : (selectedContractDetails?.mintable as boolean),
+  );
+  const [votes, setVotes] = useState(
+    selectedContractDetails?.votes === false
+      ? false
+      : (selectedContractDetails?.votes as boolean),
+  );
+  const [enumerable, setEnumerable] = useState(
+    selectedContractDetails?.enumerable === false
+      ? false
+      : (selectedContractDetails?.enumerable as boolean),
+  );
+  const [uriStorage, setUriStorage] = useState(
+    selectedContractDetails?.uriStorage === false
+      ? false
+      : (selectedContractDetails?.uriStorage as boolean),
+  );
+  const [access, setAccess] = useState(
+    selectedContractDetails?.access === ""
+      ? ""
+      : (selectedContractDetails?.access as string),
+  );
+  const [upgradeable, setUpgradeable] = useState(
+    selectedContractDetails?.upgradeable === ""
+      ? "false"
+      : (selectedContractDetails?.upgradeable as string),
+  );
+  const [securityContract, setSecurityContract] = useState(
+    selectedContractDetails?.info?.securityContract === ""
+      ? ""
+      : (selectedContractDetails?.info?.securityContract as string),
+  );
   const [license, setLicense] = useState(getLicences()[2].value);
   const [contract, setContract] = useState("");
 
@@ -46,9 +112,6 @@ export default function Erc721({
   const [verified, setVerified] = useState(false);
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
-
-  const { contractsData, updateContractDetails } = useContractDetails();
-  const { userDetails } = useUserDetails();
 
   // const isDeployed = (deploy: boolean) => {
   //   setDeployed(deploy);
@@ -74,6 +137,7 @@ export default function Erc721({
       pausable,
       incremental,
       votes,
+      enumerable,
       uriStorage,
       access: access as access,
       upgradeable: (upgradeable === "false"
@@ -99,6 +163,7 @@ export default function Erc721({
       pausable,
       incremental,
       votes,
+      enumerable,
       uriStorage,
       access: access as access,
       upgradeable: (upgradeable === "false"
@@ -125,6 +190,7 @@ export default function Erc721({
     securityContract,
     symbol,
     upgradeable,
+    enumerable,
     uriStorage,
     votes,
   ]);
@@ -159,6 +225,7 @@ export default function Erc721({
   // }
 
   function saveDetails() {
+    setIsSaving(true);
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -192,6 +259,42 @@ export default function Erc721({
       // Update the contract details using the context
       updateContractDetails(updatedContract);
     }
+
+    // Find the templateContract with the selected chain
+    const selectedTemplateContract =
+      erc721TemplateContractDetails.contracts.find(
+        (contract) => contract.chain === selectedChain,
+      );
+
+    if (selectedTemplateContract) {
+      // Create an updated contract with only the changed fields
+      const updatedTemplateContract: Erc721TemplateSaveContractDetailsData = {
+        ...selectedTemplateContract,
+        name,
+        symbol,
+        baseUri,
+        mintable,
+        burnable,
+        pausable,
+        incremental,
+        votes,
+        enumerable,
+        uriStorage,
+        access,
+        upgradeable,
+        info: {
+          securityContract,
+          license,
+        },
+      };
+
+      // Update the contract details using the context
+      updateErc721TemplateContractDetail(
+        selectedChain,
+        updatedTemplateContract,
+      );
+    }
+    setIsSaving(false);
   }
 
   // function handleDeployModalClose() {
@@ -367,10 +470,10 @@ export default function Erc721({
       <div className="flex justify-between mt-[140px] ">
         <Button
           onClick={saveDetails}
-          className="min-w-[113px]"
+          className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
           color={deployed && !verified ? "secondary" : "primary"}
         >
-          Save
+          {isSaving ? "Saving..." : "Save"}
         </Button>
         {/*<Button*/}
         {/*  onClick={() => setDeployModal(true)}*/}
