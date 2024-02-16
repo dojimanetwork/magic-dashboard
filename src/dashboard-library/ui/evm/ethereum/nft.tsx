@@ -8,7 +8,7 @@ import {
 import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../../context/user-appState";
 import {
-  TemplateSaveContractDetailsData,
+  Erc721TemplateSaveContractDetailsData,
   useTemplateContractDetails,
 } from "../../../../context/template-contract-appState";
 import { EthereumCrossChainNftTemplate } from "../../../template-contracts/contracts/ethereum/nft/EthereumCrossChainNft";
@@ -21,11 +21,11 @@ export default function EthereumNftTemplateView({
   selectedChain: AvailableChains;
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
-  const { templateContractDetails, updateTemplateContractDetail } =
+  const { erc721TemplateContractDetails, updateErc721TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
 
-  const selectedContractDetails = templateContractDetails.contracts.find(
+  const selectedContractDetails = erc721TemplateContractDetails.contracts.find(
     (data) => data.chain === selectedChain,
   );
 
@@ -92,20 +92,20 @@ export default function EthereumNftTemplateView({
     }
 
     // Find the templateContract with the selected chain
-    const selectedTemplateContract = templateContractDetails.contracts.find(
+    const selectedTemplateContract = erc721TemplateContractDetails.contracts.find(
       (contract) => contract.chain === selectedChain,
     );
 
     if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
-      const updatedTemplateContract: TemplateSaveContractDetailsData = {
+      const updatedTemplateContract: Erc721TemplateSaveContractDetailsData = {
         ...selectedTemplateContract,
         name,
         symbol,
       };
 
       // Update the contract details using the context
-      updateTemplateContractDetail(selectedChain, updatedTemplateContract);
+      updateErc721TemplateContractDetail(selectedChain, updatedTemplateContract);
     }
   }
 

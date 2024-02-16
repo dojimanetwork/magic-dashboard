@@ -8,7 +8,7 @@ import {
 import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../../../../context/user-appState";
 import {
-  TemplateSaveContractDetailsData,
+  Erc20TemplateSaveContractDetailsData,
   useTemplateContractDetails,
 } from "../../../../context/template-contract-appState";
 // import { BscCrossChainTokenTemplate } from "../../../template-contracts/contracts/bsc/token/BscCrossChainToken";
@@ -113,11 +113,11 @@ export default function BscBep20View({
   selectedChain: AvailableChains;
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
-  const { templateContractDetails, updateTemplateContractDetail } =
+  const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
 
-  const selectedContractDetails = templateContractDetails.contracts.find(
+  const selectedContractDetails = erc20TemplateContractDetails.contracts.find(
     (data) => data.chain === selectedChain,
   );
 
@@ -205,13 +205,13 @@ export default function BscBep20View({
     }
 
     // Find the templateContract with the selected chain
-    const selectedTemplateContract = templateContractDetails.contracts.find(
+    const selectedTemplateContract = erc20TemplateContractDetails.contracts.find(
       (contract) => contract.chain === selectedChain,
     );
 
     if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
-      const updatedTemplateContract: TemplateSaveContractDetailsData = {
+      const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
         ...selectedTemplateContract,
         name,
         symbol,
@@ -219,7 +219,7 @@ export default function BscBep20View({
       };
 
       // Update the contract details using the context
-      updateTemplateContractDetail(selectedChain, updatedTemplateContract);
+      updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
     }
   }
 
