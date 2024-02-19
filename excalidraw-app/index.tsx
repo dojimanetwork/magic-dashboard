@@ -195,11 +195,13 @@ const ExcalidrawWrapper = () => {
      * */
     const argument = searchParams.get("argument");
     const argumentsFromDashboard: {
+      email: string,
+      projectName: string,
       chains: AvailableChains[];
       templateType: templateType;
     } = argument
       ? JSON.parse(argument)
-      : { chains: userDetails.chains, templateType: userDetails.type };
+      : userDetails;
     /** Retrieves old data from localStorage even after page refresh */
     const localDataState = argumentsFromDashboard
       ? importFromLocalStorage(
@@ -210,6 +212,8 @@ const ExcalidrawWrapper = () => {
     /** Update user inputs like selected chains and templateType */
     if (argumentsFromDashboard) {
       updateUserDetails({
+        email: argumentsFromDashboard.email,
+        projectName: argumentsFromDashboard.projectName,
         chains: argumentsFromDashboard.chains,
         type: argumentsFromDashboard.templateType,
       });

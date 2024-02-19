@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ui.css";
 // import Button from "./common/Button";
 // import { Text } from "./common/Typography";
@@ -9,6 +9,29 @@ import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { AvailableChains } from "../../../excalidraw-app/dojima-templates/types";
 import { DisplayContract } from "./DisplayContract";
+import { useUserDetails } from "../../context/user-appState";
+import axios from "axios";
+
+export type ProjectChainsDeploymentData = {
+  chain: string;
+  contractAddress: string;
+  contractAbi: string;
+  contractByteCode: string;
+};
+
+export type ProjectDataObject = {
+  projectName: string;
+  email: string;
+  ownerUrl: string;
+  description: string;
+  type: string;
+  chains: string[];
+  projectData: string;
+  status?: boolean;
+  deploymentData?: ProjectChainsDeploymentData[];
+  dateCreated?: Date;
+  lastUpdated?: Date;
+};
 
 export function formatSolidityCode(code: string): string {
   code = code.replace("pragma solidity", "\npragma solidity");
@@ -30,10 +53,41 @@ function ContractView({
   selectedElementChain: AvailableChains;
 }) {
   const [contractCode, setContractCode] = useState("");
+  const [isDeployed, setIsDeployed] = useState(false);
+  const [contractDeployedData, setContractDeployedData] =
+    useState<ProjectChainsDeploymentData>();
+  const { userDetails } = useUserDetails();
 
   const displayContractCode = (code: string) => {
     setContractCode(code);
   };
+
+  useEffect(() => {
+    if (userDetails.email && userDetails.projectName) {
+      // Make Axios POST request with DeployEVMContractParams in the request body
+      axios
+        .get(
+          `https://faas-test.dojima.network/v1/dev/dash/projects/project`,
+          {
+            params: {
+              email: userDetails.email,
+              projectName: userDetails.projectName,
+            },
+          },
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            const projectData: ProjectDataObject = response.data;
+            const contractDataByChain = projectData.deploymentData?.find(
+              (data) => data.chain === selectedElementChain,
+            );
+            setContractDeployedData(contractDataByChain);
+            setIsDeployed(true);
+          } else {
+          }
+        });
+    }
+  }, []);
 
   // const copyToClipboard = async () => {
   //   try {
@@ -44,46 +98,91 @@ function ContractView({
   // };
 
   return (
-    <section className="">
-      <div className="flex items-center text-center border-b text-[] text-xl/6 font-semibold uppercase">
-        {/* <div className="w-1/3 cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
-          Erc20
-        </div>
-        <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
-          ERC721
-        </div>
-        <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
-          ERC1155
-        </div> */}
-        <div className="cursor-pointer text-center w-full py-6 text-[#6B45CD] border-r last:border-r-0">
-          {selectedElementChain}
-        </div>
-      </div>
-      <div className="flex h-[600px] overflow-auto w-[810px]">
-        <div className="h-full overflow-auto w-1/3 shrink-0">
-          <div>
-            <DisplayContract
-              displayCode={displayContractCode}
-              selectedChain={selectedElementChain}
-            />
+    <>
+      {isDeployed ? (
+        <>
+          <div className=" mt-4 mb-4  p-4">
+            <div className="flex items-center">
+              <p className="text-start text-sm w-20">
+                {contractDeployedData?.chain}{" "}
+              </p>
+            </div>
+            <div className="flex items-center">
+              <p className="text-start text-sm w-20 ">Contract Address </p>
+              <p className="w-10">:</p>
+              <strong className="font-semibold">
+                {contractDeployedData?.contractAddress}
+              </strong>
+            </div>
           </div>
-        </div>
+          <div className="mt-6">
+            <p className="text-base text-[#757575] font-semibold ">
+              Contract ABI
+            </p>
+            <div className=" text-black cursor-not-allowed">
+              <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
+                <div>
+                  <pre>
+                    {JSON.stringify(contractDeployedData?.contractAbi, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6">
+            <p className="text-base text-[#757575] font-semibold ">
+              Contract ByteCode
+            </p>
+            <div className=" text-black cursor-not-allowed">
+              <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
+                {contractDeployedData?.contractByteCode}
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <section className="">
+          <div className="flex items-center text-center border-b text-[] text-xl/6 font-semibold uppercase">
+            {/* <div className="w-1/3 cursor-pointer py-6 text-[#6B45CD] border-r last:border-r-0">
+            Erc20
+          </div>
+          <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
+            ERC721
+          </div>
+          <div className="w-1/3 cursor-pointer py-6 hover:text-[#6B45CD] border-r last:border-r-0">
+            ERC1155
+          </div> */}
+            <div className="cursor-pointer text-center w-full py-6 text-[#6B45CD] border-r last:border-r-0">
+              {selectedElementChain}
+            </div>
+          </div>
+          <div className="flex h-[600px] overflow-auto w-[810px]">
+            <div className="h-full overflow-auto w-1/3 shrink-0">
+              <div>
+                <DisplayContract
+                  displayCode={displayContractCode}
+                  selectedChain={selectedElementChain}
+                />
+              </div>
+            </div>
 
-        <div className="contract-view-content h-full w-full">
-          <SyntaxHighlighter
-            language="solidity"
-            style={monokai}
-            wrapLongLines={true}
-            customStyle={{
-              backgroundColor: "transparent",
-              color: "white",
-            }}
-          >
-            {formatSolidityCode(contractCode)}
-          </SyntaxHighlighter>
-        </div>
-      </div>
-    </section>
+            <div className="contract-view-content h-full w-full">
+              <SyntaxHighlighter
+                language="solidity"
+                style={monokai}
+                wrapLongLines={true}
+                customStyle={{
+                  backgroundColor: "transparent",
+                  color: "white",
+                }}
+              >
+                {formatSolidityCode(contractCode)}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+        </section>
+      )}
+    </>
   );
 }
 

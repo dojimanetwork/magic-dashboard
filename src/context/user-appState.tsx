@@ -5,6 +5,8 @@ import {
 } from "../../excalidraw-app/dojima-templates/types";
 
 export interface UserDetails {
+  email: string,
+  projectName: string,
   chains: Array<AvailableChains>;
   type: templateType;
 }
@@ -25,6 +27,8 @@ export const UserDetailsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [userDetails, setUserDetails] = React.useState<UserDetails>({
+    email: "",
+    projectName: "",
     chains: ["dojima"],
     type: "erc20",
   });
