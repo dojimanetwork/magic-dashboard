@@ -259,9 +259,10 @@ export default function Dex({
     }
 
     // Find the templateContract with the selected chain
-    const selectedTemplateContract = erc20TemplateContractDetails.contracts.find(
-      (contract) => contract.chain === selectedChain,
-    );
+    const selectedTemplateContract =
+      erc20TemplateContractDetails.contracts.find(
+        (contract) => contract.chain === selectedChain,
+      );
 
     if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields

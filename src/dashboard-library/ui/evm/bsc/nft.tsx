@@ -92,9 +92,10 @@ export default function BscNftTemplateView({
     }
 
     // Find the templateContract with the selected chain
-    const selectedTemplateContract = erc721TemplateContractDetails.contracts.find(
-      (contract) => contract.chain === selectedChain,
-    );
+    const selectedTemplateContract =
+      erc721TemplateContractDetails.contracts.find(
+        (contract) => contract.chain === selectedChain,
+      );
 
     if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
@@ -105,7 +106,10 @@ export default function BscNftTemplateView({
       };
 
       // Update the contract details using the context
-      updateErc721TemplateContractDetail(selectedChain, updatedTemplateContract);
+      updateErc721TemplateContractDetail(
+        selectedChain,
+        updatedTemplateContract,
+      );
     }
   }
 

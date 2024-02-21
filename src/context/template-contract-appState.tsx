@@ -184,7 +184,7 @@ export const TemplateContractProvider: React.FC<{
     erc20TemplateContractDetails,
     erc721TemplateContractDetails,
     updateErc20TemplateContractDetail,
-    updateErc721TemplateContractDetail
+    updateErc721TemplateContractDetail,
   };
 
   return (

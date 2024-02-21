@@ -11,6 +11,8 @@ import {
   Erc20TemplateSaveContractDetailsData,
   useTemplateContractDetails,
 } from "../../../../context/template-contract-appState";
+import { Text } from "../../common/Typography";
+import CheckboxInput from "../../common/CheckboxInput";
 // import { BscCrossChainTokenTemplate } from "../../../template-contracts/contracts/bsc/token/BscCrossChainToken";
 
 export type Bep20ContractParams = {
@@ -205,9 +207,10 @@ export default function BscBep20View({
     }
 
     // Find the templateContract with the selected chain
-    const selectedTemplateContract = erc20TemplateContractDetails.contracts.find(
-      (contract) => contract.chain === selectedChain,
-    );
+    const selectedTemplateContract =
+      erc20TemplateContractDetails.contracts.find(
+        (contract) => contract.chain === selectedChain,
+      );
 
     if (selectedTemplateContract) {
       // Create an updated contract with only the changed fields
@@ -252,6 +255,27 @@ export default function BscBep20View({
             value={premint}
             setValue={setPremint}
             minNum={0}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-y-5 py-6 border-b">
+        <Text Type="16-Md"> Features</Text>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+          <CheckboxInput
+            id="mintable"
+            label="Mintable"
+            value={mintable}
+            setValue={setMintable}
+            labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
+          />
+          <CheckboxInput
+            id="burnable"
+            label="Burnable"
+            value={burnable}
+            setValue={setBurnable}
+            labelClassName="text-subtext"
+            className="accent-[#6B45CD]"
           />
         </div>
       </div>

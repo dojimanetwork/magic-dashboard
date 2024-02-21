@@ -67,7 +67,7 @@ function ContractView({
       // Make Axios POST request with DeployEVMContractParams in the request body
       axios
         .get(
-          `https://faas-test.dojima.network/v1/dev/dash/projects/project`,
+          `${process.env.VITE_APP_FAAS_TESTNET_URL}/v1/dev/dash/projects/project`,
           {
             params: {
               email: userDetails.email,

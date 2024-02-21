@@ -5,8 +5,8 @@ import {
 } from "../../excalidraw-app/dojima-templates/types";
 
 export interface UserDetails {
-  email: string,
-  projectName: string,
+  email: string;
+  projectName: string;
   chains: Array<AvailableChains>;
   type: templateType;
 }

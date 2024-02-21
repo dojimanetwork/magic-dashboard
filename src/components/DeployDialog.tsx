@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 // import { t } from "../i18n";
 import { Dialog } from "./Dialog";
 import "./HelpDialog.scss";
@@ -9,9 +9,9 @@ import { useUserDetails } from "../context/user-appState";
 import axios from "axios";
 // import { DeployEVMContractParams } from "../contracts/types";
 import AddIconImg from "../static/add_icon.svg";
-import { XTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/XTokenContract";
-import { OmniChainTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/OmniChainTokenContract";
-import { EthereumCrossChainTokenTemplate } from "../dashboard-library/template-contracts/contracts/ethereum/token/EthereumCrossChainToken";
+// import { XTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/XTokenContract";
+// import { OmniChainTokenContractTemplate } from "../dashboard-library/template-contracts/contracts/dojima/token/OmniChainTokenContract";
+// import { EthereumCrossChainTokenTemplate } from "../dashboard-library/template-contracts/contracts/ethereum/token/EthereumCrossChainToken";
 import SuccessIcon from "./Success.icon";
 import ErrorIcon from "./ErrorIcon";
 
@@ -89,23 +89,26 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     });
 
     // Make Axios POST request with DeployEVMContractParams in the request body
-    axios.post("http://localhost:3002/deploy", { data }).then((response) => {
-      if (response.status === 200) {
-        const result: Array<DeployedDetails> = response.data;
+    axios
+      .post("http://localhost:3002/deploy", { data })
+      .then((response) => {
+        if (response.status === 200) {
+          const result: Array<DeployedDetails> = response.data;
+          setIsDeploying(false);
+          setDeployedDetails(result);
+          setDeploymentStatus("success");
+          setIsDeployed(true);
+        } else {
+          setDeploymentStatus("failed");
+          setIsDeployed(true);
+        }
+      })
+      .catch((error) => {
         setIsDeploying(false);
-        setDeployedDetails(result);
-        setDeploymentStatus("success");
-        setIsDeployed(true);
-      } else {
         setDeploymentStatus("failed");
         setIsDeployed(true);
-      }
-    }).catch((error) => {
-      setIsDeploying(false);
-      setDeploymentStatus("failed");
-      setIsDeployed(true);
-      console.error(error);
-    });
+        console.error(error);
+      });
 
     // const data: Array<DeployableChainsData> = [
     //   {
