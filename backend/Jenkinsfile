@@ -28,7 +28,7 @@ pipeline {
                          withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -i ${env.SSH_KEY}"]) {
                              echo "Selected action: $INCREMENT_TYPE, $TAG, $GCR"
                              sh 'gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin --password-stdin https://$GCR'
-                             sh 'make release'
+                             sh 'cd ./backend && make release'
                          }
                     }
                 }
