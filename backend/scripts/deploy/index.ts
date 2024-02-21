@@ -4,8 +4,7 @@ import { promisify } from "util";
 import { formatSolidityCode } from "../utils";
 import { ethers } from "ethers";
 import { writeFileSync, readFileSync } from "fs";
-import { DeployEVMContractParams, EVMContractDeployedObject } from "../types";
-import { AvailableChains } from "../../../excalidraw-app/dojima-templates/types";
+import { AvailableChains, DeployEVMContractParams, EVMContractDeployedObject } from "../types";
 import deployOmnichainTokenContracts from "../omnichain/deploy_omnichain_token_contracts";
 
 const promisifiedExec = promisify(exec);

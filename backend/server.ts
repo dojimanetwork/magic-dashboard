@@ -78,6 +78,9 @@ app.options('*', cors()); // Enable preflight for all routes
 //   // res.send(result);
 // });
 
+app.get("/", (req, res) => {
+  res.send(process.env.VITE_APP_MESSAGE);
+});
 
 app.post('/deploy', async (req, res) => {
   const { data } = req.body;

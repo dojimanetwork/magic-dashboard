@@ -1,4 +1,4 @@
-import { AvailableChains } from "../../excalidraw-app/dojima-templates/types";
+import { AvailableChains } from "./types";
 import { deployBSCContractHandler } from "./bsc/deployContract";
 import { DeployableChainsData } from "./deploy";
 import { deployDOJContractHandler } from "./dojima/deployContract";

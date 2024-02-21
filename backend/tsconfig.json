@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "outDir": "dist",
-        "rootDir": "src",
+        "outDir": "build",
+        "rootDir": "./",
         "strict": true,
         "target": "ESNext",
         "lib": ["dom", "dom.iterable", "esnext"],
@@ -15,11 +15,10 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "noEmit": true,
         "jsx": "react-jsx",
         "types": ["node", "dotenv"]
     },
-    "include": ["src/**/*.ts"],
+    "include": ["**/*.ts"],
     "exclude": ["node_modules"]
 }
   
