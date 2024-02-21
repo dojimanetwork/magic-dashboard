@@ -11,7 +11,7 @@ import { DeployChainScript } from './scripts';
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const port = 3002;
+const port = process.env.VITE_APP_BACKEND_PORT;
 
 // // Example: Allow requests only from 'http://localhost:3001'
 // const corsOptions = {
