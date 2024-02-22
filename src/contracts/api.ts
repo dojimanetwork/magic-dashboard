@@ -6,7 +6,7 @@ import {
 } from "./types";
 
 const apiInstance = axios.create({
-  baseURL: "http://localhost:3002/v1/dev/dash/contracts",
+  baseURL: `${import.meta.env.VITE_APP_FAAS_TESTNET_URL}/v1/dev/dash/contracts`,
 });
 
 async function handleRequest<T>(

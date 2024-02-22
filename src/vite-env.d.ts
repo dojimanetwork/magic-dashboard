@@ -54,6 +54,13 @@ interface ImportMetaEnv {
   MODE: string;
   DEV: string;
   PROD: string;
+
+  // Dojima URL's
+
+  VITE_APP_FAAS_STAGENET_URL: string;
+  VITE_APP_FAAS_TESTNET_URL: string;
+
+  VITE_APP_MAGIC_DASHBOARD_BACKEND_URL: string;
 }
 
 interface ImportMeta {

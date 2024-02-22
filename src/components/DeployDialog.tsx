@@ -90,7 +90,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
 
     // Make Axios POST request with DeployEVMContractParams in the request body
     axios
-      .post("http://localhost:3002/deploy", { data })
+      .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, { data })
       .then((response) => {
         if (response.status === 200) {
           const result: Array<DeployedDetails> = response.data;
