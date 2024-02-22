@@ -67,7 +67,7 @@ function ContractView({
       // Make Axios POST request with DeployEVMContractParams in the request body
       axios
         .get(
-          `${process.env.VITE_APP_FAAS_TESTNET_URL}/v1/dev/dash/projects/project`,
+          `${import.meta.env.VITE_APP_FAAS_TESTNET_URL}/v1/dev/dash/projects/project`,
           {
             params: {
               email: userDetails.email,
@@ -78,13 +78,20 @@ function ContractView({
         .then((response) => {
           if (response.status === 200) {
             const projectData: ProjectDataObject = response.data;
-            const contractDataByChain = projectData.deploymentData?.find(
-              (data) => data.chain === selectedElementChain,
-            );
-            setContractDeployedData(contractDataByChain);
-            setIsDeployed(true);
+            if(projectData.deploymentData && projectData.deploymentData.length > 0) {
+              const contractDataByChain = projectData.deploymentData?.find(
+                (data) => data.chain === selectedElementChain,
+              );
+              setContractDeployedData(contractDataByChain);
+              setIsDeployed(true);
+            } else {
+              setIsDeployed(false);
+            }
           } else {
+            setIsDeployed(false);
           }
+        }).catch(() => {
+          setIsDeployed(false);
         });
     }
   }, []);
