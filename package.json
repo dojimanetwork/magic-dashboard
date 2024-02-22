@@ -153,6 +153,6 @@
     "build:preview": "yarn build && vite preview --port 5000",
     "release:excalidraw": "node scripts/release.js",
     "docker:build": "docker build -t magic-dashboard --build-arg build_command=build:testnet -f Dockerfile .",
-    "docker:run": "docker run --name magic-dashboard -p 3006:3006 -d magic-dashboard"
+    "docker:run": "docker run --name magic-dashboard -p 3012:3012 -d magic-dashboard"
   }
 }

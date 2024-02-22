@@ -42,7 +42,7 @@ ENV NODE_ENV production
 COPY --from=builder  /app/build /var/www/
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 3006
+EXPOSE 3012
 
 # start the nginx web server
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
