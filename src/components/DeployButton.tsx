@@ -17,7 +17,7 @@ export const DeployButton = (props: DeployButtonProps) => (
     aria-label={t("deployDialog.title")}
     style={{
       background: props.enable
-        ? "linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)"
+        ? "linear-gradient(270deg, #A71CFF -35.09%, #8000FF 65.62%)"
         : "#CCCCCC",
       color: "white",
       cursor: props.enable ? "pointer" : "not-allowed",

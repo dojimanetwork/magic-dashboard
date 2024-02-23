@@ -250,7 +250,7 @@ export default function Dex({
         code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
-        gasPrice: "",
+        gasPrice: "~0.0002",
         type: userDetails.type,
       };
 

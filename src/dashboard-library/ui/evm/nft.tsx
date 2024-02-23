@@ -252,7 +252,7 @@ export default function Erc721({
         code: contract,
         arguments: deployedArgs.length > 0 ? deployedArgs : [],
         chain: selectedChain,
-        gasPrice: "",
+        gasPrice: "~0.0002",
         type: userDetails.type,
       };
 
