@@ -113,6 +113,9 @@
     "vitest": "0.34.1",
     "vitest-canvas-mock": "0.3.2"
   },
+  "engines": {
+    "node": "18.0.0 - 20.x.x"
+  },
   "homepage": ".",
   "name": "excalidraw",
   "prettier": "@excalidraw/prettier-config",

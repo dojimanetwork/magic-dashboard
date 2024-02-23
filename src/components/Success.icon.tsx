@@ -1,18 +1,11 @@
 import React from "react";
-import { Icons } from "./copyIcon";
 
-function SuccessIcon({
-  width = "40",
-  height = "40",
-  fill = "white",
-  stroke = "currentColor",
-  className,
-}: Icons) {
+function SuccessIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
+      width="40"
+      height="40"
       viewBox="0 0 40 40"
       fill="none"
     >

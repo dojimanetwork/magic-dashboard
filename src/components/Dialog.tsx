@@ -16,7 +16,6 @@ import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { jotaiScope } from "../jotai";
-import CircleCancleIcon from "./circlecancleIcon";
 
 export type DialogSize = number | "small" | "regular" | "wide" | undefined;
 
@@ -122,7 +121,7 @@ export const Dialog = (props: DialogProps) => {
           title={t("buttons.close")}
           aria-label={t("buttons.close")}
         >
-          {isFullscreen ? back : <CircleCancleIcon />}
+          {isFullscreen ? back : CloseIcon}
         </button>
         <div className="Dialog__content">{props.children}</div>
       </Island>
