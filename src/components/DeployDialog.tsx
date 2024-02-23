@@ -112,9 +112,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
 
     // Make Axios POST request with DeployEVMContractParams in the request body
     axios
-      .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, {
-        data,
-      })
+      .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, { data })
       .then((response) => {
         if (response.status === 200) {
           const result: Array<DeployedDetails> = response.data;
@@ -291,7 +289,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   }
 
   const renderDetailsForChain = (chain: AvailableChains) => {
-    const contract = contractsData.contracts[tab - 1];
+    const contract = contractsData.contracts.find((c) => c.chain === chain);
     if (!contract) {
       return null;
     }
@@ -345,7 +343,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   // };
 
   const renderCodeForChain = (chain: AvailableChains) => {
-    const contract = contractsData.contracts[tab - 1];
+    const contract = contractsData.contracts.find((c) => c.chain === chain);
     if (!contract) {
       return null;
     }
