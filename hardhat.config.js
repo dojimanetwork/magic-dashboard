@@ -18,7 +18,7 @@ module.exports = {
     }
   },
   networks: {
-    dojimachain: {
+    dojima: {
       url: 'https://api-dev.d11k.dojima.network',
       // url: process.env.VITE_APP_DOJIMA_API_URL,
       chainId: 1001,
@@ -29,7 +29,7 @@ module.exports = {
         "ae1d058b9c5713848e7ac4c1901fac9a737729a34c10c997991c861dd7705ac0",
       ],
     },
-    goerli: {
+    ethereum: {
       url: `https://eth-goerli.g.alchemy.com/v2/TIMeEU-fdUdyD-YijUoB_AbdtlVfEcl2`,
       // url: process.env.VITE_APP_ETH_GOERLI_ALCHEMY_URL,
       chainId: 1337,
@@ -58,12 +58,12 @@ module.exports = {
   etherscan: {
     apiKey: {
       ethereum: "6IU4JG5P2PNVRSB54YIAMIAQFQ879PXJ7C",
-      dojimachain: 'dojima',
+      dojima: 'dojima',
       bsc: "7X1FZ7XNHKPHMXA6VXFX56I533BP7KW3MW",
     },
     customChains: [
       {
-        network: 'dojimachain',
+        network: 'dojima',
         chainId: 1001,
         urls: {
           apiURL: process.env.VITE_APP_DOJIMA_BLOCKSCOUT_URL,

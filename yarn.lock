@@ -2169,10 +2169,10 @@
   resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-5.0.1.tgz#93da90fc209a0a4ff09c1deb037fbb35e4020890"
   integrity sha512-yQJaT5HDp9hYOOp4jTYxMsR02gdFZFXhewX5HW9Jo4fsqSVqqyIO/xTHdWDaKX5a3pv1txmf076Lziz+sO7L1w==
 
-"@openzeppelin/wizard@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.npmjs.org/@openzeppelin/wizard/-/wizard-0.4.1.tgz#c055fc05edf5a78a41c8df9d19a77132db680aa1"
-  integrity sha512-ylpncxGx9jA7vXrPCkHf9u/lKWcuGdhdu+uyBUb6pPN4zCYAzfRvW/ToPgjYUWn0c8+MPdO+/kaRxUu3Lgc7Zw==
+"@openzeppelin/wizard@^0.4.1":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@openzeppelin/wizard/-/wizard-0.4.2.tgz#76dd7ac90beca68156e462cd81c05218a4ffadc3"
+  integrity sha512-8RdbAU/fjxDL8Sh2yTDBmDNqHGa0ocnFsk9dOKDA/XeXoa3cKLDjq59k8GJhfo0iqbUI97ugHG5ZFWjEXCgAnQ==
   dependencies:
     array.prototype.flatmap "^1.2.4"
 

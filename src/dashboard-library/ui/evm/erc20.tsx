@@ -417,31 +417,6 @@ export default function Erc20({
         </div>
         <div className="py-6 border-b">
           <div className="flex flex-col gap-y-5">
-            {/* <Text Type="16-Md">Upgradeability</Text> */}
-
-            <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-              <RadioInput
-                id="upgradeable"
-                label="Upgradeability"
-                value={upgradeable}
-                setValue={setUpgradeable}
-                valueOptions={[
-                  {
-                    value: "transparent",
-                    label: "Transparent",
-                  },
-                  {
-                    value: "uups",
-                    label: "UUPS",
-                  },
-                ]}
-                labelClassName="text-subtext"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="py-6 border-b">
-          <div className="flex flex-col gap-y-5">
             {/* <Text Type="16-Md"> INFO</Text> */}
             {/* <TextInput
             id="securityContract"
