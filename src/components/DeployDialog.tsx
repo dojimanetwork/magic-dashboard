@@ -147,7 +147,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   }
 
   const renderDetailsForChain = (chain: AvailableChains) => {
-    const contract = contractsData.contracts.find((c) => c.chain === chain);
+    const contract = contractsData.contracts[tab - 1];
     if (!contract) {
       return null;
     }
@@ -183,7 +183,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   // };
 
   const renderCodeForChain = (chain: AvailableChains) => {
-    const contract = contractsData.contracts.find((c) => c.chain === chain);
+    const contract = contractsData.contracts[tab - 1];
     if (!contract) {
       return null;
     }
