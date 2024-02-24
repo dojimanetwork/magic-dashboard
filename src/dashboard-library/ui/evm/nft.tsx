@@ -113,6 +113,8 @@ export default function Erc721({
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
 
+  const [isEditing, setIsEditing] = useState(false);
+
   // const isDeployed = (deploy: boolean) => {
   //   setDeployed(deploy);
   //   setDeployModal(false);
@@ -154,6 +156,7 @@ export default function Erc721({
   }, []);
 
   useEffect(() => {
+    setIsEditing(true);
     const erc721Options: ERC721ContractParams = {
       name,
       symbol,
@@ -295,6 +298,7 @@ export default function Erc721({
       );
     }
     setIsSaving(false);
+    setIsEditing(false);
   }
 
   // function handleDeployModalClose() {
@@ -446,7 +450,7 @@ export default function Erc721({
         <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
-          color={deployed && !verified ? "secondary" : "primary"}
+          color={isEditing ? "secondary" : "primary"}
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>

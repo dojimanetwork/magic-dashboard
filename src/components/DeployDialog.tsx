@@ -23,6 +23,13 @@ export type ContractsData = {
   args?: any;
 };
 
+export type ProjectChainsDeploymentData = {
+  chain: string;
+  contractAddress: string;
+  contractAbi: string;
+  contractByteCode: string;
+};
+
 export type DeployableChainsData = {
   chainName: AvailableChains;
   contracts: Array<ContractsData>;
@@ -45,6 +52,37 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
     <div className="HelpDialog__islands-container">{props.children}</div>
   </>
 );
+
+async function addDeployedDetailsToDb(
+  email: string,
+  projectName: string,
+  contractDetails: Array<DeployedDetails>,
+) {
+  const deploymentData: ProjectChainsDeploymentData[] = contractDetails.map(
+    (details) => ({
+      chain: details.chain,
+      contractAddress: details.details.contractAddress,
+      contractAbi: details.details.contractABI,
+      contractByteCode: details.details.contractByteCode,
+    }),
+  );
+  const response = await axios.post(
+    `${
+      import.meta.env.VITE_APP_FAAS_TESTNET_URL
+    }/v1/dev/dash/projects/update/deployment`,
+    {
+      projectName: projectName,
+      email: email,
+      deploymentData: deploymentData,
+    },
+  );
+
+  if (response.status === 201) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [tab, setTab] = useState(1);
@@ -90,7 +128,9 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
 
     // Make Axios POST request with DeployEVMContractParams in the request body
     axios
-      .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, { data })
+      .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, {
+        data,
+      })
       .then((response) => {
         if (response.status === 200) {
           const result: Array<DeployedDetails> = response.data;
@@ -98,6 +138,13 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           setDeployedDetails(result);
           setDeploymentStatus("success");
           setIsDeployed(true);
+          addDeployedDetailsToDb(
+            userDetails.email,
+            userDetails.projectName,
+            result,
+          )
+            .then(() => {})
+            .catch(() => {});
         } else {
           setDeploymentStatus("failed");
           setIsDeployed(true);

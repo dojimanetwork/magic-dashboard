@@ -144,6 +144,8 @@ export default function BscBep20View({
 
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const bep20Options: Bep20ContractParams = {
@@ -159,6 +161,7 @@ export default function BscBep20View({
   }, []);
 
   useEffect(() => {
+    setIsEditing(true);
     const bep20Options: Bep20ContractParams = {
       name,
       symbol,
@@ -172,6 +175,7 @@ export default function BscBep20View({
   }, [displayCode, name, premint, symbol, burnable, mintable]);
 
   function saveDetails() {
+    setIsSaving(true);
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -224,6 +228,8 @@ export default function BscBep20View({
       // Update the contract details using the context
       updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
     }
+    setIsSaving(false);
+    setIsEditing(false);
   }
 
   return (
@@ -280,8 +286,12 @@ export default function BscBep20View({
         </div>
       </div>
       <div className="flex justify-between mt-[140px] ">
-        <Button onClick={saveDetails} className="w-full" color={"primary"}>
-          Save
+      <Button
+          onClick={saveDetails}
+          className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
+          color={isEditing ? "secondary" : "primary"}
+        >
+          {isSaving ? "Saving..." : "Save"}
         </Button>
       </div>
     </div>

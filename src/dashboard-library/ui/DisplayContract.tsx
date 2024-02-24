@@ -33,7 +33,7 @@ const componentMapping = {
   },
   bsc: {
     erc20: EVMContractsUI.BscBep20View,
-    nft: EVMContractsUI.BscBep20View,
+    nft: EVMContractsUI.Erc721,
   },
   solana: {
     erc20: EVMContractsUI.Erc20,

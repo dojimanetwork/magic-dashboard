@@ -110,6 +110,8 @@ export default function Erc20({
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
 
+  const [isEditing, setIsEditing] = useState(false);
+
   // const isDeployed = (deploy: boolean) => {
   //   setDeployed(deploy);
   //   setDeployModal(false);
@@ -150,6 +152,7 @@ export default function Erc20({
   }, []);
 
   useEffect(() => {
+    setIsEditing(true);
     const erc20Options: ERC20ContractParams = {
       name,
       symbol,
@@ -289,6 +292,7 @@ export default function Erc20({
       updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
     }
     setIsSaving(false);
+    setIsEditing(false);
   }
 
   // function handleDeployModalClose() {
@@ -442,7 +446,7 @@ export default function Erc20({
         <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
-          color={deployed && !verified ? "secondary" : "primary"}
+          color={isEditing ? "secondary" : "primary"}
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>
