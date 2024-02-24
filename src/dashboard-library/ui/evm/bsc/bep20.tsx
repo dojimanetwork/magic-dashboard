@@ -289,7 +289,7 @@ export default function BscBep20View({
       <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
-          color={isEditing ? "secondary" : "primary"}
+          color={"primary"}
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>

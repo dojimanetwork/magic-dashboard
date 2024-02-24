@@ -450,7 +450,7 @@ export default function Erc721({
         <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
-          color={isEditing ? "secondary" : "primary"}
+          color={deployed && !verified ? "secondary" : "primary"}
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>
