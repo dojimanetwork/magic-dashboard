@@ -167,6 +167,12 @@ export const serializeAsClipboardJSON = ({
   return JSON.stringify(contents);
 };
 
+export async function copyTextToClipboard(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (err) {}
+}
+
 export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   files: BinaryFiles | null,
