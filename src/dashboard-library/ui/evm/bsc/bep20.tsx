@@ -115,6 +115,7 @@ export default function BscBep20View({
   selectedChain: AvailableChains;
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
+  const [disable, setDisable] = useState(false);
   const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
@@ -231,65 +232,69 @@ export default function BscBep20View({
     setIsSaving(false);
     setIsEditing(false);
   }
+  console.log(disable);
+  
 
   return (
-    <div className="contract-form-container">
-      {/* <div className="">Contract Form</div> */}
-      <div className="border-b">
-        <div className="flex flex-col gap-y-5">
-          <TextInput
-            id="name"
-            label="Contract Name*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={name}
-            setValue={setName}
-          />
-          <TextInput
-            id="symbol"
-            label="Contract Symbol*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={symbol}
-            setValue={setSymbol}
-          />
-          <TextInput
-            id="premint"
-            label="Premint"
-            labelClassName="text-subtext"
-            type={TextInputTypes.NUMBER}
-            value={premint}
-            setValue={setPremint}
-            minNum={0}
-          />
+    <div>
+      <div className="contract-form-container h-[458px] overflow-auto">
+        {/* <div className="">Contract Form</div> */}
+        <div className="border-b">
+          <div className="flex flex-col gap-y-5">
+            <TextInput
+              id="name"
+              label="Contract Name*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={name}
+              setValue={setName}
+            />
+            <TextInput
+              id="symbol"
+              label="Contract Symbol*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={symbol}
+              setValue={setSymbol}
+            />
+            <TextInput
+              id="premint"
+              label="Premint"
+              labelClassName="text-subtext"
+              type={TextInputTypes.NUMBER}
+              value={premint}
+              setValue={setPremint}
+              minNum={0}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-y-5 py-6 border-b">
+          <Text Type="16-Md"> Features</Text>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+            <CheckboxInput
+              id="mintable"
+              label="Mintable"
+              value={mintable}
+              setValue={setMintable}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+            <CheckboxInput
+              id="burnable"
+              label="Burnable"
+              value={burnable}
+              setValue={setBurnable}
+              labelClassName="text-subtext"
+              className="accent-[#6B45CD]"
+            />
+          </div>
         </div>
       </div>
-      <div className="flex flex-col gap-y-5 py-6 border-b">
-        <Text Type="16-Md"> Features</Text>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-          <CheckboxInput
-            id="mintable"
-            label="Mintable"
-            value={mintable}
-            setValue={setMintable}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-          <CheckboxInput
-            id="burnable"
-            label="Burnable"
-            value={burnable}
-            setValue={setBurnable}
-            labelClassName="text-subtext"
-            className="accent-[#6B45CD]"
-          />
-        </div>
-      </div>
-      <div className="flex justify-between mt-[140px] ">
-      <Button
+      <div className="flex justify-center mt-[75px] ">
+        <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}
-          color={"primary"}
+          color={disable === true ? "secondary" : "primary"}
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>
