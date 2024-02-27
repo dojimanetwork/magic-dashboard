@@ -26,6 +26,7 @@ export interface InitialContractDetails {
 export interface ContractDetailsContextProps {
   contractsData: InitialContractDetails;
   updateContractDetails: (updatedContract: ContractDetailsData) => void;
+  resetContractDetails: () => void;
 }
 
 export const ContractDetailsContext =
@@ -61,9 +62,16 @@ export const ContractDetailsProvider: React.FC<{
     }
   };
 
+  const resetContractDetails = () => {
+    setContractsData({
+      contracts: [],
+    });
+  };
+
   const contextValue: ContractDetailsContextProps = {
     contractsData,
     updateContractDetails,
+    resetContractDetails,
   };
 
   return (

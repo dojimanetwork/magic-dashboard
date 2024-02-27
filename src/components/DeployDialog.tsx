@@ -118,7 +118,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     }
   }, [onClose]);
 
-  const { contractsData, updateContractDetails } = useContractDetails();
+  const { contractsData, updateContractDetails, resetContractDetails } = useContractDetails();
   const { userDetails } = useUserDetails();
   const { refreshProjectData } = useProjectData();
   const [deployedDetails, setDeployedDetails] = useState<
@@ -175,6 +175,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           setDeploymentStatus("success");
           setIsDeployed(true);
           refreshProjectData();
+          resetContractDetails();
           addDeployedDetailsToDb(
             userDetails.email,
             userDetails.projectName,
