@@ -57,6 +57,10 @@ interface ImportMetaEnv {
 
   // Dojima URL's
 
+  VITE_APP_DOJ_TESTNET_EXPLORER_URL: string;
+  VITE_APP_ETH_TESTNET_EXPLORER_URL: string;
+  VITE_APP_BSC_TESTNET_EXPLORER_URL: string;
+
   VITE_APP_FAAS_STAGENET_URL: string;
   VITE_APP_FAAS_TESTNET_URL: string;
 

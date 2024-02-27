@@ -1,7 +1,7 @@
 /** Chains supported by dashboard
  * Note: Might increase in future
  */
-export type AvailableChains = "dojima" | "ethereum" | "solana" | "bsc";
+export type AvailableChains = "dojima" | "ethereum"| "bsc";
 
 /** EVM Template types supported by dashboard */
 

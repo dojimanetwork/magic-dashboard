@@ -11,34 +11,34 @@ import * as EVMContractsUI from "./evm";
 // };
 
 const componentMapping = {
-  // dojima: {
-  //   erc20: EVMContractsUI.DojimaErc20TemplateView,
-  //   nft: EVMContractsUI.DojimaNftTemplateView,
-  // },
-  // ethereum: {
-  //   erc20: EVMContractsUI.EthereumErc20TemplateView,
-  //   nft: EVMContractsUI.EthereumNftTemplateView,
-  // },
-  // bsc: {
-  //   erc20: EVMContractsUI.BscErc20TemplateView,
-  //   nft: EVMContractsUI.BscNftTemplateView,
-  // },
   dojima: {
-    erc20: EVMContractsUI.Erc20,
-    nft: EVMContractsUI.Erc721,
+    erc20: EVMContractsUI.DojimaErc20TemplateView,
+    nft: EVMContractsUI.DojimaNftTemplateView,
   },
   ethereum: {
-    erc20: EVMContractsUI.Erc20,
-    nft: EVMContractsUI.Erc721,
+    erc20: EVMContractsUI.EthereumErc20TemplateView,
+    nft: EVMContractsUI.EthereumNftTemplateView,
   },
   bsc: {
-    erc20: EVMContractsUI.BscBep20View,
-    nft: EVMContractsUI.Erc721,
+    erc20: EVMContractsUI.BscErc20TemplateView,
+    nft: EVMContractsUI.BscNftTemplateView,
   },
-  solana: {
-    erc20: EVMContractsUI.Erc20,
-    nft: EVMContractsUI.Erc721,
-  },
+  // dojima: {
+  //   erc20: EVMContractsUI.Erc20,
+  //   nft: EVMContractsUI.Erc721,
+  // },
+  // ethereum: {
+  //   erc20: EVMContractsUI.Erc20,
+  //   nft: EVMContractsUI.Erc721,
+  // },
+  // bsc: {
+  //   erc20: EVMContractsUI.BscBep20View,
+  //   nft: EVMContractsUI.Erc721,
+  // },
+  // solana: {
+  //   erc20: EVMContractsUI.Erc20,
+  //   nft: EVMContractsUI.Erc721,
+  // },
   // Add mappings for other chains as needed
 };
 

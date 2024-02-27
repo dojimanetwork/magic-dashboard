@@ -118,7 +118,8 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     }
   }, [onClose]);
 
-  const { contractsData, updateContractDetails, resetContractDetails } = useContractDetails();
+  const { contractsData, updateContractDetails, resetContractDetails } =
+    useContractDetails();
   const { userDetails } = useUserDetails();
   const { refreshProjectData } = useProjectData();
   const [deployedDetails, setDeployedDetails] = useState<
@@ -140,7 +141,20 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     }
   }
 
- 
+  function getChainExplorerUrl(chain: string) {
+    switch (chain) {
+      case "dojima":
+      case "DOJ":
+        return import.meta.env.VITE_APP_DOJ_TESTNET_EXPLORER_URL;
+      case "ethereum":
+      case "ETH":
+        return import.meta.env.VITE_APP_ETH_TESTNET_EXPLORER_URL;
+      case "bsc":
+      case "binance":
+      case "BSC":
+        return import.meta.env.VITE_APP_BSC_TESTNET_EXPLORER_URL;
+    }
+  }
 
   function handleDeploy() {
     setIsDeploying(true);
@@ -231,126 +245,6 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     // axios.post("http://localhost:3002/deploy", { data }).then((response) => {
     //   console.log(response);
     // });
-  }
-
-  function ContractDetails() {
-    return (
-      <div>
-        <div className=" flex text-base items-center mb-2">
-          <div className=" mr-2 w-[150px] font-semibold text-sm text-[#000]">
-            Contract Address
-          </div>
-          <div className="w-full flex justify-between pr-4 items-center mr-2 p-2 text-[15px] font-medium text-black border rounded-lg h-[40px]">
-            <div>0x000095E79eAC4d76aab57cB2c1f091d553b36ca0hgy678hjuuyi</div>
-            <div>
-              <CopyIcon width="15" />
-            </div>
-          </div>
-        </div>
-        <div className="h-[1px] bg-[#dddddd] mt-4"></div>
-        <div className="mt-6">
-          <p className="text-base text-black mb-2 font-semibold ">
-            Contract ABI
-          </p>
-          {userDetails.chains.map((chain, index) => (
-            <React.Fragment key={index}>
-              {tab === index + 1 && renderCodeForChain(chain)}
-            </React.Fragment>
-          ))}
-        </div>
-        <div className="mt-6">
-          <p className="text-base text-black mb-2 font-semibold ">
-            Contract Bytecode
-          </p>
-          {userDetails.chains.map((chain, index) => (
-            <React.Fragment key={index}>
-              {tab === index + 1 && renderCodeForChain(chain)}
-            </React.Fragment>
-          ))}
-        </div>
-        <div className="flex justify-between mt-4 items-center">
-          <button
-            className={`py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white`}
-            onClick={
-              tab === 1
-                ? handleClose
-                : () => {
-                    setTab(tab - 1);
-                  }
-            }
-          >
-            {tab === 1 ? "Verify" : "Close"}
-          </button>
-          <button
-            className="py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl"
-            onClick={
-              tab === contractsData.contracts.length
-                ? handleDeploy
-                : () => {
-                    setTab(tab + 1);
-                  }
-            }
-          >
-            Close
-            {/* {tab === contractsData.contracts.length
-                ? isDeploying
-                  ? "Deploying..."
-                  : "Deploy"
-                : "Next"} */}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  function DeployStatus() {
-    return (
-      <div className="w-full border bg-white rounded-lg shadow border-[#fff]">
-        <div className="flex p-7 w-full items-center justify-between ">
-          <div className="flex items-center">
-            <p className="text-lg tracking-wide font-bold mr-2 font-sans ">
-              Deploy Details
-            </p>
-            <SuccessIcon width="25" height="25" />
-          </div>
-          <div className="cursor-pointer">
-            <CircleCancleIcon width="25" height="25" />
-          </div>
-        </div>
-        <div className="h-[1px] bg-[#F2F3F5]"></div>
-        <div className="px-7 py-3">
-          <div className="grid grid-cols-[0.6fr_2fr_0.5fr] body16 font-sans tracking-wide text-sm">
-            <div>Chain</div>
-            <div>Address</div>
-          </div>
-          <hr className="border-dotted mt-3 border-t-2 " />
-          <div className="grid-cols-[0.6fr_2fr_0.5fr] body16 items-center grid border-b border-outline mt-1 pb-2 last:border-none">
-            {[{ chains: "ETH", address: "sdafdfjhjkhkjhkdfhakdklj" }].map(
-              (item) => (
-                <>
-                  <div className="flex mt-4 items-center">
-                    <img
-                      className="mr-1"
-                      width={23}
-                      alt="img"
-                      src={handleChains(item.chains)}
-                    />
-                    <p className="text-sm text-black">{item.chains}</p>
-                  </div>
-                  <p className="text-sm mt-4 text-black">{item.address}</p>
-                  <div
-                    className="cursor-pointer mt-4"
-                    onClick={() => copyTextToClipboard(item.address)}
-                  >
-                    <CopyIcon width="15" />
-                  </div>
-                </>
-              ),
-            )}
-          </div>
-        </div>
-      </div>
-    );
   }
 
   const renderDetailsForChain = (chain: AvailableChains) => {
@@ -497,7 +391,17 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                     <p className="text-sm text-black">{item.chain}</p>
                   </div>
                   <p className="text-sm mt-4 text-black">
-                    {item.details.contractAddress}
+                    <a
+                      href={`${getChainExplorerUrl(item.chain)}address/${
+                        item.details.contractAddress
+                      }`}
+                      target="_blank" // Open link in a new tab
+                      rel="noopener noreferrer" // Necessary for security reasons when opening in a new tab
+                      // onClick={handleLinkClick}
+                      className="no-underline hover:underline"
+                    >
+                      {item.details.contractAddress}
+                    </a>
                   </p>
                   <div
                     className="cursor-pointer mt-4"
@@ -667,6 +571,10 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                 </React.Fragment>
               ))}
             </div>
+            <div className="mt-3">
+              Note: 'Deploy' button is enabled only if all chains contract data
+              is added and input all required arguments.
+            </div>
           </div>
           <div className="flex justify-between mt-2 items-center">
             <button
@@ -692,7 +600,13 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                       setTab(tab + 1);
                     }
               }
-              disabled={!checkForAllInputArgs()}
+              disabled={
+                (tab === contractsData.contracts.length &&
+                  !(
+                    userDetails.chains.length === contractsData.contracts.length
+                  )) ||
+                !checkForAllInputArgs()
+              }
             >
               {tab === contractsData.contracts.length
                 ? isDeploying
