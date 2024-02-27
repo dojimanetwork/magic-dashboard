@@ -22,18 +22,18 @@ const port = process.env.VITE_APP_BACKEND_PORT;
 //   app.use(cors(corsOptions));
 
 // Enable CORS for all routes
-app.use(cors());
+// app.use(cors());
 
 app.use(express.json()); // Parse JSON in the request body
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', `${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', `${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`);
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type');
+//   next();
+// });
 
-app.options('*', cors()); // Enable preflight for all routes
+// app.options('*', cors()); // Enable preflight for all routes
 
 // app.get('/', async (req, res) => {
 //   // const {contract, contractName} = req.query;
@@ -89,7 +89,7 @@ app.get("/", (req, res) => {
   res.send(process.env.VITE_APP_MESSAGE);
 });
 
-app.post('/deploy', cors(), async (req, res) => {
+app.post('/deploy', async (req, res) => {
   const { data } = req.body;
   const result = await DeployChainScript(data as Array<DeployableChainsData>);
   res.send(result);

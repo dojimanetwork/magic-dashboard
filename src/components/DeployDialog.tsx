@@ -176,21 +176,21 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       data.push(addContract);
     });
 
-    const customHeaders = {
-      "Content-Type": "application/json",
-    };
+    // const customHeaders = {
+    //   "Content-Type": "application/json",
+    // };
 
     // Make Axios POST request with DeployEVMContractParams in the request body
     axios
       .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, {
         data,
-        headers: {
-          ...customHeaders,
-          "Access-Control-Allow-Origin":
-            "https://magic-dashboard.test.dojima.network",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-          "Access-Control-Allow-Headers": "Content-Type",
-        },
+        // headers: {
+        //   ...customHeaders,
+        //   "Access-Control-Allow-Origin":
+        //     "https://magic-dashboard.test.dojima.network",
+        //   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        //   "Access-Control-Allow-Headers": "Content-Type",
+        // },
       })
       .then((response) => {
         if (response.status === 200) {
