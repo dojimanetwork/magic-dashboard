@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Dialog } from "./Dialog";
 import "./HelpDialog.scss";
 import { usersIcon } from "./icons";
-import { useContractDetails } from "../context/contract-appState";
+import {
+  ContractDetailsData,
+  useContractDetails,
+} from "../context/contract-appState";
 import { AvailableChains } from "../../excalidraw-app/dojima-templates/types";
 import { useUserDetails } from "../context/user-appState";
 import axios from "axios";
@@ -21,12 +24,14 @@ import FailIcon from "./FailIcon";
 import CircleCancleIcon from "./circlecancleIcon";
 import CopyIcon from "./copyIcon";
 import { Card } from "./Card";
-import { copyTextToClipboard } from "../clipboard";
+import { copyTextToClipboard, copyTextToSystemClipboard } from "../clipboard";
 import FillDeleteIcon from "./filldeleteIcon";
 import {
   extractConstructorArguments,
   InputConstructorArgsType,
 } from "../dashboard-library/utils/readConstructorArgs";
+import { useProjectData } from "../context/project-appState";
+import Button from "../dashboard-library/ui/common/Button";
 
 export type ContractsData = {
   fileName: string;
@@ -84,9 +89,9 @@ async function addDeployedDetailsToDb(
       import.meta.env.VITE_APP_FAAS_TESTNET_URL
     }/v1/dev/dash/projects/update/deployment`,
     {
-      projectName: projectName,
-      email: email,
-      deploymentData: deploymentData,
+      projectName,
+      email,
+      deploymentData,
     },
   );
 
@@ -113,8 +118,9 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     }
   }, [onClose]);
 
-  const { contractsData } = useContractDetails();
+  const { contractsData, updateContractDetails } = useContractDetails();
   const { userDetails } = useUserDetails();
+  const { refreshProjectData } = useProjectData();
   const [deployedDetails, setDeployedDetails] = useState<
     Array<DeployedDetails>
   >([]);
@@ -168,12 +174,15 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           setDeployedDetails(result);
           setDeploymentStatus("success");
           setIsDeployed(true);
+          refreshProjectData();
           addDeployedDetailsToDb(
             userDetails.email,
             userDetails.projectName,
             result,
           )
-            .then(() => {})
+            .then((res) => {
+              // console.log(res);
+            })
             .catch(() => {});
         } else {
           setDeploymentStatus("failed");
@@ -369,36 +378,62 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     );
   };
 
+  const checkForAllInputArgs = () => {
+    const contract = contractsData.contracts[tab - 1];
+    if (!contract) {
+      return null;
+    }
+
+    const { code, ...remainingContract } = contract;
+
+    const allValuesHaveLengthGreaterThanZero =
+      remainingContract.arguments &&
+      remainingContract.arguments.length > 0 &&
+      remainingContract.arguments.every((value) => value.length > 0);
+
+    return allValuesHaveLengthGreaterThanZero
+      ? true
+      : remainingContract.arguments && remainingContract.arguments.length === 0;
+  };
+
   const renderArgumentsForChain = (chain: AvailableChains) => {
     const contract = contractsData.contracts[tab - 1];
     if (!contract) {
       return null;
     }
 
-    const {
-      code,
-      arguments: contractArguments,
-      ...remainingContract
-    } = contract;
+    const { code, ...remainingContract } = contract;
 
     const constructorArgs = extractConstructorArguments(code);
 
+    // Handler for input change
+    const handleTypeInputChange = (index: number, value: string) => {
+      const newInputValues = remainingContract.arguments as any[];
+      newInputValues[index] = value;
+      // setInputValues(newInputValues);
+
+      const updatedContract: ContractDetailsData = {
+        ...contract,
+        arguments: newInputValues,
+      };
+
+      // Update the contract details using the context
+      updateContractDetails(updatedContract);
+    };
+
     return (
       <>
-        {constructorArgs && (
-          <div>
+        {constructorArgs && constructorArgs.length > 0 && (
+          <div className="flex flex-col gap-3  w-full">
             {constructorArgs.map((arg, index) => (
-              <div key={index}>
-                <input
-                  type="text"
-                  className="border rounded-lg p-1"
-                  // value={
-                  //   userContractDetails.userInputTypes[tab - 1]?.[index] || ""
-                  // }
-                  // onChange={(e) => handleTypeInputChange(index, e.target.value)}
-                  placeholder={`${arg.key} - ${arg.type}`}
-                />
-              </div>
+              <input
+                key={index}
+                type="text"
+                className="border !rounded-lg p-1 w-full h-10"
+                value={(remainingContract.arguments as any[])[index]}
+                onChange={(e) => handleTypeInputChange(index, e.target.value)}
+                placeholder={`${arg.key} - ${arg.type}`}
+              />
             ))}
           </div>
         )}
@@ -439,10 +474,43 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       {isDeployed ? (
         <Dialog
           onCloseRequest={handleClose}
-          title="Deploy Status"
+          title="Deploy Details"
           className={"HelpDialog max-w-[760px] mx-auto"}
         >
-          <div className="w-ful text-center">
+          <div className="px-7 py-3">
+            <div className="grid grid-cols-[0.6fr_2fr_0.5fr] body16 font-sans tracking-wide text-sm">
+              <div>Chain</div>
+              <div>Address</div>
+            </div>
+            <hr className="border-dotted mt-3 border-t-2 " />
+            <div className="grid-cols-[0.6fr_2fr_0.5fr] body16 items-center grid border-b border-outline mt-1 pb-2 last:border-none">
+              {deployedDetails.map((item) => (
+                <>
+                  <div className="flex mt-4 items-center">
+                    <img
+                      className="mr-1"
+                      width={23}
+                      alt="img"
+                      src={handleChains(item.chain)}
+                    />
+                    <p className="text-sm text-black">{item.chain}</p>
+                  </div>
+                  <p className="text-sm mt-4 text-black">
+                    {item.details.contractAddress}
+                  </p>
+                  <div
+                    className="cursor-pointer mt-4"
+                    onClick={() =>
+                      copyTextToSystemClipboard(item.details.contractAddress)
+                    }
+                  >
+                    <CopyIcon width="15" />
+                  </div>
+                </>
+              ))}
+            </div>
+          </div>
+          {/* <div className="w-ful text-center">
             <div>
               {deploymentStatus === "success" ? (
                 <div className=" flex justify-center items-center ">
@@ -476,8 +544,8 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                   <div className="w-full h-[1px] bg-[#CEC2FF]" />
                 </>
               );
-            })}
-            {/* <div className=" mt-4 mb-4  p-4">
+            })} */}
+          {/* <div className=" mt-4 mb-4  p-4">
               <div className="flex items-center">
                 <p className="text-start text-sm w-20 ">Chain </p>
                 <p className="w-10">:</p>
@@ -506,7 +574,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                 </strong>
               </div>
             </div> */}
-          </div>
+          {/* </div> */}
         </Dialog>
       ) : (
         <Dialog
@@ -527,14 +595,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                       ? "border-[#6B45CD] bg-[rgba(107,_69,_205,_0.14)]"
                       : ""
                   }   rounded-lg text-black capitalize`}
-                  onClick={() => {
-                    setTab(index);
-                    // setIsDetailsComplete(!isDetailsComplete);
-                  }}
+                  // onClick={() => {
+                  //   setTab(index);
+                  //   // setIsDetailsComplete(!isDetailsComplete);
+                  // }}
                   key={i}
                 >
                   <div className="w-6 h-6 grid place-items-center bg-[#CEC2FF] rounded-full p-1">
-                    <img alt="" src={handleChains("dojima")} />
+                    <img alt="" src={handleChains(item.chain)} />
                   </div>
                   {item.chain}
                 </button>
@@ -543,14 +611,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           </div>
           <div className="h-[450px] pb-4 mt-8 pr-2">
             <div className="flex gap-x-[20px] w-full">
-              <div className="w-1/2  border rounded-lg p-4 h-[240px] max-h-[240px] overflow-scroll">
+              <div className="w-1/2  border rounded-lg p-4 max-h-[240px] min-h-[120px] overflow-scroll">
                 {userDetails.chains.map((chain, index) => (
                   <React.Fragment key={index}>
                     {tab === index + 1 && renderDetailsForChain(chain)}
                   </React.Fragment>
                 ))}
               </div>
-              <div className="w-1/2 border p-4 rounded-lg h-[240px] max-h-[240px]">
+              <div className="w-1/2 border p-4 rounded-lg max-h-[240px] min-h-[120px]">
                 <div className="flex w-full items-center">
                   <div className="text-base font-[600] ">
                     Arguments Required
@@ -612,7 +680,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
             >
               {tab === 1 ? "Close" : "Back"}
             </button>
-            <button
+            <Button
               className={`py-4 text-lg/[22px] font-semibold px-4 min-w-[160px] border rounded-xl bg-[linear-gradient(270deg,_#A71CFF_-35.09%,_#8000FF_65.62%)] shadow-[0px_5px_20px_0px_rgba(0,_0,_0,_0.15)] text-white ${
                 isDeploying && "cursor-not-allowed"
               }`}
@@ -623,13 +691,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                       setTab(tab + 1);
                     }
               }
+              disabled={!checkForAllInputArgs()}
             >
               {tab === contractsData.contracts.length
                 ? isDeploying
                   ? "Deploying..."
                   : "Deploy"
                 : "Next"}
-            </button>
+            </Button>
           </div>
 
           {/* <div className="HelpDialog__header">

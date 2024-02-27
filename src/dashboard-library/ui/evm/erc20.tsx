@@ -22,6 +22,7 @@ import {
   Erc20TemplateSaveContractDetailsData,
   useTemplateContractDetails,
 } from "../../../context/template-contract-appState";
+import { extractConstructorArguments } from "../../utils/readConstructorArgs";
 
 export default function Erc20({
   displayCode,
@@ -232,6 +233,8 @@ export default function Erc20({
       (contract) => contract.chain === selectedChain,
     );
 
+    const constructorArgs = extractConstructorArguments(contract);
+
     if (selectedContract) {
       // Create an updated contract with only the changed fields
       const updatedContract: ContractDetailsData = {
@@ -240,7 +243,9 @@ export default function Erc20({
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
         code: contract,
         arguments:
-          deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
+          constructorArgs && constructorArgs.length > 0
+            ? Array(constructorArgs.length).fill("")
+            : selectedContract.arguments,
       };
 
       // Update the contract details using the context
@@ -251,7 +256,10 @@ export default function Erc20({
         name,
         symbol: symbol !== "" ? symbol : "",
         code: contract,
-        arguments: deployedArgs.length > 0 ? deployedArgs : [],
+        arguments:
+          constructorArgs && constructorArgs.length > 0
+            ? Array(constructorArgs.length).fill("")
+            : [],
         chain: selectedChain,
         gasPrice: "~0.0002",
         type: userDetails.type,
@@ -442,7 +450,7 @@ export default function Erc20({
           </div>
         </div>
       </div>
-      <div className="flex justify-center mt-6 ">
+      <div className="flex justify-center mt-6">
         <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}

@@ -81,7 +81,7 @@ export async function deployETHContractHandler(
     // Check if required parameters are present
     if (!contractCode || !contractName) {
       console.error("Input all required params");
-      return "Error: Input all required params";
+      throw new Error( "Error: Input all required params");
     }
 
     try {
@@ -105,12 +105,12 @@ export async function deployETHContractHandler(
 
         return deployDetails;
       }
-      return "Error compiling contract";
+      throw new Error( "Error compiling contract");
     } catch (e: any) {
-      return `Error deploying and compiling contract: ${e.message}`;
+      throw new Error( `Error deploying and compiling contract: ${e.message}`);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return "Internal Server Error";
+    throw new Error(`Internal Server Error: ${error.message}`);
   }
 }

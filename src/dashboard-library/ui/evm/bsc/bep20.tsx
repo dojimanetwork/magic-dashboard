@@ -13,6 +13,7 @@ import {
 } from "../../../../context/template-contract-appState";
 import { Text } from "../../common/Typography";
 import CheckboxInput from "../../common/CheckboxInput";
+import { extractConstructorArguments } from "../../../utils/readConstructorArgs";
 // import { BscCrossChainTokenTemplate } from "../../../template-contracts/contracts/bsc/token/BscCrossChainToken";
 
 export type Bep20ContractParams = {
@@ -182,6 +183,8 @@ export default function BscBep20View({
       (contract) => contract.chain === selectedChain,
     );
 
+    const constructorArgs = extractConstructorArguments(contract);
+
     if (selectedContract) {
       // Create an updated contract with only the changed fields
       const updatedContract: ContractDetailsData = {
@@ -190,7 +193,9 @@ export default function BscBep20View({
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
         code: contract,
         arguments:
-          deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
+          constructorArgs && constructorArgs.length > 0
+            ? Array(constructorArgs.length).fill("")
+            : selectedContract.arguments,
       };
 
       // Update the contract details using the context
@@ -201,7 +206,10 @@ export default function BscBep20View({
         name,
         symbol: symbol !== "" ? symbol : "",
         code: contract,
-        arguments: deployedArgs.length > 0 ? deployedArgs : [],
+        arguments:
+          constructorArgs && constructorArgs.length > 0
+            ? Array(constructorArgs.length).fill("")
+            : [],
         chain: selectedChain,
         gasPrice: "~0.0002",
         type: userDetails.type,
@@ -232,8 +240,6 @@ export default function BscBep20View({
     setIsSaving(false);
     setIsEditing(false);
   }
-  console.log(disable);
-  
 
   return (
     <div>
@@ -290,7 +296,7 @@ export default function BscBep20View({
           </div>
         </div>
       </div>
-      <div className="flex justify-center mt-[75px] ">
+      <div className="flex justify-center mt-6">
         <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}

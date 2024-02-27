@@ -11,6 +11,9 @@ import { AvailableChains } from "../../../excalidraw-app/dojima-templates/types"
 import { DisplayContract } from "./DisplayContract";
 import { useUserDetails } from "../../context/user-appState";
 import axios from "axios";
+import { useProjectData } from "../../context/project-appState";
+import CopyIcon from "../../components/copyIcon";
+import { copyTextToSystemClipboard } from "../../clipboard";
 
 export type ProjectChainsDeploymentData = {
   chain: string;
@@ -57,6 +60,7 @@ function ContractView({
   const [contractDeployedData, setContractDeployedData] =
     useState<ProjectChainsDeploymentData>();
   const { userDetails } = useUserDetails();
+  const { projectData } = useProjectData();
 
   const displayContractCode = (code: string) => {
     setContractCode(code);
@@ -64,43 +68,18 @@ function ContractView({
 
   useEffect(() => {
     if (userDetails.email && userDetails.projectName) {
-      // Make Axios POST request with DeployEVMContractParams in the request body
-      axios
-        .get(
-          `${
-            import.meta.env.VITE_APP_FAAS_TESTNET_URL
-          }/v1/dev/dash/projects/project`,
-          {
-            params: {
-              email: userDetails.email,
-              projectName: userDetails.projectName,
-            },
-          },
-        )
-        .then((response) => {
-          if (response.status === 200) {
-            const projectData: ProjectDataObject = response.data;
-            if (
-              projectData.deploymentData &&
-              projectData.deploymentData.length > 0
-            ) {
-              const contractDataByChain = projectData.deploymentData?.find(
-                (data) => data.chain === selectedElementChain,
-              );
-              setContractDeployedData(contractDataByChain);
-              setIsDeployed(true);
-            } else {
-              setIsDeployed(false);
-            }
-          } else {
-            setIsDeployed(false);
-          }
-        })
-        .catch(() => {
-          setIsDeployed(false);
-        });
+      if (projectData.deploymentData && projectData.deploymentData.length > 0) {
+        const contractDataByChain = projectData.deploymentData?.find(
+          (data) => data.chain === selectedElementChain,
+        );
+
+        setContractDeployedData(contractDataByChain);
+        setIsDeployed(true);
+      } else {
+        setIsDeployed(false);
+      }
     }
-  }, []);
+  }, [selectedElementChain]);
 
   // const copyToClipboard = async () => {
   //   try {
@@ -113,46 +92,116 @@ function ContractView({
   return (
     <>
       {isDeployed ? (
-        <>
-          <div className=" mt-4 mb-4  p-4">
-            <div className="flex items-center">
-              <p className="text-start text-sm w-20">
-                {contractDeployedData?.chain}{" "}
-              </p>
+        // <>
+        //   <div className=" mt-4 mb-4  p-4">
+        //     <div className="flex items-center">
+        //       <p className="text-start text-sm w-20">
+        //         {contractDeployedData?.chain}{" "}
+        //       </p>
+        //     </div>
+        //     <div className="flex items-center">
+        //       <p className="text-start text-sm w-20 ">Contract Address </p>
+        //       <p className="w-10">:</p>
+        //       <strong className="font-semibold">
+        //         {contractDeployedData?.contractAddress}
+        //       </strong>
+        //     </div>
+        //   </div>
+        //   <div className="mt-6">
+        //     <p className="text-base text-[#757575] font-semibold ">
+        //       Contract ABI
+        //     </p>
+        //     <div className=" text-black cursor-not-allowed">
+        //       <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
+        //         <div>
+        //           <pre>
+        //             {JSON.stringify(contractDeployedData?.contractAbi, null, 2)}
+        //           </pre>
+        //         </div>
+        //       </div>
+        //     </div>
+        //   </div>
+        //   <div className="mt-6">
+        //     <p className="text-base text-[#757575] font-semibold ">
+        //       Contract ByteCode
+        //     </p>
+        //     <div className=" text-black cursor-not-allowed">
+        //       <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
+        //         {contractDeployedData?.contractByteCode}
+        //       </div>
+        //     </div>
+        //   </div>
+        // </>
+        <div>
+          <div className=" flex text-base items-center m-2">
+            <div className=" w-[150px] font-semibold text-base text-[#000]">
+              Contract Address
             </div>
-            <div className="flex items-center">
-              <p className="text-start text-sm w-20 ">Contract Address </p>
-              <p className="w-10">:</p>
-              <strong className="font-semibold">
-                {contractDeployedData?.contractAddress}
-              </strong>
+            <div className="w-full flex justify-between pr-4 items-center mr-2 p-2 text-[15px] font-medium text-black border rounded-lg h-[40px]">
+              {contractDeployedData?.contractAddress}
+              <div
+                className="cursor-pointer"
+                onClick={() =>
+                  copyTextToSystemClipboard(
+                    contractDeployedData?.contractAddress as string,
+                  )
+                }
+              >
+                <CopyIcon width="15" />
+              </div>
             </div>
           </div>
-          <div className="mt-6">
-            <p className="text-base text-[#757575] font-semibold ">
-              Contract ABI
-            </p>
+          <div className="h-[1px] bg-[#dddddd] m-4"></div>
+          <div className="m-2">
+            <div className="flex justify-between">
+              <p className="text-base text-black mb-2 font-semibold ">
+                Contract ABI
+              </p>
+              <div
+                className="cursor-pointer mr-5"
+                onClick={() =>
+                  copyTextToSystemClipboard(
+                    contractDeployedData?.contractAbi as string,
+                  )
+                }
+              >
+                <CopyIcon width="15" />
+              </div>
+            </div>
             <div className=" text-black cursor-not-allowed">
-              <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
-                <div>
-                  <pre>
-                    {JSON.stringify(contractDeployedData?.contractAbi, null, 2)}
-                  </pre>
+              <div className="text-[15px] w-full h-36 max-h-36 font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
+                <pre>
+                  {JSON.stringify(contractDeployedData?.contractAbi, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div className="h-[1px] bg-[#dddddd] m-4"></div>
+          <div className="m-2">
+            <div className="flex justify-between">
+              <p className="text-base text-black mb-2 font-semibold ">
+                Contract Bytecode
+              </p>
+              <div
+                className="cursor-pointer mr-5"
+                onClick={() =>
+                  copyTextToSystemClipboard(
+                    contractDeployedData?.contractByteCode as string,
+                  )
+                }
+              >
+                <CopyIcon width="15" />
+              </div>
+            </div>
+            <div className=" text-black cursor-not-allowed">
+              <div className="text-[15px] w-full break-all h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
+                <div className="m-2">
+                  {contractDeployedData?.contractByteCode}
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-6">
-            <p className="text-base text-[#757575] font-semibold ">
-              Contract ByteCode
-            </p>
-            <div className=" text-black cursor-not-allowed">
-              <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
-                {contractDeployedData?.contractByteCode}
-              </div>
-            </div>
-          </div>
-        </>
+        </div>
       ) : (
         <section className="">
           <div className="flex items-center text-center border-b text-[] text-xl/6 font-semibold uppercase">
@@ -174,7 +223,7 @@ function ContractView({
               <div>
                 <DisplayContract
                   displayCode={displayContractCode}
-                  selectedChain={selectedElementChain}
+                  selectedChain={selectedElementChain as AvailableChains}
                 />
               </div>
             </div>

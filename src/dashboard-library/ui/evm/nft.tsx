@@ -18,6 +18,7 @@ import {
   Erc721TemplateSaveContractDetailsData,
   useTemplateContractDetails,
 } from "../../../context/template-contract-appState";
+import { extractConstructorArguments } from "../../utils/readConstructorArgs";
 // import DeployModal from "../deploy/page";
 // import VerifyContract from "../verifycontract/page";
 
@@ -234,6 +235,8 @@ export default function Erc721({
       (contract) => contract.chain === selectedChain,
     );
 
+    const constructorArgs = extractConstructorArguments(contract);
+
     if (selectedContract) {
       // Create an updated contract with only the changed fields
       const updatedContract: ContractDetailsData = {
@@ -242,7 +245,9 @@ export default function Erc721({
         symbol: symbol !== "" ? symbol : selectedContract.symbol,
         code: contract,
         arguments:
-          deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
+          constructorArgs && constructorArgs.length > 0
+            ? Array(constructorArgs.length).fill("")
+            : selectedContract.arguments,
       };
 
       // Update the contract details using the context
@@ -253,7 +258,10 @@ export default function Erc721({
         name,
         symbol: symbol !== "" ? symbol : "",
         code: contract,
-        arguments: deployedArgs.length > 0 ? deployedArgs : [],
+        arguments:
+          constructorArgs && constructorArgs.length > 0
+            ? Array(constructorArgs.length).fill("")
+            : [],
         chain: selectedChain,
         gasPrice: "~0.0002",
         type: userDetails.type,
@@ -309,125 +317,126 @@ export default function Erc721({
   // }
 
   return (
-    <div className="contract-form-container">
-      <div className="contract-heading">Contract Form</div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          <TextInput
-            id="name"
-            label="Contract Name*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={name}
-            setValue={setName}
-          />
-          <TextInput
-            id="symbol"
-            label="Contract Symbol*"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={symbol}
-            setValue={setSymbol}
-          />
-          <TextInput
-            id="baseUri"
-            label="Base URI"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={baseUri}
-            setValue={setBaseUri}
-            placeholder="https://..."
-          />
+    <div>
+      <div className=" h-[515px] overflow-auto contract-form-container">
+        {/* <div className="">Contract Form</div> */}
+        <div className="border-b ">
+          <div className="flex flex-col gap-y-5">
+            <TextInput
+              id="name"
+              label="Contract Name*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={name}
+              setValue={setName}
+            />
+            <TextInput
+              id="symbol"
+              label="Contract Symbol*"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={symbol}
+              setValue={setSymbol}
+            />
+            <TextInput
+              id="baseUri"
+              label="Base URI"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={baseUri}
+              setValue={setBaseUri}
+              placeholder="https://..."
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-y-5 py-6 border-b">
-        <Text Type="16-Md"> Features</Text>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-          <CheckboxInput
-            id="mintable"
-            label="Mintable"
-            value={mintable}
-            setValue={setMintable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="incremental"
-            label="Auto Increment IDs"
-            value={incremental}
-            setValue={setIncremental}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="burnable"
-            label="Burnable"
-            value={burnable}
-            setValue={setBurnable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="pausable"
-            label="Pausable"
-            value={pausable}
-            setValue={setPausable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="votes"
-            label="Votes"
-            value={votes}
-            setValue={setVotes}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="enumerable"
-            label="Enumerable"
-            value={enumerable}
-            setValue={setEnumerable}
-            labelClassName="text-subtext"
-          />
-          <CheckboxInput
-            id="uriStorage"
-            label="URI Storage"
-            value={uriStorage}
-            setValue={setUriStorage}
-            labelClassName="text-subtext"
-          />
-        </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md"> Access control</Text> */}
-
+        <div className="flex flex-col gap-y-5 py-6 border-b">
+          <Text Type="16-Md"> Features</Text>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
-            <RadioInput
-              id="accesss"
-              label="Access Control"
-              value={access}
-              setValue={setAccess}
-              valueOptions={[
-                {
-                  value: "ownable",
-                  label: "Ownable",
-                },
-                {
-                  value: "roles",
-                  label: "Roles",
-                },
-                {
-                  value: "managed",
-                  label: "Managed",
-                },
-              ]}
+            <CheckboxInput
+              id="mintable"
+              label="Mintable"
+              value={mintable}
+              setValue={setMintable}
+              labelClassName="text-subtext"
+            />
+            <CheckboxInput
+              id="incremental"
+              label="Auto Increment IDs"
+              value={incremental}
+              setValue={setIncremental}
+              labelClassName="text-subtext"
+            />
+            <CheckboxInput
+              id="burnable"
+              label="Burnable"
+              value={burnable}
+              setValue={setBurnable}
+              labelClassName="text-subtext"
+            />
+            <CheckboxInput
+              id="pausable"
+              label="Pausable"
+              value={pausable}
+              setValue={setPausable}
+              labelClassName="text-subtext"
+            />
+            <CheckboxInput
+              id="votes"
+              label="Votes"
+              value={votes}
+              setValue={setVotes}
+              labelClassName="text-subtext"
+            />
+            <CheckboxInput
+              id="enumerable"
+              label="Enumerable"
+              value={enumerable}
+              setValue={setEnumerable}
+              labelClassName="text-subtext"
+            />
+            <CheckboxInput
+              id="uriStorage"
+              label="URI Storage"
+              value={uriStorage}
+              setValue={setUriStorage}
               labelClassName="text-subtext"
             />
           </div>
         </div>
-      </div>
-      <div className="py-6 border-b">
-        <div className="flex flex-col gap-y-5">
-          {/* <Text Type="16-Md"> INFO</Text> */}
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md"> Access control</Text> */}
 
-          {/* <TextInput
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+              <RadioInput
+                id="accesss"
+                label="Access Control"
+                value={access}
+                setValue={setAccess}
+                valueOptions={[
+                  {
+                    value: "ownable",
+                    label: "Ownable",
+                  },
+                  {
+                    value: "roles",
+                    label: "Roles",
+                  },
+                  {
+                    value: "managed",
+                    label: "Managed",
+                  },
+                ]}
+                labelClassName="text-subtext"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="py-6 border-b">
+          <div className="flex flex-col gap-y-5">
+            {/* <Text Type="16-Md"> INFO</Text> */}
+
+            {/* <TextInput
             id="securityContract"
             label="Security Contract"
             labelClassName="text-subtext"
@@ -436,17 +445,18 @@ export default function Erc721({
             setValue={setSecurityContract}
             placeholder="security@example.com"
           /> */}
-          <TextInput
-            id="license"
-            label="License"
-            labelClassName="text-subtext"
-            type={TextInputTypes.TEXT}
-            value={license}
-            setValue={setLicense}
-          />
+            <TextInput
+              id="license"
+              label="License"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={license}
+              setValue={setLicense}
+            />
+          </div>
         </div>
       </div>
-      <div className="flex justify-between mt-[140px] ">
+      <div className="flex justify-center mt-6">
         <Button
           onClick={saveDetails}
           className={`w-3/4 ${isSaving && "cursor-not-allowed"}`}

@@ -70,6 +70,7 @@ function generateErc20InitialDetails(): Erc20TemplateSaveContractDetails {
     contracts: chains.map((chain) => ({
       chain,
       name: "Token",
+      symbol: "Tkn",
     })),
   };
 
@@ -83,6 +84,7 @@ function generateErc721InitialDetails(): Erc721TemplateSaveContractDetails {
     contracts: chains.map((chain) => ({
       chain,
       name: "Nft",
+      symbol: "Nft",
     })),
   };
 
