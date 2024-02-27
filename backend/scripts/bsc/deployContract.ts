@@ -11,7 +11,7 @@ const promisifiedExec = promisify(exec);
 async function compile(contract: string, contractName: string) {
   const code = formatSolidityCode(contract);
   //   createFile(code, `contracts/${contractName}.sol`);
-  writeFileSync(`contracts/${contractName}-bsc.sol`, code);
+  writeFileSync(`${process.cwd()}/contracts/${contractName}-bsc.sol`, code);
 
   const command = `yarn hardhat compile`;
 
@@ -43,7 +43,7 @@ async function deploy(
   try {
     const jsonData = JSON.parse(
       readFileSync(
-        `artifacts/contracts/${contractName}-bsc.sol/${contractName}.json`,
+        `${process.cwd()}/artifacts/contracts/${contractName}-bsc.sol/${contractName}.json`,
       ).toString(),
     );
 

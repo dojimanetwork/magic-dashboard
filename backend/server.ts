@@ -89,7 +89,7 @@ app.get("/", (req, res) => {
   res.send(process.env.VITE_APP_MESSAGE);
 });
 
-app.post('/deploy', async (req, res) => {
+app.post('/deploy', cors(), async (req, res) => {
   const { data } = req.body;
   const result = await DeployChainScript(data as Array<DeployableChainsData>);
   res.send(result);
