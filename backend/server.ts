@@ -13,21 +13,36 @@ dotenv.config(); // Load environment variables from .env file
 const app = express();
 const port = process.env.VITE_APP_BACKEND_PORT;
 
-var allowedOrigin = ['https://magic-dashboard.test.dojima.network'];
-// // Example: Allow requests only from 'http://localhost:3001'
+// var allowedOrigin = ['http://localhost:3012'];
+// // // Example: Allow requests only from 'http://localhost:3001'
+// // const corsOptions = {
+// //   origin: function (origin: any, callback: any) {
+// //     if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
+// //       callback(null, true);
+// //     } else {
+// //       callback(new Error("CORS error"));
+// //     }
+// //   },
+// // };
+
 // const corsOptions = {
-//   origin: function (origin: any, callback: any) {
-//     if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("CORS error"));
-//     }
-//   },
+//   origin: allowedOrigin,
+//   optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
 // };
 
+// Define allowed origins
+const allowedOrigin = ['http://localhost:3012', 'https://magic-dashboard.test.dojima.network'];
+
+// CORS middleware
 const corsOptions = {
-  origin: allowedOrigin,
-  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  origin: function (origin: any, callback: any) {
+    if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
 };
 
 // Then pass these options to cors:
@@ -38,6 +53,13 @@ app.use(cors(corsOptions));
 // app.use(cors());
 
 app.use(express.json()); // Parse JSON in the request body
+
+// Custom middleware for handling OPTIONS requests
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(200);
+});
 
 // app.use((req, res, next) => {
 //   res.header('Access-Control-Allow-Origin', `${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`);
@@ -113,7 +135,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/deploy", async (req, res) => {
-  res.set('Access-Control-Allow-Origin', 'https://magic-dashboard.test.dojima.network');
+  // res.set('Access-Control-Allow-Origin', 'https://magic-dashboard.test.dojima.network');
+  // res.set('Access-Control-Allow-Origin', 'http://localhost:3012');
   const { data } = req.body;
   const result = await DeployChainScript(data as Array<DeployableChainsData>);
   res.send(result);
