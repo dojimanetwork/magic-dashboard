@@ -1,28 +1,34 @@
 // server/server.ts
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
 // import { compile } from "./scripts/utils";
 // import { deployDOJContractHandler } from "./scripts/dojima/deployContract";
 import { deployETHContractHandler } from "./scripts/ethereum/deployContract";
-import { DeployableChainsData, DeployContract } from './scripts/deploy';
-import { DeployChainScript } from './scripts';
+import { DeployableChainsData, DeployContract } from "./scripts/deploy";
+import { DeployChainScript } from "./scripts";
 
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const port = process.env.VITE_APP_BACKEND_PORT;
 
-// // Example: Allow requests only from 'http://localhost:3001'
-// const corsOptions = {
-//     origin: 'http://localhost:3001',
-//     optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
-//   };
-  
-//   app.use(cors(corsOptions));
+var allowedOrigin = [`${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`];
+// Example: Allow requests only from 'http://localhost:3001'
+const corsOptions = {
+  origin: function (origin: any, callback: any) {
+    if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS error"));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
 
 // Enable CORS for all routes
-app.use(cors());
+// app.use(cors());
 
 app.use(express.json()); // Parse JSON in the request body
 
@@ -33,17 +39,17 @@ app.use(express.json()); // Parse JSON in the request body
 //   next();
 // });
 
-app.use((req, res, next) => {
-  res.set({
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*",
-      "Access-Control-Allow-Headers": "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
-  });
+// app.use((req, res, next) => {
+//   res.set({
+//       "Access-Control-Allow-Origin": "*",
+//       "Access-Control-Allow-Methods": "*",
+//       "Access-Control-Allow-Headers": "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
+//   });
 
-  next();
-});
+//   next();
+// });
 
-app.options('*', cors()); // Enable preflight for all routes
+app.options("*", cors()); // Enable preflight for all routes
 
 // app.get('/', async (req, res) => {
 //   // const {contract, contractName} = req.query;
@@ -99,7 +105,7 @@ app.get("/", (req, res) => {
   res.send(process.env.VITE_APP_MESSAGE);
 });
 
-app.post('/deploy', async (req, res) => {
+app.post("/deploy", async (req, res) => {
   const { data } = req.body;
   const result = await DeployChainScript(data as Array<DeployableChainsData>);
   res.send(result);
