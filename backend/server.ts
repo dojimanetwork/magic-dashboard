@@ -14,16 +14,23 @@ const app = express();
 const port = process.env.VITE_APP_BACKEND_PORT;
 
 var allowedOrigin = [`${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`];
-// Example: Allow requests only from 'http://localhost:3001'
-const corsOptions = {
-  origin: function (origin: any, callback: any) {
-    if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS error"));
-    }
-  },
+// // Example: Allow requests only from 'http://localhost:3001'
+// const corsOptions = {
+//   origin: function (origin: any, callback: any) {
+//     if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("CORS error"));
+//     }
+//   },
+// };
+
+const corsOptions: cors.CorsOptions = {
+  origin: allowedOrigin,
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
+
+// Then pass these options to cors:
 
 app.use(cors(corsOptions));
 
