@@ -25,7 +25,7 @@ var allowedOrigin = [`${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`];
 //   },
 // };
 
-const corsOptions: cors.CorsOptions = {
+const corsOptions = {
   origin: allowedOrigin,
   optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
