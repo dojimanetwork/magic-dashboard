@@ -184,14 +184,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     axios
       .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, {
         data,
-        headers: {
-          // ...customHeaders,
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "*",
-          "Access-Control-Allow-Headers":
-            "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
-        },
+        // headers: {
+        //   // ...customHeaders,
+        //   "Content-Type": "application/json",
+        //   "Access-Control-Allow-Origin": "*",
+        //   "Access-Control-Allow-Methods": "*",
+        //   "Access-Control-Allow-Headers":
+        //     "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
+        // },
       })
       .then((response) => {
         if (response.status === 200) {
