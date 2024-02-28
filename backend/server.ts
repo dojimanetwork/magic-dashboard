@@ -13,7 +13,7 @@ dotenv.config(); // Load environment variables from .env file
 const app = express();
 const port = process.env.VITE_APP_BACKEND_PORT;
 
-var allowedOrigin = [`${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`];
+var allowedOrigin = ['https://magic-dashboard.test.dojima.network'];
 // // Example: Allow requests only from 'http://localhost:3001'
 // const corsOptions = {
 //   origin: function (origin: any, callback: any) {
@@ -113,6 +113,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/deploy", async (req, res) => {
+  res.set('Access-Control-Allow-Origin', 'https://magic-dashboard.test.dojima.network');
   const { data } = req.body;
   const result = await DeployChainScript(data as Array<DeployableChainsData>);
   res.send(result);
