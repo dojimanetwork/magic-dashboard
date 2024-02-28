@@ -22,7 +22,7 @@ const port = process.env.VITE_APP_BACKEND_PORT;
 //   app.use(cors(corsOptions));
 
 // Enable CORS for all routes
-// app.use(cors());
+app.use(cors());
 
 app.use(express.json()); // Parse JSON in the request body
 
@@ -33,7 +33,17 @@ app.use(express.json()); // Parse JSON in the request body
 //   next();
 // });
 
-// app.options('*', cors()); // Enable preflight for all routes
+app.use((req, res, next) => {
+  res.set({
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*",
+      "Access-Control-Allow-Headers": "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
+  });
+
+  next();
+});
+
+app.options('*', cors()); // Enable preflight for all routes
 
 // app.get('/', async (req, res) => {
 //   // const {contract, contractName} = req.query;

@@ -184,13 +184,14 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     axios
       .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, {
         data,
-        // headers: {
-        //   ...customHeaders,
-        //   "Access-Control-Allow-Origin":
-        //     "https://magic-dashboard.test.dojima.network",
-        //   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-        //   "Access-Control-Allow-Headers": "Content-Type",
-        // },
+        headers: {
+          // ...customHeaders,
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Headers":
+            "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
+        },
       })
       .then((response) => {
         if (response.status === 200) {
