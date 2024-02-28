@@ -42,7 +42,7 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  optionsSuccessStatus: 204, // Some legacy browsers choke on 204
 };
 
 // Then pass these options to cors:
@@ -58,7 +58,7 @@ app.use(express.json()); // Parse JSON in the request body
 app.options('*', (req, res) => {
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.sendStatus(200);
+  res.sendStatus(204);
 });
 
 // app.use((req, res, next) => {
