@@ -65,7 +65,7 @@ app.use(cors());
 
 app.use(express.json()); // Parse JSON in the request body
 
-app.options("*", cors()); // Enable preflight for all routes
+// app.options("*", cors()); // Enable preflight for all routes
 
 // // Custom middleware for handling OPTIONS requests
 // app.options('*', (req, res) => {
