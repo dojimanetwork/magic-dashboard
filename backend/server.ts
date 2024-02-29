@@ -2,11 +2,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import winston from 'winston';
 // import { compile } from "./scripts/utils";
 // import { deployDOJContractHandler } from "./scripts/dojima/deployContract";
 import { deployETHContractHandler } from "./scripts/ethereum/deployContract";
 import { DeployableChainsData, DeployContract } from "./scripts/deploy";
 import { DeployChainScript } from "./scripts";
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.simple(),
+  transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({ filename: 'error.log', level: 'error' }),
+      new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -131,17 +142,41 @@ app.options('*', (req, res) => {
 // });
 
 app.get("/", (req, res) => {
+  logger.info('GET request received');
   res.send(process.env.VITE_APP_MESSAGE);
 });
 
+// app.post("/deploy", async (req, res) => {
+//   // res.set('Access-Control-Allow-Origin', 'https://magic-dashboard.test.dojima.network');
+//   // res.set('Access-Control-Allow-Origin', 'http://localhost:3012');
+//   const { data } = req.body;
+//   const result = await DeployChainScript(data as Array<DeployableChainsData>);
+//   res.send(result);
+// });
+
 app.post("/deploy", async (req, res) => {
-  // res.set('Access-Control-Allow-Origin', 'https://magic-dashboard.test.dojima.network');
-  // res.set('Access-Control-Allow-Origin', 'http://localhost:3012');
-  const { data } = req.body;
-  const result = await DeployChainScript(data as Array<DeployableChainsData>);
-  res.send(result);
+  try {
+      const { data } = req.body;
+
+      // Log the received data
+      logger.info('POST request to /deploy with data:', data);
+
+      const result = await DeployChainScript(data as Array<DeployableChainsData>);
+
+      // Log the result before sending it
+      logger.info('Deployment result:', result);
+
+      res.send(result);
+  } catch (error) {
+      // Log any errors that occurred during the process
+      logger.error('Error during deployment:', error);
+
+      // Handle the error and send an appropriate response
+      res.status(500).send('Internal Server Error');
+  }
 });
 
+
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  logger.info(`Server is running on port ${port}`);
 });
