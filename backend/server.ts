@@ -42,35 +42,37 @@ const port = process.env.VITE_APP_BACKEND_PORT;
 // };
 
 // Define allowed origins
-const allowedOrigin = ['http://localhost:3012', 'https://magic-dashboard.test.dojima.network'];
+// const allowedOrigin = ['http://localhost:3012', 'https://magic-dashboard.test.dojima.network'];
 
-// CORS middleware
-const corsOptions = {
-  origin: function (origin: any, callback: any) {
-    if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  optionsSuccessStatus: 204, // Some legacy browsers choke on 204
-};
+// // CORS middleware
+// const corsOptions = {
+//   origin: function (origin: any, callback: any) {
+//     if (allowedOrigin.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   optionsSuccessStatus: 204, // Some legacy browsers choke on 204
+// };
 
-// Then pass these options to cors:
+// // Then pass these options to cors:
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // Enable CORS for all routes
-// app.use(cors());
+app.use(cors());
 
 app.use(express.json()); // Parse JSON in the request body
 
-// Custom middleware for handling OPTIONS requests
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.sendStatus(204);
-});
+app.options("*", cors()); // Enable preflight for all routes
+
+// // Custom middleware for handling OPTIONS requests
+// app.options('*', (req, res) => {
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   res.sendStatus(204);
+// });
 
 // app.use((req, res, next) => {
 //   res.header('Access-Control-Allow-Origin', `${process.env.VITE_APP_MAGIC_DASHBOARD_URL}`);
