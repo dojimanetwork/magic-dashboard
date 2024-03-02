@@ -2,21 +2,26 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import winston from 'winston';
+import winston from "winston";
 import timeout from "connect-timeout";
 // import { compile } from "./scripts/utils";
 // import { deployDOJContractHandler } from "./scripts/dojima/deployContract";
 import { deployETHContractHandler } from "./scripts/ethereum/deployContract";
 import { DeployableChainsData, DeployContract } from "./scripts/deploy";
-import { DeployChainScript } from "./scripts";
+import {
+  DeployBSCChainScript,
+  DeployChainScript,
+  DeployDOJChainScript,
+  DeployETHChainScript,
+} from "./scripts";
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.simple(),
   transports: [
-      new winston.transports.Console(),
-      new winston.transports.File({ filename: 'error.log', level: 'error' }),
-      new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
   ],
 });
 
@@ -145,19 +150,19 @@ app.use(express.json()); // Parse JSON in the request body
 // });
 
 // Set a timeout of 30 seconds for all routes
-app.use(timeout('1500s'));
+app.use(timeout("1500s"));
 
 // This middleware will run for every request
 app.use((req, res, next) => {
   // Check if the request has timed out
   if (req.timedout) {
-    return res.status(408).send('Request Timeout');
+    return res.status(408).send("Request Timeout");
   }
   next();
 });
 
 app.get("/", (req, res) => {
-  logger.info('GET request received');
+  logger.info("GET request received");
   res.send(process.env.VITE_APP_MESSAGE);
 });
 
@@ -171,26 +176,91 @@ app.get("/", (req, res) => {
 
 app.post("/deploy", async (req, res) => {
   try {
-      const { data } = req.body;
+    const { data } = req.body;
 
-      // Log the received data
-      logger.info('POST request to /deploy with data:', data);
+    // Log the received data
+    logger.info("POST request to /deploy with data:", data);
 
-      const result = await DeployChainScript(data as Array<DeployableChainsData>);
+    const result = await DeployChainScript(data as Array<DeployableChainsData>);
 
-      // Log the result before sending it
-      logger.info('Deployment result:', result);
+    // Log the result before sending it
+    logger.info("Deployment result:", result);
 
-      res.send(result);
+    res.send(result);
   } catch (error) {
-      // Log any errors that occurred during the process
-      logger.error('Error during deployment:', error);
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
 
-      // Handle the error and send an appropriate response
-      res.status(500).send('Internal Server Error');
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
   }
 });
 
+app.post("/deploy/dojima", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    // Log the received data
+    logger.info("POST request to /deploy/dojima with data:", data);
+
+    const result = await DeployDOJChainScript(data as DeployableChainsData);
+
+    // Log the result before sending it
+    logger.info("Dojima Deployment result:", result);
+
+    res.send(result);
+  } catch (error) {
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
+
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/deploy/ethereum", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    // Log the received data
+    logger.info("POST request to /deploy/ethereum with data:", data);
+
+    const result = await DeployETHChainScript(data as DeployableChainsData);
+
+    // Log the result before sending it
+    logger.info("ethereum Deployment result:", result);
+
+    res.send(result);
+  } catch (error) {
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
+
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/deploy/bsc", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    // Log the received data
+    logger.info("POST request to /deploy/bsc with data:", data);
+
+    const result = await DeployBSCChainScript(data as DeployableChainsData);
+
+    // Log the result before sending it
+    logger.info("bsc Deployment result:", result);
+
+    res.send(result);
+  } catch (error) {
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
+
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 app.listen(port, () => {
   logger.info(`Server is running on port ${port}`);

@@ -102,6 +102,33 @@ async function addDeployedDetailsToDb(
   }
 }
 
+async function deployContracts(contractsData: Array<DeployableChainsData>) {
+  let deployedDetails: Array<DeployedDetails> = [];
+  for (const contractData of contractsData) {
+    const result = await axios.post(
+      `${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy/${contractData.chainName}`,
+      {
+        data: contractData,
+      },
+    );
+    if (result.status === 200) {
+      const response: DeployedDetails = result.data;
+      deployedDetails.push(response);
+    } else {
+      deployedDetails.push({
+        chain: contractData.chainName,
+        details: {
+          contractAddress: "",
+          contractABI: "",
+          contractByteCode: "",
+        },
+      });
+    }
+  }
+
+  return deployedDetails;
+}
+
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [tab, setTab] = useState(1);
   const [isDeploying, setIsDeploying] = useState(false);
@@ -180,41 +207,70 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     //   "Content-Type": "application/json",
     // };
 
-    // Make Axios POST request with DeployEVMContractParams in the request body
-    axios
-      .post(`${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`, {
-        data,
-        // headers: {
-        //   // ...customHeaders,
-        //   "Content-Type": "application/json",
-        //   "Access-Control-Allow-Origin": "*",
-        //   "Access-Control-Allow-Methods": "*",
-        //   "Access-Control-Allow-Headers":
-        //     "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
-        // },
-      },{ timeout: 300000 })
-      .then((response) => {
-        if (response.status === 200) {
-          const result: Array<DeployedDetails> = response.data;
-          setIsDeploying(false);
-          setDeployedDetails(result);
-          setDeploymentStatus("success");
-          setIsDeployed(true);
-          refreshProjectData();
-          resetContractDetails();
-          addDeployedDetailsToDb(
-            userDetails.email,
-            userDetails.projectName,
-            result,
-          )
-            .then((res) => {
-              // console.log(res);
-            })
-            .catch(() => {});
-        } else {
-          setDeploymentStatus("failed");
-          setIsDeployed(true);
-        }
+    // // Make Axios POST request with DeployEVMContractParams in the request body
+    // axios
+    //   .post(
+    //     `${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy`,
+    //     {
+    //       data,
+    //       // headers: {
+    //       //   // ...customHeaders,
+    //       //   "Content-Type": "application/json",
+    //       //   "Access-Control-Allow-Origin": "*",
+    //       //   "Access-Control-Allow-Methods": "*",
+    //       //   "Access-Control-Allow-Headers":
+    //       //     "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
+    //       // },
+    //     },
+    //     { timeout: 300000 },
+    //   )
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       const result: Array<DeployedDetails> = response.data;
+    //       setIsDeploying(false);
+    //       setDeployedDetails(result);
+    //       setDeploymentStatus("success");
+    //       setIsDeployed(true);
+    //       refreshProjectData();
+    //       resetContractDetails();
+    //       addDeployedDetailsToDb(
+    //         userDetails.email,
+    //         userDetails.projectName,
+    //         result,
+    //       )
+    //         .then((res) => {
+    //           // console.log(res);
+    //         })
+    //         .catch(() => {});
+    //     } else {
+    //       setDeploymentStatus("failed");
+    //       setIsDeployed(true);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     setIsDeploying(false);
+    //     setDeploymentStatus("failed");
+    //     setIsDeployed(true);
+    //     console.error(error);
+    //   });
+
+    deployContracts(data)
+      .then((result) => {
+        setIsDeploying(false);
+        setDeployedDetails(result);
+        setDeploymentStatus("success");
+        setIsDeployed(true);
+        refreshProjectData();
+        resetContractDetails();
+        addDeployedDetailsToDb(
+          userDetails.email,
+          userDetails.projectName,
+          result,
+        )
+          .then((res) => {
+            // console.log(res);
+          })
+          .catch(() => {});
       })
       .catch((error) => {
         setIsDeploying(false);
