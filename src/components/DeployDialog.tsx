@@ -192,7 +192,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
         //   "Access-Control-Allow-Headers":
         //     "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
         // },
-      })
+      },{ timeout: 300000 })
       .then((response) => {
         if (response.status === 200) {
           const result: Array<DeployedDetails> = response.data;
