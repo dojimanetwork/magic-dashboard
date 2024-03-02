@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import winston from 'winston';
+import timeout from "connect-timeout";
 // import { compile } from "./scripts/utils";
 // import { deployDOJContractHandler } from "./scripts/dojima/deployContract";
 import { deployETHContractHandler } from "./scripts/ethereum/deployContract";
@@ -142,6 +143,18 @@ app.use(express.json()); // Parse JSON in the request body
 //   // });
 //   // res.send(result);
 // });
+
+// Set a timeout of 30 seconds for all routes
+app.use(timeout('1500s'));
+
+// This middleware will run for every request
+app.use((req, res, next) => {
+  // Check if the request has timed out
+  if (req.timedout) {
+    return res.status(408).send('Request Timeout');
+  }
+  next();
+});
 
 app.get("/", (req, res) => {
   logger.info('GET request received');
