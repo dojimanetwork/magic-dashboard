@@ -18,6 +18,7 @@ import { extractConstructorArguments } from "../../../utils/readConstructorArgs"
 export type BSCNFTContractParams = {
   name: string;
   symbol: string;
+  baseUri: string;
 };
 
 export function GetBSCNFTContract(params: BSCNFTContractParams) {
@@ -71,6 +72,10 @@ export function GetBSCNFTContract(params: BSCNFTContractParams) {
           omniChainNFTContractAddress = _omniChainNFTContractAddress;
           _setupRole(EXECUTE_STATE_ROLE, _inboundStateSender);
       }
+
+      function _baseURI() internal view virtual override returns (string memory) {
+        return "${params.baseUri}";
+      }
   
       function transferToOmniChain(address user, uint256 tokenId) external nonReentrant {
           _burn(tokenId);
@@ -106,6 +111,8 @@ export default function BscNftTemplateView({
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
   const [disable, setDisable] = useState(false);
+  const [missingAllInputs, setMissingAllInputs] = useState(false);
+  const [baseUriError, setBaseUriError] = useState(false);
   const { erc721TemplateContractDetails, updateErc721TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
@@ -124,6 +131,13 @@ export default function BscNftTemplateView({
       ? "Nft"
       : (selectedContractDetails?.symbol as string),
   );
+
+  const [baseUri, setBaseUri] = useState(
+    selectedContractDetails?.baseUri === ""
+      ? ""
+      : (selectedContractDetails?.baseUri as string),
+  );
+
   const [contract, setContract] = useState("");
 
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
@@ -135,6 +149,7 @@ export default function BscNftTemplateView({
     const nftOptions: BSCNFTContractParams = {
       name,
       symbol,
+      baseUri
     };
     const finalContract = GetBSCNFTContract(nftOptions);
     setContract(finalContract);
@@ -146,14 +161,28 @@ export default function BscNftTemplateView({
     const nftOptions: BSCNFTContractParams = {
       name,
       symbol,
+      baseUri
     };
     const finalContract = GetBSCNFTContract(nftOptions);
     setContract(finalContract);
     displayCode(finalContract);
-  }, [displayCode, name, symbol]);
+  }, [displayCode, name, symbol, baseUri]);
 
   function saveDetails() {
     setIsSaving(true);
+
+    if (!name || !symbol || !baseUri) {
+      setMissingAllInputs(true);
+      setIsSaving(false);
+      return;
+    }
+
+    if (!baseUri.startsWith("https://")) {
+      setBaseUriError(true);
+      setIsSaving(false);
+      return;
+    }
+
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -207,6 +236,7 @@ export default function BscNftTemplateView({
         ...selectedTemplateContract,
         name,
         symbol,
+        baseUri,
       };
 
       // Update the contract details using the context
@@ -241,6 +271,15 @@ export default function BscNftTemplateView({
               value={symbol}
               setValue={setSymbol}
             />
+            <TextInput
+              id="baseUri"
+              label="Base URI"
+              labelClassName="text-subtext"
+              type={TextInputTypes.TEXT}
+              value={baseUri}
+              setValue={setBaseUri}
+              placeholder="https://..."
+            />
             {/* <TextInput
               id="premint"
               label="Premint"
@@ -274,6 +313,12 @@ export default function BscNftTemplateView({
           </div>
         </div> */}
       </div>
+      {missingAllInputs ? (
+        <p className="text-red-600 text-sm">Please enter all required fields</p>
+      ) : null}
+      {baseUriError ? (
+        <p className="text-red-600 text-sm">{`Base URI should start with https://`}</p>
+      ) : null}
       <div className="flex justify-center mt-6">
         <Button
           onClick={saveDetails}

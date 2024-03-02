@@ -79,7 +79,7 @@ function ContractView({
         setIsDeployed(false);
       }
     }
-  }, [selectedElementChain]);
+  }, [projectData, selectedElementChain]);
 
   // const copyToClipboard = async () => {
   //   try {

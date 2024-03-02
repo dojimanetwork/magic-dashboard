@@ -18,7 +18,7 @@ import { extractConstructorArguments } from "../../../utils/readConstructorArgs"
 export type DOJNFTContractParams = {
   name: string;
   symbol: string;
-  premint: number;
+  baseUri: string;
   mintable: boolean;
   burnable: boolean;
 };
@@ -44,6 +44,10 @@ export function GetDOJNFTContract(params: DOJNFTContractParams) {
           _setupRole(ADMIN_ROLE, msg.sender);
       }
   
+      function _baseURI() internal view virtual override returns (string memory) {
+        return "${params.baseUri}";
+      }
+
       function setOmniChainContract(address _omniChainNFTContract) external onlyRole(ADMIN_ROLE) {
           omniChainNFTContract = _omniChainNFTContract;
           emit OmniChainNFTContractUpdated(_omniChainNFTContract);
@@ -87,6 +91,8 @@ export default function DojimaNftTemplateView({
 }) {
   const { contractsData, updateContractDetails } = useContractDetails();
   const [disable, setDisable] = useState(false);
+  const [missingAllInputs, setMissingAllInputs] = useState(false);
+  const [baseUriError, setBaseUriError] = useState(false);
   const { erc721TemplateContractDetails, updateErc721TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
@@ -105,11 +111,17 @@ export default function DojimaNftTemplateView({
       ? "Nft"
       : (selectedContractDetails?.symbol as string),
   );
-  const [premint, setPremint] = useState(
-    selectedContractDetails?.premint === ""
-      ? "0"
-      : (selectedContractDetails?.premint as string),
+
+  const [baseUri, setBaseUri] = useState(
+    selectedContractDetails?.baseUri === ""
+      ? ""
+      : (selectedContractDetails?.baseUri as string),
   );
+  // const [premint, setPremint] = useState(
+  //   selectedContractDetails?.premint === ""
+  //     ? "0"
+  //     : (selectedContractDetails?.premint as string),
+  // );
   const [mintable, setMintable] = useState(true); // TODO : add option to user
   const [burnable, setBurnable] = useState(true); // TODO : add option to user
   const [contract, setContract] = useState("");
@@ -123,7 +135,7 @@ export default function DojimaNftTemplateView({
     const nftOptions: DOJNFTContractParams = {
       name,
       symbol,
-      premint: premint ? Number(premint) : 0,
+      baseUri,
       mintable,
       burnable,
     };
@@ -133,21 +145,36 @@ export default function DojimaNftTemplateView({
   }, []);
 
   useEffect(() => {
+    setMissingAllInputs(false);
+    setBaseUriError(false);
     setIsEditing(true);
     const nftOptions: DOJNFTContractParams = {
       name,
       symbol,
-      premint: premint ? Number(premint) : 0,
+      baseUri,
       mintable,
       burnable,
     };
     const finalContract = GetDOJNFTContract(nftOptions);
     setContract(finalContract);
     displayCode(finalContract);
-  }, [displayCode, name, premint, symbol, burnable, mintable]);
+  }, [displayCode, name, baseUri, symbol, burnable, mintable]);
 
   function saveDetails() {
     setIsSaving(true);
+
+    if (!name || !symbol || !baseUri) {
+      setMissingAllInputs(true);
+      setIsSaving(false);
+      return;
+    }
+
+    if (!baseUri.startsWith("https://")) {
+      setBaseUriError(true);
+      setIsSaving(false);
+      return;
+    }
+
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -201,7 +228,7 @@ export default function DojimaNftTemplateView({
         ...selectedTemplateContract,
         name,
         symbol,
-        premint,
+        baseUri,
       };
 
       // Update the contract details using the context
@@ -237,13 +264,13 @@ export default function DojimaNftTemplateView({
               setValue={setSymbol}
             />
             <TextInput
-              id="premint"
-              label="Premint"
+              id="baseUri"
+              label="Base URI"
               labelClassName="text-subtext"
-              type={TextInputTypes.NUMBER}
-              value={premint}
-              setValue={setPremint}
-              minNum={0}
+              type={TextInputTypes.TEXT}
+              value={baseUri}
+              setValue={setBaseUri}
+              placeholder="https://..."
             />
           </div>
         </div>
@@ -269,6 +296,12 @@ export default function DojimaNftTemplateView({
           </div>
         </div>
       </div>
+      {missingAllInputs ? (
+        <p className="text-red-600 text-sm">Please enter all required fields</p>
+      ) : null}
+      {baseUriError ? (
+        <p className="text-red-600 text-sm">{`Base URI should start with https://`}</p>
+      ) : null}
       <div className="flex justify-center mt-6">
         <Button
           onClick={saveDetails}
