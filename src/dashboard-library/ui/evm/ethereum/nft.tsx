@@ -273,7 +273,7 @@ export default function EthereumNftTemplateView({
             />
             <TextInput
               id="baseUri"
-              label="Base URI"
+              label="Base URI*"
               labelClassName="text-subtext"
               type={TextInputTypes.TEXT}
               value={baseUri}

@@ -105,24 +105,78 @@ async function addDeployedDetailsToDb(
 async function deployContracts(contractsData: Array<DeployableChainsData>) {
   let deployedDetails: Array<DeployedDetails> = [];
   for (const contractData of contractsData) {
-    const result = await axios.post(
-      `${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy/${contractData.chainName}`,
-      {
-        data: contractData,
-      },
-    );
-    if (result.status === 200) {
-      const response: DeployedDetails = result.data;
-      deployedDetails.push(response);
-    } else {
+    // try {
+    //   const result = await axios.post(
+    //     `${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy/${
+    //       contractData.chainName
+    //     }`,
+    //     {
+    //       data: contractData,
+    //     },
+    //   );
+    //   if (result.status === 200) {
+    //     const response: DeployedDetails = result.data;
+    //     deployedDetails.push(response);
+    //   } else {
+    //     deployedDetails.push({
+    //       chain: contractData.chainName,
+    //       details: {
+    //         contractAddress: "Deployment Failed",
+    //         contractABI: "-",
+    //         contractByteCode: "-",
+    //       },
+    //     });
+    //   }
+    // } catch (error: any) {
+    //   deployedDetails.push({
+    //     chain: contractData.chainName,
+    //     details: {
+    //       contractAddress: "Deployment Failed",
+    //       contractABI: "-",
+    //       contractByteCode: "-",
+    //     },
+    //   });
+    //   console.error(error);
+    // }
+    try {
+      const url = `${
+        import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL
+      }/deploy/${contractData.chainName}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: contractData,
+        }),
+      });
+
+      if (response.status === 200) {
+        const result = await response.json();
+        const responseDetails: DeployedDetails = result;
+        deployedDetails.push(responseDetails);
+      } else {
+        deployedDetails.push({
+          chain: contractData.chainName,
+          details: {
+            contractAddress: "Deployment Failed",
+            contractABI: "-",
+            contractByteCode: "-",
+          },
+        });
+      }
+    } catch (error) {
       deployedDetails.push({
         chain: contractData.chainName,
         details: {
-          contractAddress: "",
-          contractABI: "",
-          contractByteCode: "",
+          contractAddress: "Deployment Failed",
+          contractABI: "-",
+          contractByteCode: "-",
         },
       });
+      console.error(error);
     }
   }
 
@@ -136,14 +190,6 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [deploymentStatus, setDeploymentStatus] = useState<
     "success" | "failed" | ""
   >("");
-  const handleClose = React.useCallback(() => {
-    setDeploymentStatus("");
-    setIsDeployed(false);
-    setDeployedDetails([]);
-    if (onClose) {
-      onClose();
-    }
-  }, [onClose]);
 
   const { contractsData, updateContractDetails, resetContractDetails } =
     useContractDetails();
@@ -152,6 +198,16 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [deployedDetails, setDeployedDetails] = useState<
     Array<DeployedDetails>
   >([]);
+
+  const handleClose = React.useCallback(() => {
+    setDeploymentStatus("");
+    setIsDeployed(false);
+    setDeployedDetails([]);
+    refreshProjectData();
+    if (onClose) {
+      onClose();
+    }
+  }, [onClose]);
 
   function handleChains(chain: string) {
     switch (chain) {

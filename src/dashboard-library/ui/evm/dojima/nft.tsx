@@ -122,8 +122,8 @@ export default function DojimaNftTemplateView({
   //     ? "0"
   //     : (selectedContractDetails?.premint as string),
   // );
-  const [mintable, setMintable] = useState(true); // TODO : add option to user
-  const [burnable, setBurnable] = useState(true); // TODO : add option to user
+  const [mintable, setMintable] = useState(false); // TODO : add option to user
+  const [burnable, setBurnable] = useState(false); // TODO : add option to user
   const [contract, setContract] = useState("");
 
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
@@ -265,7 +265,7 @@ export default function DojimaNftTemplateView({
             />
             <TextInput
               id="baseUri"
-              label="Base URI"
+              label="Base URI*"
               labelClassName="text-subtext"
               type={TextInputTypes.TEXT}
               value={baseUri}

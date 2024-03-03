@@ -125,6 +125,7 @@ export default function DojimaErc20TemplateView({
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [missingAllInputs, setMissingAllInputs] = useState(false);
 
   useEffect(() => {
     const erc20Options: DOJERC20ContractParams = {
@@ -155,6 +156,13 @@ export default function DojimaErc20TemplateView({
 
   function saveDetails() {
     setIsSaving(true);
+
+    if (!name || !symbol) {
+      setMissingAllInputs(true);
+      setIsSaving(false);
+      return;
+    }
+
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
@@ -273,6 +281,9 @@ export default function DojimaErc20TemplateView({
           </div>
         </div>
       </div>
+      {missingAllInputs ? (
+        <p className="text-red-600 text-sm">Please enter all required fields</p>
+      ) : null}
       <div className="flex justify-center mt-6">
         <Button
           onClick={saveDetails}

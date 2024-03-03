@@ -57,6 +57,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 import { DeployDialog } from "./DeployDialog";
+import { useProjectData } from "../context/project-appState";
 
 /** Main UI with left, header, library and footer components */
 
@@ -139,6 +140,8 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
+
+  const { refreshProjectData } = useProjectData();
 
   const [eyeDropperState, setEyeDropperState] = useAtom(
     activeEyeDropperAtom,
@@ -449,6 +452,7 @@ const LayerUI = ({
       {appState.openDialog === "deploy" && (
         <DeployDialog
           onClose={() => {
+            refreshProjectData();
             setAppState({ openDialog: null });
           }}
         />
