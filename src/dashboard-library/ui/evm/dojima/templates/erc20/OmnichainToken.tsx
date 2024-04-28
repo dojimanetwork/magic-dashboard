@@ -1,86 +1,117 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../../common/Button";
-import TextInput, { TextInputTypes } from "../../common/TextInput";
+import Button from "../../../../common/Button";
+import TextInput, { TextInputTypes } from "../../../../common/TextInput";
 import {
   ContractDetailsData,
   useContractDetails,
-} from "../../../../context/contract-appState";
-import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
-import { useUserDetails } from "../../../../context/user-appState";
+} from "../../../../../../context/contract-appState";
+import { AvailableChains } from "../../../../../../../excalidraw-app/dojima-templates/types";
+import { useUserDetails } from "../../../../../../context/user-appState";
 import {
   Erc20TemplateSaveContractDetailsData,
   useTemplateContractDetails,
-} from "../../../../context/template-contract-appState";
-import { Text } from "../../common/Typography";
-import CheckboxInput from "../../common/CheckboxInput";
-import { extractConstructorArguments } from "../../../utils/readConstructorArgs";
+} from "../../../../../../context/template-contract-appState";
+import { Text } from "../../../../common/Typography";
+import CheckboxInput from "../../../../common/CheckboxInput";
+import { extractConstructorArguments } from "../../../../../utils/readConstructorArgs";
 
-export type BSCERC20ContractParams = {
+export type DOJERC20ContractParams = {
   id: string;
   name: string;
   symbol: string;
+  premint: number;
+  mintable?: boolean;
+  burnable?: boolean;
 };
 
-export function GetBSCERC20Contract(params: BSCERC20ContractParams) {
+export function GetDOJOmnichainTokenERC20Contract(params: DOJERC20ContractParams) {
   const contract = `// SPDX-License-Identifier: MIT
   pragma solidity ^0.8.19;
   
-  import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
+  import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
+  import '@openzeppelin/contracts/access/AccessControl.sol';
+  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
   import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-  import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
-  import '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
-  import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
-  import '@dojimanetwork/dojima-contracts/contracts/interfaces/IInboundStateSender.sol';
-  import {IStateExecutor} from '@dojimanetwork/dojima-contracts/contracts/interfaces/IStateReceiver.sol';
+  import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+  import '@dojimanetwork/dojima-contracts/contracts/interfaces/IOutboundStateSender.sol';
+  import '@dojimanetwork/dojima-contracts/contracts/interfaces/IStateReceiver.sol';
+  import '@dojimanetwork/dojima-contracts/contracts/dojimachain/StateSyncerVerifier.sol';
+  import './${params.name}XTokenContract.sol';
   
-  contract ${params.name}${params.id} is IStateExecutor, Initializable, ERC20Upgradeable, UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUpgradeable {
-      bytes32 public constant EXECUTE_STATE_ROLE = keccak256("EXECUTE_STATE_ROLE");
+  contract ${params.name}${params.id} is  Initializable, UUPSUpgradeable, ReentrancyGuardUpgradeable, AccessControl, IStateReceiver {
+      ${params.name}XTokenContract public xToken;
+      StateSyncerVerifier private _stateVerifier;
   
-      IInboundStateSender public inboundStateSender;
-      address public omniChainContractAddress;
+      IOutboundStateSender public outboundStateSender;
+      bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+      bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   
-      event TokenDeposited(
-          address indexed user,
-          address token,
-          uint256 amount,
-          uint256 indexed depositId
-      );
+      // Mapping of chain names to their contract addresses in bytes format
+      mapping(bytes32 => bytes) public chainContractMappings;
   
-      // Initialize replaces the constructor for upgradeable contracts
-      function initialize(
-          string memory name,
-          string memory symbol,
-          address _inboundStateSender,
-          address _omniChainContractAddress
-      ) public initializer {
-          require(_inboundStateSender != address(0), "${params.name}${params.id}: InboundStateSender address cannot be zero");
-          require(_omniChainContractAddress != address(0), "${params.name}${params.id}: OmniChain contract address cannot be zero");
+      event ChainContractMappingUpdated(bytes32 chainName, bytes contractAddress);
+      event TokensTransferredToChain(bytes32 destinationChain, bytes user, uint256 amount);
   
-          __ERC20_init(name, symbol);
-          __AccessControl_init();
+      modifier onlyStateSyncer() {
+          require(msg.sender == address(_stateVerifier.stateSyncer()), "${params.name}${params.id}: Caller is not the state syncer");
+          _;
+      }
+  
+      // Initializer replaces the constructor
+      function initialize(address _xTokenAddress, address _outboundStateSender, address _stateSyncerVerifier) public initializer {
+          require(_xTokenAddress != address(0), "OmniChainERC20: XToken address cannot be zero");
+          require(_outboundStateSender != address(0), "OmniChainERC20: OutboundStateSender address cannot be zero");
+          require(_stateSyncerVerifier != address(0), "OmniChainERC20: Invalid state syncer verifier address");
           __UUPSUpgradeable_init();
+          __ReentrancyGuard_init();
   
-          // Grant the deployer the default admin role: they can grant/revoke any roles
-          _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+          _setupRole(ADMIN_ROLE, msg.sender);
   
-          inboundStateSender = IInboundStateSender(_inboundStateSender);
-          omniChainContractAddress = _omniChainContractAddress;
-          _setupRole(EXECUTE_STATE_ROLE, _inboundStateSender);
+          xToken = ${params.name}XTokenContract(_xTokenAddress);
+          outboundStateSender = IOutboundStateSender(_outboundStateSender);
+          _stateVerifier = StateSyncerVerifier(_stateSyncerVerifier);
       }
   
-      function assignExecuteStateRole(address _account) external onlyRole(DEFAULT_ADMIN_ROLE) {
-          _setupRole(EXECUTE_STATE_ROLE, _account);
+      // Function to authorize upgrades
+      function _authorizeUpgrade(address newImplementation) internal override onlyRole(ADMIN_ROLE) {
+          // Upgrade authorization logic
       }
   
-      function transferToOmniChain(bytes memory user, uint256 amount) external nonReentrant {
-          _burn(msg.sender, amount);
-          inboundStateSender.transferPayload(omniChainContractAddress, abi.encode(user, amount, 0));
+      function updateChainContractMapping(bytes32 chainName, bytes memory contractAddress) external onlyRole(ADMIN_ROLE) {
+          chainContractMappings[chainName] = contractAddress;
+          emit ChainContractMappingUpdated(chainName, contractAddress);
       }
   
-      function executeState(uint256 /*depositID*/, bytes calldata stateData) external nonReentrant onlyRole(EXECUTE_STATE_ROLE) {
-          (bytes memory userBytes, uint256 amount, uint256 depositId) = abi.decode(stateData, (bytes, uint256, uint256));
+      function transferToChain(
+          bytes32 destinationChain,
+          bytes memory user,
+          uint256 amount,
+          bytes memory destinationContractAddress
+      ) external nonReentrant payable {
+          require(
+              keccak256(destinationContractAddress) == keccak256(chainContractMappings[destinationChain]),
+              "OmniChainERC20: Destination contract address does not match"
+          );
+  
+          xToken.burn(msg.sender, amount);
+          // msg.value will be used as gas amount for the outbound transfer
+          outboundStateSender.transferPayload{value: msg.value}(
+              destinationChain,
+              destinationContractAddress,
+              msg.sender,
+              abi.encode(user, amount, 0) // TODO: add depositId
+          );
+          emit TokensTransferredToChain(destinationChain, user, amount);
+      }
+  
+      function onStateReceive(uint256 /* id */, bytes calldata data) external onlyStateSyncer {
+          (bytes memory userBytes, uint256 amount, uint256 depositId ) = abi.decode(data, (bytes, uint256, uint256));
+  
           // Ensure the bytes array for the address is of the correct length
-          require(userBytes.length == 20, "${params.name}${params.id}: Invalid address length");
+          require(userBytes.length == 20, "OmniChainERC20: Invalid address length");
+
+          // Ensure depositId is non-zero
+          require(depositId != 0, "OmniChainERC20: Invalid depositId");
   
           address userAddress;
           assembly {
@@ -88,35 +119,29 @@ export function GetBSCERC20Contract(params: BSCERC20ContractParams) {
           }
   
           // Additional validation for the address can go here if needed
-          require(userAddress != address(0), "${params.name}${params.id}: Invalid address");
+          require(userAddress != address(0), "OmniChainERC20: Invalid address");
   
-          _mint(userAddress, amount);
-          emit TokenDeposited(userAddress, address(this), amount, depositId);
-      }
-  
-      // Ensure only admin can upgrade the contract
-      function _authorizeUpgrade(address newImplementation) internal override onlyRole(DEFAULT_ADMIN_ROLE) {
-          // Upgrade authorization logic
+          xToken.mint(userAddress, amount);
       }
   }`;
 
   return contract;
 }
 
-export default function BscErc20TemplateView({
+export default function DojimaOmnichainTokenTemplateView({
   displayCode,
   selectedChain,
 }: {
   displayCode: (code: string) => void;
   selectedChain: AvailableChains;
 }) {
-  const mounted = useRef(false);
+  const mounted = useRef(false); // Ref to track whether the component is mounted
   const { contractsData, updateContractDetails } = useContractDetails();
   const [disable, setDisable] = useState(false);
   const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
-  const Contract_Id = "BscCrossChainToken";
+  const Contract_Id = "OmniChainERC20";
 
   const selectedContractDetails = erc20TemplateContractDetails.contracts.find(
     (data) => data.chain === selectedChain,
@@ -132,7 +157,13 @@ export default function BscErc20TemplateView({
       ? "Tkn"
       : (selectedContractDetails?.symbol as string),
   );
-
+  const [premint, setPremint] = useState(
+    selectedContractDetails?.premint === ""
+      ? "0"
+      : (selectedContractDetails?.premint as string),
+  );
+  const [mintable, setMintable] = useState(false); // TODO : add option to user
+  const [burnable, setBurnable] = useState(false); // TODO : add option to user
   const [contract, setContract] = useState("");
 
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
@@ -150,28 +181,29 @@ export default function BscErc20TemplateView({
 
     setMissingAllInputs(false);
     setIsEditing(true);
-    
-    const erc20Options: BSCERC20ContractParams = {
+
+    const erc20Options: DOJERC20ContractParams = {
       id: Contract_Id,
       name,
-      symbol
+      symbol,
+      premint: premint ? Number(premint) : 0,
     };
-    const finalContract = GetBSCERC20Contract(erc20Options);
+    const finalContract = GetDOJOmnichainTokenERC20Contract(erc20Options);
     setContract(finalContract);
     displayCode(finalContract);
-
+  
     const constructorArgs = extractConstructorArguments(finalContract);
-
+  
     // Find the contract with the selected chain
     const selectedContract = contractsData.contracts.find(
       (contract) => contract.chain === selectedChain,
     );
-
+  
     if (selectedContract) {
       const existingCodeDetailIndex = selectedContract.codeDetails.findIndex(
         (detail) => detail.id === Contract_Id,
       );
-
+  
       if (existingCodeDetailIndex !== -1) {
         // If code details with Contract_Id exist, update existing details
         const updatedContract: ContractDetailsData = {
@@ -191,9 +223,9 @@ export default function BscErc20TemplateView({
             selectedContract.argumentsDetails &&
             selectedContract.argumentsDetails.length > 0
               ? selectedContract.argumentsDetails.map((argDetail) => ({
-                  ...argDetail,
-                  fileName: `${name}${Contract_Id}`,
-                }))
+                ...argDetail,
+                fileName: `${name}${Contract_Id}`,
+              }))
               : [
                   {
                     id: Contract_Id,
@@ -205,7 +237,7 @@ export default function BscErc20TemplateView({
                   },
                 ],
         };
-
+  
         // Update the contract details using the context
         updateContractDetails(updatedContract);
       } else {
@@ -215,7 +247,7 @@ export default function BscErc20TemplateView({
           fileName: `${name}${Contract_Id}`,
           code: finalContract,
         };
-
+      
         const newArgumentsDetail = {
           id: Contract_Id,
           fileName: `${name}${Contract_Id}`,
@@ -224,18 +256,21 @@ export default function BscErc20TemplateView({
               ? Array(constructorArgs.length).fill("")
               : [],
         };
-
+      
         const updatedContract: ContractDetailsData = {
           ...selectedContract,
           name,
           symbol,
-          codeDetails: [...selectedContract.codeDetails, newCodeDetail],
+          codeDetails: [
+            ...selectedContract.codeDetails,
+            newCodeDetail,
+          ],
           argumentsDetails: [
             ...(selectedContract.argumentsDetails || []),
             newArgumentsDetail,
           ],
         };
-
+      
         // Update the contract details using the context
         updateContractDetails(updatedContract);
       }
@@ -265,58 +300,238 @@ export default function BscErc20TemplateView({
         gasPrice: "~0.0002",
         type: userDetails.type,
       };
-
+  
       // Update the contract details using the context
       updateContractDetails(addContractDetails);
     }
-
+  
     // Find the templateContract with the selected chain
-    const selectedTemplateContractIndex =
-      erc20TemplateContractDetails.contracts.findIndex(
-        (contract) => contract.chain === selectedChain,
-      );
-
+    const selectedTemplateContractIndex = erc20TemplateContractDetails.contracts.findIndex(
+      (contract) => contract.chain === selectedChain,
+    );
+  
     if (selectedTemplateContractIndex !== -1) {
       // If template contract with selectedChain exists, update existing details
-      const updatedTemplateContracts = [
-        ...erc20TemplateContractDetails.contracts,
-      ];
+      const updatedTemplateContracts = [...erc20TemplateContractDetails.contracts];
       updatedTemplateContracts[selectedTemplateContractIndex] = {
         ...updatedTemplateContracts[selectedTemplateContractIndex],
         name,
-        symbol
+        symbol,
+        premint,
       };
-
+  
       // Update the template contract details using the context
-      updateErc20TemplateContractDetail(
-        selectedChain,
-        updatedTemplateContracts[selectedTemplateContractIndex],
-      );
-    }
+      updateErc20TemplateContractDetail(selectedChain, updatedTemplateContracts[selectedTemplateContractIndex]);
+    } 
 
     setIsEditing(false);
-  }, [name, symbol, selectedChain]);
+  }, [name, symbol, premint, selectedChain]);
 
   // useEffect(() => {
-  //   const erc20Options: BSCERC20ContractParams = {
+  //   const erc20Options: DOJERC20ContractParams = {
   //     id: Contract_Id,
   //     name,
   //     symbol,
+  //     premint: premint ? Number(premint) : 0,
   //   };
-  //   const finalContract = GetBSCERC20Contract(erc20Options);
+  //   const finalContract = GetDOJOmnichainTokenERC20Contract(erc20Options);
+  //   setContract(finalContract);
+  //   displayCode(finalContract);
+
+  //   const constructorArgs = extractConstructorArguments(contract);
+
+  //   // Find the contract with the selected chain
+  //   const selectedContract = contractsData.contracts.find(
+  //     (contract) => contract.chain === selectedChain,
+  //   );
+
+  //   if (selectedContract) {
+  //     const codeDetailsByContractId = selectedContract.codeDetails.find(
+  //       (detail) => detail.id === Contract_Id,
+  //     );
+
+  //     if (!codeDetailsByContractId) {
+  //       const updatedContract: ContractDetailsData = {
+  //         ...selectedContract,
+  //         codeDetails: [
+  //           ...selectedContract.codeDetails,
+  //           {
+  //             id: Contract_Id,
+  //             fileName: `${name}${Contract_Id}`,
+  //             code: contract,
+  //           },
+  //         ],
+  //         argumentsDetails:
+  //           selectedContract.argumentsDetails &&
+  //           selectedContract.argumentsDetails.length > 0
+  //             ? [
+  //                 ...selectedContract.argumentsDetails,
+  //                 {
+  //                   id: Contract_Id,
+  //                   fileName: `${name}${Contract_Id}`,
+  //                   arguments:
+  //                     constructorArgs && constructorArgs.length > 0
+  //                       ? Array(constructorArgs.length).fill("")
+  //                       : [],
+  //                 },
+  //               ]
+  //             : [
+  //                 {
+  //                   id: Contract_Id,
+  //                   fileName: `${name}${Contract_Id}`,
+  //                   arguments:
+  //                     constructorArgs && constructorArgs.length > 0
+  //                       ? Array(constructorArgs.length).fill("")
+  //                       : [],
+  //                 },
+  //               ],
+  //       };
+
+  //       // Update the contract details using the context
+  //       updateContractDetails(updatedContract);
+  //     }
+  //   } else {
+  //     const addContractDetails: ContractDetailsData = {
+  //       name,
+  //       symbol: symbol !== "" ? symbol : "",
+  //       codeDetails: [
+  //         {
+  //           id: Contract_Id,
+  //           fileName: `${name}${Contract_Id}`,
+  //           code: contract,
+  //         },
+  //       ],
+  //       argumentsDetails: [
+  //         {
+  //           id: Contract_Id,
+  //           fileName: `${name}${Contract_Id}`,
+  //           arguments:
+  //             constructorArgs && constructorArgs.length > 0
+  //               ? Array(constructorArgs.length).fill("")
+  //               : [],
+  //         },
+  //       ],
+  //       chain: selectedChain,
+  //       gasPrice: "~0.0002",
+  //       type: userDetails.type,
+  //     };
+
+  //     // Update the contract details using the context
+  //     updateContractDetails(addContractDetails);
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   setIsEditing(true);
+  //   const erc20Options: DOJERC20ContractParams = {
+  //     id: Contract_Id,
+  //     name,
+  //     symbol,
+  //     premint: premint ? Number(premint) : 0,
+  //   };
+  //   const finalContract = GetDOJOmnichainTokenERC20Contract(erc20Options);
+  //   setContract(finalContract);
+  //   displayCode(finalContract);
+
+  //   // Find the templateContract with the selected chain
+  //   const selectedTemplateContract =
+  //     erc20TemplateContractDetails.contracts.find(
+  //       (contract) => contract.chain === selectedChain,
+  //     );
+
+  //   if (selectedTemplateContract) {
+  //     // Create an updated contract with only the changed fields
+  //     const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
+  //       ...selectedTemplateContract,
+  //       name,
+  //       symbol,
+  //       premint,
+  //     };
+
+  //     // Update the contract details using the context
+  //     updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
+  //   }
+  // }, [name, symbol, premint]);
+
+  // useEffect(() => {
+  //   const constructorArgs = extractConstructorArguments(contract);
+
+  //   // Find the contract with the selected chain
+  //   const selectedContract = contractsData.contracts.find(
+  //     (contract) => contract.chain === selectedChain,
+  //   );
+
+  //   if (selectedContract) {
+  //     const codeDetailsByContractId = selectedContract.codeDetails.find(
+  //       (detail) => detail.id === Contract_Id,
+  //     );
+
+  //     if (codeDetailsByContractId) {
+  //       const updatedContract: ContractDetailsData = {
+  //         ...selectedContract,
+  //         name,
+  //         symbol,
+  //         codeDetails: [
+  //           ...selectedContract.codeDetails,
+  //           {
+  //             id: Contract_Id,
+  //             fileName: `${name}${Contract_Id}`,
+  //             code: contract,
+  //           },
+  //         ],
+  //         argumentsDetails:
+  //           selectedContract.argumentsDetails &&
+  //           selectedContract.argumentsDetails.length > 0
+  //             ? [
+  //                 ...selectedContract.argumentsDetails,
+  //                 {
+  //                   id: Contract_Id,
+  //                   fileName: `${name}${Contract_Id}`,
+  //                   arguments:
+  //                     constructorArgs && constructorArgs.length > 0
+  //                       ? Array(constructorArgs.length).fill("")
+  //                       : [],
+  //                 },
+  //               ]
+  //             : [
+  //                 {
+  //                   id: Contract_Id,
+  //                   fileName: `${name}${Contract_Id}`,
+  //                   arguments:
+  //                     constructorArgs && constructorArgs.length > 0
+  //                       ? Array(constructorArgs.length).fill("")
+  //                       : [],
+  //                 },
+  //               ],
+  //       };
+
+  //       // Update the contract details using the context
+  //       updateContractDetails(updatedContract);
+  //     }
+  //   }
+  // }, [displayCode]);
+
+  // useEffect(() => {
+  //   const erc20Options: DOJERC20ContractParams = {
+  //     id: Contract_Id,
+  //     name,
+  //     symbol,
+  //     premint: premint ? Number(premint) : 0
+  //   };
+  //   const finalContract = GetDOJOmnichainTokenERC20Contract(erc20Options);
   //   setContract(finalContract);
   //   displayCode(finalContract);
   // }, []);
 
   // useEffect(() => {
-  //   setMissingAllInputs(false);
   //   setIsEditing(true);
-  //   const erc20Options: BSCERC20ContractParams = {
+  //   const erc20Options: DOJERC20ContractParams = {
   //     id: Contract_Id,
   //     name,
   //     symbol,
+  //     premint: premint ? Number(premint) : 0,
   //   };
-  //   const finalContract = GetBSCERC20Contract(erc20Options);
+  //   const finalContract = GetDOJOmnichainTokenERC20Contract(erc20Options);
   //   setContract(finalContract);
   //   displayCode(finalContract);
 
@@ -462,83 +677,26 @@ export default function BscErc20TemplateView({
   //       ...selectedTemplateContract,
   //       name,
   //       symbol,
+  //       premint,
   //     };
 
   //     // Update the contract details using the context
   //     updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
   //   }
-  // }, [displayCode, name, symbol]);
+  // }, [displayCode, name, premint, symbol, burnable, mintable]);
 
-  function saveDetails() {
-    setIsSaving(true);
+  //   function saveDetails() {
+  //     setIsSaving(true);
 
-    if (!name || !symbol) {
-      setMissingAllInputs(true);
-      setIsSaving(false);
-      return;
-    }
+  //     if (!name || !symbol) {
+  //       setMissingAllInputs(true);
+  //       setIsSaving(false);
+  //       return;
+  //     }
 
-    // // Find the contract with the selected chain
-    // const selectedContract = contractsData.contracts.find(
-    //   (contract) => contract.chain === selectedChain,
-    // );
-
-    // const constructorArgs = extractConstructorArguments(contract);
-
-    // if (selectedContract) {
-    //   // Create an updated contract with only the changed fields
-    //   const updatedContract: ContractDetailsData = {
-    //     ...selectedContract,
-    //     name,
-    //     symbol: symbol !== "" ? symbol : selectedContract.symbol,
-    //     code: contract,
-    //     arguments:
-    //       constructorArgs && constructorArgs.length > 0
-    //         ? Array(constructorArgs.length).fill("")
-    //         : selectedContract.arguments,
-    //   };
-
-    //   // Update the contract details using the context
-    //   updateContractDetails(updatedContract);
-    // } else {
-    //   // Create an updated contract with only the changed fields
-    //   const updatedContract: ContractDetailsData = {
-    //     name,
-    //     symbol: symbol !== "" ? symbol : "",
-    //     code: contract,
-    //     arguments:
-    //       constructorArgs && constructorArgs.length > 0
-    //         ? Array(constructorArgs.length).fill("")
-    //         : [],
-    //     chain: selectedChain,
-    //     gasPrice: "~0.0002",
-    //     type: userDetails.type,
-    //   };
-
-    //   // Update the contract details using the context
-    //   updateContractDetails(updatedContract);
-    // }
-
-    // // Find the templateContract with the selected chain
-    // const selectedTemplateContract =
-    //   erc20TemplateContractDetails.contracts.find(
-    //     (contract) => contract.chain === selectedChain,
-    //   );
-
-    // if (selectedTemplateContract) {
-    //   // Create an updated contract with only the changed fields
-    //   const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
-    //     ...selectedTemplateContract,
-    //     name,
-    //     symbol,
-    //   };
-
-    //   // Update the contract details using the context
-    //   updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
-    // }
-    setIsSaving(false);
-    // setIsEditing(false);
-  }
+  //     setIsSaving(false);
+  //     setIsEditing(false);
+  //   }
 
   return (
     <div>
@@ -562,7 +720,7 @@ export default function BscErc20TemplateView({
               value={symbol}
               setValue={setSymbol}
             />
-            {/* <TextInput
+            <TextInput
               id="premint"
               label="Premint"
               labelClassName="text-subtext"
@@ -570,10 +728,10 @@ export default function BscErc20TemplateView({
               value={premint}
               setValue={setPremint}
               minNum={0}
-            /> */}
+            />
           </div>
         </div>
-        {/* <div className="flex flex-col gap-y-5 py-6 border-b">
+        <div className="flex flex-col gap-y-5 py-6 border-b">
           <Text Type="16-Md"> Features</Text>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
             <CheckboxInput
@@ -593,9 +751,9 @@ export default function BscErc20TemplateView({
               className="accent-[#6B45CD]"
             />
           </div>
-        </div> */}
+        </div>
       </div>
-      {missingAllInputs ? (
+      {/* {missingAllInputs ? (
         <p className="text-red-600 text-sm">Please enter all required fields</p>
       ) : null}
       <div className="flex justify-center mt-6">
@@ -606,174 +764,7 @@ export default function BscErc20TemplateView({
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }
-
-// import { useEffect, useState } from "react";
-// import Button from "../../common/Button";
-// import TextInput, { TextInputTypes } from "../../common/TextInput";
-// import {
-//   ContractDetailsData,
-//   useContractDetails,
-// } from "../../../../context/contract-appState";
-// import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
-// import { useUserDetails } from "../../../../context/user-appState";
-// import {
-//   Erc20TemplateSaveContractDetailsData,
-//   useTemplateContractDetails,
-// } from "../../../../context/template-contract-appState";
-// import { BscCrossChainTokenTemplate } from "../../../template-contracts/contracts/bsc/token/BscCrossChainToken";
-// import { extractConstructorArguments } from "../../../utils/readConstructorArgs";
-
-// export default function BscErc20TemplateView({
-//   displayCode,
-//   selectedChain,
-// }: {
-//   displayCode: (code: string) => void;
-//   selectedChain: AvailableChains;
-// }) {
-//   const { contractsData, updateContractDetails } = useContractDetails();
-//   const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
-//     useTemplateContractDetails();
-//   const { userDetails } = useUserDetails();
-
-//   const selectedContractDetails = erc20TemplateContractDetails.contracts.find(
-//     (data) => data.chain === selectedChain,
-//   );
-
-//   const [name, setName] = useState(
-//     selectedContractDetails?.name === ""
-//       ? "Token"
-//       : (selectedContractDetails?.name as string),
-//   );
-//   const [symbol, setSymbol] = useState(
-//     selectedContractDetails?.symbol === ""
-//       ? "Tkn"
-//       : (selectedContractDetails?.symbol as string),
-//   );
-//   const [premint, setPremint] = useState(
-//     selectedContractDetails?.premint === ""
-//       ? ""
-//       : (selectedContractDetails?.premint as string),
-//   );
-//   const [contract, setContract] = useState("");
-
-//   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
-//   // const [deployedAddress, setDeployedAddress] = useState<string>("");
-
-//   useEffect(() => {
-//     const finalContract = BscCrossChainTokenTemplate;
-//     setContract(finalContract);
-//     displayCode(finalContract);
-//   }, []);
-
-//   useEffect(() => {
-//     const finalContract = BscCrossChainTokenTemplate;
-//     setContract(finalContract);
-//     displayCode(finalContract);
-//   }, [displayCode, name, premint, symbol]);
-
-//   function saveDetails() {
-//     // Find the contract with the selected chain
-//     const selectedContract = contractsData.contracts.find(
-//       (contract) => contract.chain === selectedChain,
-//     );
-
-//     const constructorArgs = extractConstructorArguments(contract);
-
-//     if (selectedContract) {
-//       // Create an updated contract with only the changed fields
-//       const updatedContract: ContractDetailsData = {
-//         ...selectedContract,
-//         name,
-//         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-//         code: contract,
-//         arguments:
-//           constructorArgs && constructorArgs.length > 0
-//             ? Array(constructorArgs.length).fill("")
-//             : selectedContract.arguments,
-//       };
-
-//       // Update the contract details using the context
-//       updateContractDetails(updatedContract);
-//     } else {
-//       // Create an updated contract with only the changed fields
-//       const updatedContract: ContractDetailsData = {
-//         name,
-//         symbol: symbol !== "" ? symbol : "",
-//         code: contract,
-//         arguments:
-//           constructorArgs && constructorArgs.length > 0
-//             ? Array(constructorArgs.length).fill("")
-//             : [],
-//         chain: selectedChain,
-//         gasPrice: "~0.0002",
-//         type: userDetails.type,
-//       };
-
-//       // Update the contract details using the context
-//       updateContractDetails(updatedContract);
-//     }
-
-//     // Find the templateContract with the selected chain
-//     const selectedTemplateContract =
-//       erc20TemplateContractDetails.contracts.find(
-//         (contract) => contract.chain === selectedChain,
-//       );
-
-//     if (selectedTemplateContract) {
-//       // Create an updated contract with only the changed fields
-//       const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
-//         ...selectedTemplateContract,
-//         name,
-//         symbol,
-//         premint,
-//       };
-
-//       // Update the contract details using the context
-//       updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
-//     }
-//   }
-
-//   return (
-//     <div className="contract-form-container">
-//       {/* <div className="">Contract Form</div> */}
-//       <div className="border-b">
-//         <div className="flex flex-col gap-y-5">
-//           <TextInput
-//             id="name"
-//             label="Contract Name*"
-//             labelClassName="text-subtext"
-//             type={TextInputTypes.TEXT}
-//             value={name}
-//             setValue={setName}
-//           />
-//           <TextInput
-//             id="symbol"
-//             label="Contract Symbol*"
-//             labelClassName="text-subtext"
-//             type={TextInputTypes.TEXT}
-//             value={symbol}
-//             setValue={setSymbol}
-//           />
-//           <TextInput
-//             id="premint"
-//             label="Premint"
-//             labelClassName="text-subtext"
-//             type={TextInputTypes.NUMBER}
-//             value={premint}
-//             setValue={setPremint}
-//             minNum={0}
-//           />
-//         </div>
-//       </div>
-//       <div className="flex justify-between mt-[140px] ">
-//         <Button onClick={saveDetails} className="w-full" color={"secondary"}>
-//           Save
-//         </Button>
-//       </div>
-//     </div>
-//   );
-// }

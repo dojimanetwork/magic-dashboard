@@ -1,17 +1,17 @@
-import Erc20 from "./erc20";
-import Erc721 from "./nft";
-// import Dex from "./dex";
-// import Defi from "./defi";
-
-import { DojimaErc20TemplateView, DojimaNftTemplateView } from "./dojima";
+import {
+  DojimaErc20TemplateView,
+  DojimaNftTemplateView,
+  DojimaErc20TemplateComponent,
+  DojimaNftTemplateComponent,
+} from "./dojima";
 import { EthereumErc20TemplateView, EthereumNftTemplateView } from "./ethereum";
 import { BscErc20TemplateView, BscNftTemplateView, BscBep20View } from "./bsc";
 
 export {
-  Erc20,
-  Erc721,
   DojimaErc20TemplateView,
   DojimaNftTemplateView,
+  DojimaErc20TemplateComponent,
+  DojimaNftTemplateComponent,
   EthereumErc20TemplateView,
   EthereumNftTemplateView,
   BscErc20TemplateView,

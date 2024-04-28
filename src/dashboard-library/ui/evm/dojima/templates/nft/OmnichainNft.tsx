@@ -1,90 +1,122 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../../common/Button";
-import TextInput, { TextInputTypes } from "../../common/TextInput";
+import Button from "../../../../common/Button";
+import TextInput, { TextInputTypes } from "../../../../common/TextInput";
 import {
   ContractDetailsData,
   useContractDetails,
-} from "../../../../context/contract-appState";
-import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
-import { useUserDetails } from "../../../../context/user-appState";
+} from "../../../../../../context/contract-appState";
+import { AvailableChains } from "../../../../../../../excalidraw-app/dojima-templates/types";
+import { useUserDetails } from "../../../../../../context/user-appState";
 import {
   Erc721TemplateSaveContractDetailsData,
   useTemplateContractDetails,
-} from "../../../../context/template-contract-appState";
-import { Text } from "../../common/Typography";
-import CheckboxInput from "../../common/CheckboxInput";
-import { extractConstructorArguments } from "../../../utils/readConstructorArgs";
+} from "../../../../../../context/template-contract-appState";
+import { Text } from "../../../../common/Typography";
+import CheckboxInput from "../../../../common/CheckboxInput";
+import { extractConstructorArguments } from "../../../../../utils/readConstructorArgs";
 
-export type BSCNFTContractParams = {
+export type DOJNFTContractParams = {
   id: string;
   name: string;
   symbol: string;
-  baseUri: string;
 };
 
-export function GetBSCNFTContract(params: BSCNFTContractParams) {
+export function GetDOJOmnichainNftERC20Contract(params: DOJNFTContractParams) {
   const contract = `// SPDX-License-Identifier: MIT
   pragma solidity ^0.8.19;
   
-  import "@openzeppelin/contracts/access/AccessControl.sol";
-  import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
+  import '@openzeppelin/contracts/access/AccessControl.sol';
   import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
   import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
   import '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
-  import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
-  import '@dojimanetwork/dojima-contracts/contracts/interfaces/IInboundStateSender.sol';
-  import {IStateExecutor} from '@dojimanetwork/dojima-contracts/contracts/interfaces/IStateReceiver.sol';
+  import '@dojimanetwork/dojima-contracts/contracts/interfaces/IOutboundStateSender.sol';
+  import '@dojimanetwork/dojima-contracts/contracts/interfaces/IStateReceiver.sol';
+  import '@dojimanetwork/dojima-contracts/contracts/dojimachain/StateSyncerVerifier.sol';
+  import './${params.name}XNFTContract.sol'; // Your ERC721 contract
   
-  contract ${params.name}${params.id} is IStateExecutor, Initializable, ERC721Upgradeable, UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUpgradeable {
-      bytes32 public constant EXECUTE_STATE_ROLE = keccak256("EXECUTE_STATE_ROLE");
+  contract ${params.name}${params.id} is Initializable, UUPSUpgradeable, IStateReceiver, ReentrancyGuardUpgradeable, AccessControl {
+      XNFTContract public xNFT;
+      IOutboundStateSender public outboundStateSender;
+      StateSyncerVerifier private _stateVerifier;
   
-      IInboundStateSender public inboundStateSender;
-      address public omniChainNFTContractAddress;
+      bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+      bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   
-      event NFTDeposited(
-          address indexed user,
-          address nft,
-          uint256 tokenId,
-          uint256 indexed depositId
-      );
+      // Mapping of chain names to their contract addresses in bytes format
+      mapping(bytes32 => bytes) public chainContractMappings;
   
-      function initialize(
-          string memory _name,
-          string memory _symbol,
-          address _inboundStateSender,
-          address _omniChainNFTContractAddress
-      ) public initializer {
-          require(_inboundStateSender != address(0), "${params.name}${params.id}: InboundStateSender address cannot be zero");
-          require(_omniChainNFTContractAddress != address(0), "${params.name}${params.id}: OmniChain contract address cannot be zero");
+      event ChainContractMappingUpdated(bytes32 chainName, bytes contractAddress);
+      event NFTsTransferredToChain(bytes32 destinationChain, bytes user, uint256 tokenId);
   
-          __ERC721_init(_name, _symbol);
-          __AccessControl_init();
+      modifier onlyStateSyncer() {
+          require(msg.sender == address(_stateVerifier.stateSyncer()), "${params.name}${params.id}: Caller is not the state syncer");
+          _;
+      }
+  
+      // Roles and other state variables
+      function initialize(address _xNFTAddress, address _outboundStateSender, address _stateSyncerVerifier) public initializer {
+          require(_outboundStateSender != address(0), "${params.name}${params.id}: OutboundStateSender address cannot be zero");
+          require(_stateSyncerVerifier != address(0), "${params.name}${params.id}: Invalid state syncer verifier address");
           __UUPSUpgradeable_init();
+          __ReentrancyGuard_init();
   
-          _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-          inboundStateSender = IInboundStateSender(_inboundStateSender);
-          omniChainNFTContractAddress = _omniChainNFTContractAddress;
-          _setupRole(EXECUTE_STATE_ROLE, _inboundStateSender);
+          xNFT = XNFTContract(_xNFTAddress);
+          _setupRole(ADMIN_ROLE, msg.sender);
+          outboundStateSender = IOutboundStateSender(_outboundStateSender);
+          _stateVerifier = StateSyncerVerifier(_stateSyncerVerifier);
       }
   
-      function transferToOmniChain(address user, uint256 tokenId) external nonReentrant {
-          _burn(tokenId);
-          inboundStateSender.transferPayload(omniChainNFTContractAddress, abi.encode(user, tokenId, 0));
-      }
-  
-      function executeState(uint256 /*depositID*/, bytes calldata stateData) external nonReentrant onlyRole(EXECUTE_STATE_ROLE) {
-          (address userAddress, uint256 tokenId, uint256 depositId) = abi.decode(stateData, (address, uint256, uint256));
-  
-          _mint(userAddress, tokenId);
-          emit NFTDeposited(userAddress, address(this), tokenId, depositId);
-      }
-  
-      function _authorizeUpgrade(address newImplementation) internal override onlyRole(DEFAULT_ADMIN_ROLE) {
+      function _authorizeUpgrade(address newImplementation) internal override onlyRole(ADMIN_ROLE) {
           // Upgrade authorization logic
       }
   
+      function updateChainContractMapping(bytes32 chainName, bytes memory contractAddress) external onlyRole(ADMIN_ROLE) {
+          chainContractMappings[chainName] = contractAddress;
+          emit ChainContractMappingUpdated(chainName, contractAddress);
+      }
   
-      function supportsInterface(bytes4 interfaceId) public view override(ERC721Upgradeable, AccessControlUpgradeable) returns (bool) {
+      // Functions for transferring NFTs to other chains
+      function transferToChain(
+          bytes32 destinationChain,
+          bytes memory user,
+          uint256 tokenId,
+          bytes memory destinationContractAddress
+      ) external nonReentrant {
+          require(
+              keccak256(destinationContractAddress) == keccak256(chainContractMappings[destinationChain]),
+              "OmniChainNFTContract: Destination contract address does not match"
+          );
+  
+          xNFT.burn(tokenId);
+          outboundStateSender.transferPayload(
+              destinationChain,
+              destinationContractAddress,
+              msg.sender,
+              abi.encode(user, tokenId, 0) // TODO: add depositId
+          );
+  
+          emit NFTsTransferredToChain(destinationChain, user, tokenId);
+      }
+  
+      // Functions for receiving NFT state from other chains
+      // Additional NFT-specific functionalities
+      function onStateReceive(uint256 /* id */, bytes calldata data) external onlyStateSyncer {
+          (bytes memory userBytes, uint256 tokenId, uint256 depositId ) = abi.decode(data, (bytes, uint256, uint256));
+          // Ensure the bytes array for the address is of the correct length
+          require(userBytes.length == 20, "OmniChainNFTContract: Invalid address length");
+  
+          address userAddress;
+          assembly {
+              userAddress := mload(add(userBytes, 20))
+          }
+  
+          // Additional validation for the address can go here if needed
+          require(userAddress != address(0), "OmniChainNFTContract: Invalid address");
+  
+          xNFT.mint(userAddress, tokenId);
+      }
+  
+      function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
           return super.supportsInterface(interfaceId);
       }
   }`;
@@ -92,7 +124,7 @@ export function GetBSCNFTContract(params: BSCNFTContractParams) {
   return contract;
 }
 
-export default function BscNftTemplateView({
+export default function DojimaOmnichainNftTemplateView({
   displayCode,
   selectedChain,
 }: {
@@ -102,12 +134,10 @@ export default function BscNftTemplateView({
   const mounted = useRef(false);
   const { contractsData, updateContractDetails } = useContractDetails();
   const [disable, setDisable] = useState(false);
-  const [missingAllInputs, setMissingAllInputs] = useState(false);
-  const [baseUriError, setBaseUriError] = useState(false);
   const { erc721TemplateContractDetails, updateErc721TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
-  const Contract_Id = "BscCrossChainNFT";
+  const Contract_Id = "OmniChainNFT";
 
   const selectedContractDetails = erc721TemplateContractDetails.contracts.find(
     (data) => data.chain === selectedChain,
@@ -115,27 +145,28 @@ export default function BscNftTemplateView({
 
   const [name, setName] = useState(
     selectedContractDetails?.name === ""
-      ? "Nft"
+      ? "Token"
       : (selectedContractDetails?.name as string),
   );
   const [symbol, setSymbol] = useState(
     selectedContractDetails?.symbol === ""
-      ? "Nft"
+      ? "Tkn"
       : (selectedContractDetails?.symbol as string),
   );
-
-  const [baseUri, setBaseUri] = useState(
-    selectedContractDetails?.baseUri === ""
-      ? ""
-      : (selectedContractDetails?.baseUri as string),
+  const [premint, setPremint] = useState(
+    selectedContractDetails?.premint === ""
+      ? "0"
+      : (selectedContractDetails?.premint as string),
   );
-
+  const [mintable, setMintable] = useState(false); // TODO : add option to user
+  const [burnable, setBurnable] = useState(false); // TODO : add option to user
   const [contract, setContract] = useState("");
 
   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
   // const [deployedAddress, setDeployedAddress] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [missingAllInputs, setMissingAllInputs] = useState(false);
 
   useEffect(() => {
     if (!mounted.current) {
@@ -145,16 +176,14 @@ export default function BscNftTemplateView({
     }
 
     setMissingAllInputs(false);
-    setBaseUriError(false);
     setIsEditing(true);
     
-    const nftOptions: BSCNFTContractParams = {
+    const nftOptions: DOJNFTContractParams = {
       id: Contract_Id,
       name,
-      symbol,
-      baseUri
+      symbol
     };
-    const finalContract = GetBSCNFTContract(nftOptions);
+    const finalContract = GetDOJOmnichainNftERC20Contract(nftOptions);
     setContract(finalContract);
     displayCode(finalContract);
 
@@ -283,7 +312,7 @@ export default function BscNftTemplateView({
         ...updatedTemplateContracts[selectedTemplateContractIndex],
         name,
         symbol,
-        baseUri,
+        premint,
       };
 
       // Update the template contract details using the context
@@ -292,32 +321,29 @@ export default function BscNftTemplateView({
         updatedTemplateContracts[selectedTemplateContractIndex],
       );
     }
+
     setIsEditing(false);
-  }, [name, symbol, baseUri, selectedChain]);
+  }, [name, symbol, premint, selectedChain]);
 
   // useEffect(() => {
-  //   const nftOptions: BSCNFTContractParams = {
+  //   const erc20Options: DOJNFTContractParams = {
   //     id: Contract_Id,
   //     name,
-  //     symbol,
-  //     baseUri
+  //     symbol
   //   };
-  //   const finalContract = GetBSCNFTContract(nftOptions);
+  //   const finalContract = GetDOJOmnichainNftERC20Contract(erc20Options);
   //   setContract(finalContract);
   //   displayCode(finalContract);
   // }, []);
 
   // useEffect(() => {
-  //   setMissingAllInputs(false);
-  //   setBaseUriError(false);
   //   setIsEditing(true);
-  //   const nftOptions: BSCNFTContractParams = {
+  //   const erc20Options: DOJNFTContractParams = {
   //     id: Contract_Id,
   //     name,
-  //     symbol,
-  //     baseUri
+  //     symbol
   //   };
-  //   const finalContract = GetBSCNFTContract(nftOptions);
+  //   const finalContract = GetDOJOmnichainNftERC20Contract(erc20Options);
   //   setContract(finalContract);
   //   displayCode(finalContract);
 
@@ -463,97 +489,26 @@ export default function BscNftTemplateView({
   //       ...selectedTemplateContract,
   //       name,
   //       symbol,
-  //       baseUri,
+  //       premint,
   //     };
 
   //     // Update the contract details using the context
-  //     updateErc721TemplateContractDetail(
-  //       selectedChain,
-  //       updatedTemplateContract,
-  //     );
+  //     updateErc721TemplateContractDetail(selectedChain, updatedTemplateContract);
   //   }
-  // }, [displayCode, name, symbol, baseUri]);
+  // }, [displayCode, name, premint, symbol, burnable, mintable]);
 
-  function saveDetails() {
-    setIsSaving(true);
+  //   function saveDetails() {
+  //     setIsSaving(true);
 
-    if (!name || !symbol || !baseUri) {
-      setMissingAllInputs(true);
-      setIsSaving(false);
-      return;
-    }
+  //     if (!name || !symbol) {
+  //       setMissingAllInputs(true);
+  //       setIsSaving(false);
+  //       return;
+  //     }
 
-    if (!baseUri.startsWith("https://")) {
-      setBaseUriError(true);
-      setIsSaving(false);
-      return;
-    }
-
-    // // Find the contract with the selected chain
-    // const selectedContract = contractsData.contracts.find(
-    //   (contract) => contract.chain === selectedChain,
-    // );
-
-    // const constructorArgs = extractConstructorArguments(contract);
-
-    // if (selectedContract) {
-    //   // Create an updated contract with only the changed fields
-    //   const updatedContract: ContractDetailsData = {
-    //     ...selectedContract,
-    //     name,
-    //     symbol: symbol !== "" ? symbol : selectedContract.symbol,
-    //     code: contract,
-    //     arguments:
-    //       constructorArgs && constructorArgs.length > 0
-    //         ? Array(constructorArgs.length).fill("")
-    //         : selectedContract.arguments,
-    //   };
-
-    //   // Update the contract details using the context
-    //   updateContractDetails(updatedContract);
-    // } else {
-    //   // Create an updated contract with only the changed fields
-    //   const updatedContract: ContractDetailsData = {
-    //     name,
-    //     symbol: symbol !== "" ? symbol : "",
-    //     code: contract,
-    //     arguments:
-    //       constructorArgs && constructorArgs.length > 0
-    //         ? Array(constructorArgs.length).fill("")
-    //         : [],
-    //     chain: selectedChain,
-    //     gasPrice: "~0.0002",
-    //     type: userDetails.type,
-    //   };
-
-    //   // Update the contract details using the context
-    //   updateContractDetails(updatedContract);
-    // }
-
-    // // Find the templateContract with the selected chain
-    // const selectedTemplateContract =
-    //   erc721TemplateContractDetails.contracts.find(
-    //     (contract) => contract.chain === selectedChain,
-    //   );
-
-    // if (selectedTemplateContract) {
-    //   // Create an updated contract with only the changed fields
-    //   const updatedTemplateContract: Erc721TemplateSaveContractDetailsData = {
-    //     ...selectedTemplateContract,
-    //     name,
-    //     symbol,
-    //     baseUri,
-    //   };
-
-    //   // Update the contract details using the context
-    //   updateErc721TemplateContractDetail(
-    //     selectedChain,
-    //     updatedTemplateContract,
-    //   );
-    // }
-    setIsSaving(false);
-    // setIsEditing(false);
-  }
+  //     setIsSaving(false);
+  //     setIsEditing(false);
+  //   }
 
   return (
     <div>
@@ -578,15 +533,6 @@ export default function BscNftTemplateView({
               setValue={setSymbol}
             />
             <TextInput
-              id="baseUri"
-              label="Base URI*"
-              labelClassName="text-subtext"
-              type={TextInputTypes.TEXT}
-              value={baseUri}
-              setValue={setBaseUri}
-              placeholder="https://..."
-            />
-            {/* <TextInput
               id="premint"
               label="Premint"
               labelClassName="text-subtext"
@@ -594,10 +540,10 @@ export default function BscNftTemplateView({
               value={premint}
               setValue={setPremint}
               minNum={0}
-            /> */}
+            />
           </div>
         </div>
-        {/* <div className="flex flex-col gap-y-5 py-6 border-b">
+        <div className="flex flex-col gap-y-5 py-6 border-b">
           <Text Type="16-Md"> Features</Text>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3">
             <CheckboxInput
@@ -617,13 +563,10 @@ export default function BscNftTemplateView({
               className="accent-[#6B45CD]"
             />
           </div>
-        </div> */}
+        </div>
       </div>
-      {missingAllInputs ? (
+      {/* {missingAllInputs ? (
         <p className="text-red-600 text-sm">Please enter all required fields</p>
-      ) : null}
-      {baseUriError ? (
-        <p className="text-red-600 text-sm">{`Base URI should start with https://`}</p>
       ) : null}
       <div className="flex justify-center mt-6">
         <Button
@@ -633,154 +576,7 @@ export default function BscNftTemplateView({
         >
           {isSaving ? "Saving..." : "Save"}
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }
-
-// import { useEffect, useState } from "react";
-// import Button from "../../common/Button";
-// import TextInput, { TextInputTypes } from "../../common/TextInput";
-// import {
-//   ContractDetailsData,
-//   useContractDetails,
-// } from "../../../../context/contract-appState";
-// import { AvailableChains } from "../../../../../excalidraw-app/dojima-templates/types";
-// import { useUserDetails } from "../../../../context/user-appState";
-// import {
-//   Erc721TemplateSaveContractDetailsData,
-//   useTemplateContractDetails,
-// } from "../../../../context/template-contract-appState";
-// import { BscCrossChainNftTemplate } from "../../../template-contracts/contracts/bsc/nft/BscCrossChainNft";
-
-// export default function BscNftTemplateView({
-//   displayCode,
-//   selectedChain,
-// }: {
-//   displayCode: (code: string) => void;
-//   selectedChain: AvailableChains;
-// }) {
-//   const { contractsData, updateContractDetails } = useContractDetails();
-//   const { erc721TemplateContractDetails, updateErc721TemplateContractDetail } =
-//     useTemplateContractDetails();
-//   const { userDetails } = useUserDetails();
-
-//   const selectedContractDetails = erc721TemplateContractDetails.contracts.find(
-//     (data) => data.chain === selectedChain,
-//   );
-
-//   const [name, setName] = useState(
-//     selectedContractDetails?.name === ""
-//       ? "Token"
-//       : (selectedContractDetails?.name as string),
-//   );
-//   const [symbol, setSymbol] = useState(
-//     selectedContractDetails?.symbol === ""
-//       ? "Tkn"
-//       : (selectedContractDetails?.symbol as string),
-//   );
-//   const [contract, setContract] = useState("");
-
-//   const [deployedArgs, setDeployedArgs] = useState<Array<any>>([]);
-//   // const [deployedAddress, setDeployedAddress] = useState<string>("");
-
-//   useEffect(() => {
-//     const finalContract = BscCrossChainNftTemplate;
-//     setContract(finalContract);
-//     displayCode(finalContract);
-//   }, []);
-
-//   useEffect(() => {
-//     const finalContract = BscCrossChainNftTemplate;
-//     setContract(finalContract);
-//     displayCode(finalContract);
-//   }, [displayCode, name, symbol]);
-
-//   function saveDetails() {
-//     // Find the contract with the selected chain
-//     const selectedContract = contractsData.contracts.find(
-//       (contract) => contract.chain === selectedChain,
-//     );
-
-//     if (selectedContract) {
-//       // Create an updated contract with only the changed fields
-//       const updatedContract: ContractDetailsData = {
-//         ...selectedContract,
-//         name,
-//         symbol: symbol !== "" ? symbol : selectedContract.symbol,
-//         code: contract,
-//         arguments:
-//           deployedArgs.length > 0 ? deployedArgs : selectedContract.arguments,
-//       };
-
-//       // Update the contract details using the context
-//       updateContractDetails(updatedContract);
-//     } else {
-//       // Create an updated contract with only the changed fields
-//       const updatedContract: ContractDetailsData = {
-//         name,
-//         symbol: symbol !== "" ? symbol : "",
-//         code: contract,
-//         arguments: deployedArgs.length > 0 ? deployedArgs : [],
-//         chain: selectedChain,
-//         gasPrice: "~0.0002",
-//         type: userDetails.type,
-//       };
-
-//       // Update the contract details using the context
-//       updateContractDetails(updatedContract);
-//     }
-
-//     // Find the templateContract with the selected chain
-//     const selectedTemplateContract =
-//       erc721TemplateContractDetails.contracts.find(
-//         (contract) => contract.chain === selectedChain,
-//       );
-
-//     if (selectedTemplateContract) {
-//       // Create an updated contract with only the changed fields
-//       const updatedTemplateContract: Erc721TemplateSaveContractDetailsData = {
-//         ...selectedTemplateContract,
-//         name,
-//         symbol,
-//       };
-
-//       // Update the contract details using the context
-//       updateErc721TemplateContractDetail(
-//         selectedChain,
-//         updatedTemplateContract,
-//       );
-//     }
-//   }
-
-//   return (
-//     <div className="contract-form-container">
-//       {/* <div className="">Contract Form</div> */}
-//       <div className="border-b">
-//         <div className="flex flex-col gap-y-5">
-//           <TextInput
-//             id="name"
-//             label="Contract Name*"
-//             labelClassName="text-subtext"
-//             type={TextInputTypes.TEXT}
-//             value={name}
-//             setValue={setName}
-//           />
-//           <TextInput
-//             id="symbol"
-//             label="Contract Symbol*"
-//             labelClassName="text-subtext"
-//             type={TextInputTypes.TEXT}
-//             value={symbol}
-//             setValue={setSymbol}
-//           />
-//         </div>
-//       </div>
-//       <div className="flex justify-between mt-[140px] ">
-//         <Button onClick={saveDetails} className="w-full" color={"secondary"}>
-//           Save
-//         </Button>
-//       </div>
-//     </div>
-//   );
-// }

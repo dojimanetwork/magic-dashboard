@@ -32,13 +32,31 @@ import {
 } from "../dashboard-library/utils/readConstructorArgs";
 import { useProjectData } from "../context/project-appState";
 import Button from "../dashboard-library/ui/common/Button";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { monokai } from "react-syntax-highlighter/dist/esm/styles/hljs";
+
+export function formatSolidityCode(code: string): string {
+  code = code.replace("pragma solidity", "\npragma solidity");
+  code = code.replace(/;/g, ";\n");
+  code = code.replace(/{/g, "{\n");
+  code = code.replace(/}/g, "}\n");
+  const lines = code.split("\n");
+  const indentedCode = lines.map((line) => ` ${line}`).join("\n");
+  return `\n${indentedCode}\n`;
+}
 
 export type ContractsData = {
   fileName: string;
-  contractCode: string;
+  contractCode: {
+    fileName: string;
+    code: string;
+  }[];
   contractName: string;
   contractSymbol?: string;
-  args?: any;
+  args?: {
+    fileName: string;
+    arguments: any;
+  }[];
 };
 
 export type ProjectChainsDeploymentData = {
@@ -61,7 +79,28 @@ export type EVMContractDeployedObject = {
 
 export type DeployedDetails = {
   chain: AvailableChains;
-  details: EVMContractDeployedObject;
+  details: EVMContractDeployedObject[];
+};
+
+export type EVMCompileParams = {
+  fileName: string;
+  code: string;
+};
+
+export type OmnichainContractsData = {
+  fileName: string;
+  contractCode: Array<EVMCompileParams>;
+  contractName: string;
+  contractSymbol?: string;
+  args: {
+    fileName: string;
+    arguments: any;
+  }[];
+};
+
+export type OmniChainDeployableData = {
+  chainName: AvailableChains;
+  contracts: OmnichainContractsData;
 };
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
@@ -76,14 +115,19 @@ async function addDeployedDetailsToDb(
   projectName: string,
   contractDetails: Array<DeployedDetails>,
 ) {
-  const deploymentData: ProjectChainsDeploymentData[] = contractDetails.map(
-    (details) => ({
-      chain: details.chain,
-      contractAddress: details.details.contractAddress,
-      contractAbi: details.details.contractABI,
-      contractByteCode: details.details.contractByteCode,
-    }),
-  );
+  // let deploymentData: ProjectChainsDeploymentData[] = [];
+  // contractDetails.map(
+  //   (details) => {
+  //     details.details.map((subDetails: EVMContractDeployedObject) => {
+  //       deploymentData.push({
+  //         chain: details.chain,
+  //         contractAddress: subDetails.contractAddress,
+  //         contractAbi: subDetails.contractABI,
+  //         contractByteCode: subDetails.contractByteCode,
+  //       })
+  //     })
+  //   },
+  // );
   const response = await axios.post(
     `${
       import.meta.env.VITE_APP_FAAS_TESTNET_URL
@@ -91,7 +135,7 @@ async function addDeployedDetailsToDb(
     {
       projectName,
       email,
-      deploymentData,
+      contractDetails,
     },
   );
 
@@ -102,86 +146,141 @@ async function addDeployedDetailsToDb(
   }
 }
 
-async function deployContracts(contractsData: Array<DeployableChainsData>) {
+async function deployContracts(contractsData: Array<OmniChainDeployableData>) {
   let deployedDetails: Array<DeployedDetails> = [];
-  for (const contractData of contractsData) {
-    // try {
-    //   const result = await axios.post(
-    //     `${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy/${
-    //       contractData.chainName
-    //     }`,
-    //     {
-    //       data: contractData,
-    //     },
-    //   );
-    //   if (result.status === 200) {
-    //     const response: DeployedDetails = result.data;
-    //     deployedDetails.push(response);
-    //   } else {
-    //     deployedDetails.push({
-    //       chain: contractData.chainName,
-    //       details: {
-    //         contractAddress: "Deployment Failed",
-    //         contractABI: "-",
-    //         contractByteCode: "-",
-    //       },
-    //     });
-    //   }
-    // } catch (error: any) {
-    //   deployedDetails.push({
-    //     chain: contractData.chainName,
-    //     details: {
-    //       contractAddress: "Deployment Failed",
-    //       contractABI: "-",
-    //       contractByteCode: "-",
-    //     },
-    //   });
-    //   console.error(error);
-    // }
-    try {
-      const url = `${
-        import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL
-      }/deploy/${contractData.chainName}`;
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          data: contractData,
-        }),
-      });
+  try {
+    const url = `${
+      import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL
+    }/omnichain/deploy`;
 
-      if (response.status === 200) {
-        const result = await response.json();
-        const responseDetails: DeployedDetails = result;
-        deployedDetails.push(responseDetails);
-      } else {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: contractsData,
+      }),
+    });
+
+    if (response.status === 200) {
+      const result = await response.json();
+      const responseDetails: DeployedDetails = result;
+      deployedDetails.push(responseDetails);
+    } else {
+      contractsData.map((data: OmniChainDeployableData) => {
         deployedDetails.push({
-          chain: contractData.chainName,
-          details: {
+          chain: data.chainName,
+          details: [
+            {
+              contractAddress: "Deployment Failed",
+              contractABI: "-",
+              contractByteCode: "-",
+            },
+          ],
+        });
+      });
+    }
+  } catch (error) {
+    contractsData.map((data: OmniChainDeployableData) => {
+      deployedDetails.push({
+        chain: data.chainName,
+        details: [
+          {
             contractAddress: "Deployment Failed",
             contractABI: "-",
             contractByteCode: "-",
           },
-        });
-      }
-    } catch (error) {
-      deployedDetails.push({
-        chain: contractData.chainName,
-        details: {
-          contractAddress: "Deployment Failed",
-          contractABI: "-",
-          contractByteCode: "-",
-        },
+        ],
       });
-      console.error(error);
-    }
+    });
+    console.error(error);
   }
 
   return deployedDetails;
 }
+
+// async function deployContracts(contractsData: Array<DeployableChainsData>) {
+//   let deployedDetails: Array<DeployedDetails> = [];
+//   for (const contractData of contractsData) {
+//     // try {
+//     //   const result = await axios.post(
+//     //     `${import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL}/deploy/${
+//     //       contractData.chainName
+//     //     }`,
+//     //     {
+//     //       data: contractData,
+//     //     },
+//     //   );
+//     //   if (result.status === 200) {
+//     //     const response: DeployedDetails = result.data;
+//     //     deployedDetails.push(response);
+//     //   } else {
+//     //     deployedDetails.push({
+//     //       chain: contractData.chainName,
+//     //       details: {
+//     //         contractAddress: "Deployment Failed",
+//     //         contractABI: "-",
+//     //         contractByteCode: "-",
+//     //       },
+//     //     });
+//     //   }
+//     // } catch (error: any) {
+//     //   deployedDetails.push({
+//     //     chain: contractData.chainName,
+//     //     details: {
+//     //       contractAddress: "Deployment Failed",
+//     //       contractABI: "-",
+//     //       contractByteCode: "-",
+//     //     },
+//     //   });
+//     //   console.error(error);
+//     // }
+//     try {
+//       const url = `${
+//         import.meta.env.VITE_APP_MAGIC_DASHBOARD_BACKEND_URL
+//       }/deploy/${contractData.chainName}`;
+
+//       const response = await fetch(url, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           data: contractData,
+//         }),
+//       });
+
+//       if (response.status === 200) {
+//         const result = await response.json();
+//         const responseDetails: DeployedDetails = result;
+//         deployedDetails.push(responseDetails);
+//       } else {
+//         deployedDetails.push({
+//           chain: contractData.chainName,
+//           details: {
+//             contractAddress: "Deployment Failed",
+//             contractABI: "-",
+//             contractByteCode: "-",
+//           },
+//         });
+//       }
+//     } catch (error) {
+//       deployedDetails.push({
+//         chain: contractData.chainName,
+//         details: {
+//           contractAddress: "Deployment Failed",
+//           contractABI: "-",
+//           contractByteCode: "-",
+//         },
+//       });
+//       console.error(error);
+//     }
+//   }
+
+//   return deployedDetails;
+// }
 
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const [tab, setTab] = useState(1);
@@ -241,20 +340,30 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
 
   function handleDeploy() {
     setIsDeploying(true);
-    const data: Array<DeployableChainsData> = [];
+    const data: Array<OmniChainDeployableData> = [];
 
     contractsData.contracts.map((contract) => {
-      const addContract: DeployableChainsData = {
+      const addContract: OmniChainDeployableData = {
         chainName: contract.chain,
-        contracts: [
-          {
-            fileName: contract.name,
-            contractCode: contract.code,
-            contractName: contract.name,
-            contractSymbol: contract.symbol ? contract.symbol : "",
-            args: contract.arguments ? contract.arguments : [],
-          },
-        ],
+        contracts: {
+          fileName: contract.name,
+          contractCode: contract.codeDetails.map((res) => {
+            return {
+              fileName: res.fileName,
+              code: res.code,
+            };
+          }),
+          contractName: contract.name,
+          contractSymbol: contract.symbol ? contract.symbol : "",
+          args: contract.argumentsDetails
+            ? contract.argumentsDetails.map((res) => {
+                return {
+                  fileName: res.fileName,
+                  arguments: res.arguments,
+                };
+              })
+            : [],
+        },
       };
       data.push(addContract);
     });
@@ -323,10 +432,10 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           userDetails.projectName,
           result,
         )
-          .then((res) => {
-            // console.log(res);
-          })
-          .catch(() => {});
+        .then((res) => {
+          // console.log(res);
+        })
+        .catch(() => {});
       })
       .catch((error) => {
         setIsDeploying(false);
@@ -378,8 +487,8 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     }
 
     const {
-      code,
-      arguments: contractArguments,
+      codeDetails,
+      argumentsDetails: contractArguments,
       ...remainingContract
     } = contract;
 
@@ -400,19 +509,17 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const checkForAllInputArgs = () => {
     const contract = contractsData.contracts[tab - 1];
     if (!contract) {
-      return null;
+      return;
     }
 
-    const { code, ...remainingContract } = contract;
+    const { codeDetails, argumentsDetails, ...remainingContract } = contract;
 
     const allValuesHaveLengthGreaterThanZero =
-      remainingContract.arguments &&
-      remainingContract.arguments.length > 0 &&
-      remainingContract.arguments.every((value) => value.length > 0);
+      argumentsDetails &&
+      argumentsDetails.length > 0 &&
+      argumentsDetails.every(({ arguments: args }) => args && args.length > 0);
 
-    return allValuesHaveLengthGreaterThanZero
-      ? true
-      : remainingContract.arguments && remainingContract.arguments.length === 0;
+    return allValuesHaveLengthGreaterThanZero;
   };
 
   const renderArgumentsForChain = (chain: AvailableChains) => {
@@ -421,23 +528,43 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       return null;
     }
 
-    const { code, ...remainingContract } = contract;
+    const { codeDetails, ...remainingContract } = contract;
 
-    const constructorArgs = extractConstructorArguments(code);
+    // Extract constructor arguments from each file within codeDetails
+    const constructorArgs = codeDetails.flatMap((file) => {
+      const args = extractConstructorArguments(file.code);
+      if (args) {
+        return args.map((arg) => ({
+          ...arg,
+          fileName: file.fileName,
+        }));
+      } else {
+        return [];
+      }
+    });
 
     // Handler for input change
-    const handleTypeInputChange = (index: number, value: string) => {
-      const newInputValues = remainingContract.arguments as any[];
-      newInputValues[index] = value;
-      // setInputValues(newInputValues);
+    const handleTypeInputChange = (
+      fileName: string,
+      index: number,
+      value: string,
+    ) => {
+      if (!remainingContract.argumentsDetails) {
+        return; // Return early if argumentsDetails is undefined
+      }
 
-      const updatedContract: ContractDetailsData = {
-        ...contract,
-        arguments: newInputValues,
-      };
-
-      // Update the contract details using the context
-      updateContractDetails(updatedContract);
+      const newInputValues = [...remainingContract.argumentsDetails];
+      // Find the index of the argument in argumentsDetails array based on fileName and index
+      const argIndex = newInputValues.findIndex((arg) => arg.id === fileName);
+      if (argIndex !== -1) {
+        newInputValues[argIndex].arguments[index] = value;
+        const updatedContract: ContractDetailsData = {
+          ...contract,
+          argumentsDetails: newInputValues,
+        };
+        // Update the contract details using the context
+        updateContractDetails(updatedContract);
+      }
     };
 
     return (
@@ -446,18 +573,69 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
           <div className="flex flex-col gap-3  w-full">
             {constructorArgs.map((arg, index) => (
               <input
-                key={index}
+                key={`${arg.fileName}-${arg.key}`} // Use a unique key including fileName
                 type="text"
                 className="border !rounded-lg p-1 w-full h-10"
-                value={(remainingContract.arguments as any[])[index]}
-                onChange={(e) => handleTypeInputChange(index, e.target.value)}
-                placeholder={`${arg.key} - ${arg.type}`}
+                value={
+                  (remainingContract.argumentsDetails &&
+                    remainingContract.argumentsDetails.find(
+                      (argDetail) => argDetail.id === arg.fileName,
+                    )?.arguments[index]) ||
+                  ""
+                }
+                onChange={(e) =>
+                  handleTypeInputChange(arg.fileName, index, e.target.value)
+                }
+                placeholder={`${arg.fileName} - ${arg.key} - ${arg.type}`} // Display fileName along with key and type
               />
             ))}
           </div>
         )}
       </>
     );
+
+    // const contract = contractsData.contracts[tab - 1];
+    // if (!contract) {
+    //   return null;
+    // }
+
+    // const { code, ...remainingContract } = contract;
+
+    // const constructorArgs = extractConstructorArguments(code);
+
+    // // Handler for input change
+    // const handleTypeInputChange = (index: number, value: string) => {
+    //   const newInputValues = remainingContract.arguments as any[];
+    //   newInputValues[index] = value;
+    //   // setInputValues(newInputValues);
+
+    //   const updatedContract: ContractDetailsData = {
+    //     ...contract,
+    //     arguments: newInputValues,
+    //   };
+
+    //   // Update the contract details using the context
+    //   updateContractDetails(updatedContract);
+    // };
+
+    // return (
+    //   <>
+    //     {constructorArgs && constructorArgs.length > 0 && (
+    //       <div className="flex flex-col gap-3  w-full">
+    //         {constructorArgs.map((arg, index) => (
+    //           <input
+    //             key={index}
+    //             type="text"
+    //             className="border !rounded-lg p-1 w-full h-10"
+    //             value={(remainingContract.arguments as any[])[index]}
+    //             onChange={(e) => handleTypeInputChange(index, e.target.value)}
+    //             placeholder={`${arg.key} - ${arg.type}`}
+    //           />
+    //         ))}
+    //       </div>
+    //     )}
+    //   </>
+    // );
   };
 
   // const renderArgumentsForChain = (chain: AvailableChains) => {
@@ -481,7 +659,18 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
       <>
         <div className=" text-black cursor-not-allowed">
           <div className="text-base w-full h-36 max-h-36  font-medium border rounded-lg p-3 border-[#dddddd] overflow-auto">
-            {contract.code}
+            {/* {contract.code} */}
+            <SyntaxHighlighter
+              language="solidity"
+              style={monokai}
+              wrapLongLines={true}
+              customStyle={{
+                backgroundColor: "balck",
+                color: "white",
+              }}
+            >
+              {formatSolidityCode(contract.codeDetails[0].code)}
+            </SyntaxHighlighter>
           </div>
         </div>
       </>
@@ -517,20 +706,20 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                   <p className="text-sm mt-4 text-black">
                     <a
                       href={`${getChainExplorerUrl(item.chain)}address/${
-                        item.details.contractAddress
+                        item.details[0].contractAddress
                       }`}
                       target="_blank" // Open link in a new tab
                       rel="noopener noreferrer" // Necessary for security reasons when opening in a new tab
                       // onClick={handleLinkClick}
                       className="no-underline hover:underline"
                     >
-                      {item.details.contractAddress}
+                      {item.details[0].contractAddress}
                     </a>
                   </p>
                   <div
                     className="cursor-pointer mt-4"
                     onClick={() =>
-                      copyTextToSystemClipboard(item.details.contractAddress)
+                      copyTextToSystemClipboard(item.details[0].contractAddress)
                     }
                   >
                     <CopyIcon width="15" />
@@ -729,7 +918,7 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
                   !(
                     userDetails.chains.length === contractsData.contracts.length
                   )) ||
-                !checkForAllInputArgs()
+                checkForAllInputArgs()
               }
             >
               {tab === contractsData.contracts.length

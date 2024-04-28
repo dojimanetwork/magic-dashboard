@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../../common/Button";
 import TextInput, { TextInputTypes } from "../../common/TextInput";
 import {
@@ -16,6 +16,7 @@ import CheckboxInput from "../../common/CheckboxInput";
 import { extractConstructorArguments } from "../../../utils/readConstructorArgs";
 
 export type ETHERC20ContractParams = {
+  id: string;
   name: string;
   symbol: string;
 };
@@ -32,13 +33,11 @@ export function GetETHERC20Contract(params: ETHERC20ContractParams) {
   import '@dojimanetwork/dojima-contracts/contracts/interfaces/IInboundStateSender.sol';
   import {IStateExecutor} from '@dojimanetwork/dojima-contracts/contracts/interfaces/IStateReceiver.sol';
   
-  contract ${params.name} is IStateExecutor, Initializable, ERC20Upgradeable, UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUpgradeable {
+  contract ${params.name}${params.id} is IStateExecutor, Initializable, ERC20Upgradeable, UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUpgradeable {
       bytes32 public constant EXECUTE_STATE_ROLE = keccak256("EXECUTE_STATE_ROLE");
   
       IInboundStateSender public inboundStateSender;
       address public omniChainContractAddress;
-      string public token_name;
-      string public token_symbol;
   
       event TokenDeposited(
           address indexed user,
@@ -46,24 +45,18 @@ export function GetETHERC20Contract(params: ETHERC20ContractParams) {
           uint256 amount,
           uint256 indexed depositId
       );
-
-      constructor() {
-        // Assign the token details
-        token_name = "${params.name}";
-        token_symbol = "${params.symbol}";
-      }
   
       // Initialize replaces the constructor for upgradeable contracts
       function initialize(
-          // string memory token_name,
-          // string memory token_symbol,
+          string memory name,
+          string memory symbol,
           address _inboundStateSender,
           address _omniChainContractAddress
       ) public initializer {
-          require(_inboundStateSender != address(0), "EthereumCrossChainToken: InboundStateSender address cannot be zero");
-          require(_omniChainContractAddress != address(0), "EthereumCrossChainToken: OmniChain contract address cannot be zero");
+          require(_inboundStateSender != address(0), "${params.name}${params.id}: InboundStateSender address cannot be zero");
+          require(_omniChainContractAddress != address(0), "${params.name}${params.id}: OmniChain contract address cannot be zero");
   
-          __ERC20_init(token_name, token_symbol);
+          __ERC20_init(name, symbol);
           __AccessControl_init();
           __UUPSUpgradeable_init();
   
@@ -87,7 +80,7 @@ export function GetETHERC20Contract(params: ETHERC20ContractParams) {
       function executeState(uint256 /*depositID*/, bytes calldata stateData) external nonReentrant onlyRole(EXECUTE_STATE_ROLE) {
           (bytes memory userBytes, uint256 amount, uint256 depositId) = abi.decode(stateData, (bytes, uint256, uint256));
           // Ensure the bytes array for the address is of the correct length
-          require(userBytes.length == 20, "EthereumCrossChainToken: Invalid address length");
+          require(userBytes.length == 20, "${params.name}${params.id}: Invalid address length");
   
           address userAddress;
           assembly {
@@ -95,7 +88,7 @@ export function GetETHERC20Contract(params: ETHERC20ContractParams) {
           }
   
           // Additional validation for the address can go here if needed
-          require(userAddress != address(0), "EthereumCrossChainToken: Invalid address");
+          require(userAddress != address(0), "${params.name}${params.id}: Invalid address");
   
           _mint(userAddress, amount);
           emit TokenDeposited(userAddress, address(this), amount, depositId);
@@ -117,11 +110,13 @@ export default function EthereumErc20TemplateView({
   displayCode: (code: string) => void;
   selectedChain: AvailableChains;
 }) {
+  const mounted = useRef(false);
   const { contractsData, updateContractDetails } = useContractDetails();
   const [disable, setDisable] = useState(false);
   const { erc20TemplateContractDetails, updateErc20TemplateContractDetail } =
     useTemplateContractDetails();
   const { userDetails } = useUserDetails();
+  const Contract_Id = "EthCrossChainToken";
 
   const selectedContractDetails = erc20TemplateContractDetails.contracts.find(
     (data) => data.chain === selectedChain,
@@ -147,25 +142,332 @@ export default function EthereumErc20TemplateView({
   const [missingAllInputs, setMissingAllInputs] = useState(false);
 
   useEffect(() => {
-    const erc20Options: ETHERC20ContractParams = {
-      name,
-      symbol,
-    };
-    const finalContract = GetETHERC20Contract(erc20Options);
-    setContract(finalContract);
-    displayCode(finalContract);
-  }, []);
+    if (!mounted.current) {
+      // This block will execute only once when the component mounts
+      mounted.current = true;
+      return; // Exit early, don't execute the rest of the useEffect
+    }
 
-  useEffect(() => {
+    setMissingAllInputs(false);
     setIsEditing(true);
+    
     const erc20Options: ETHERC20ContractParams = {
+      id: Contract_Id,
       name,
-      symbol,
+      symbol
     };
     const finalContract = GetETHERC20Contract(erc20Options);
     setContract(finalContract);
     displayCode(finalContract);
-  }, [displayCode, name, symbol]);
+
+    const constructorArgs = extractConstructorArguments(finalContract);
+
+    // Find the contract with the selected chain
+    const selectedContract = contractsData.contracts.find(
+      (contract) => contract.chain === selectedChain,
+    );
+
+    if (selectedContract) {
+      const existingCodeDetailIndex = selectedContract.codeDetails.findIndex(
+        (detail) => detail.id === Contract_Id,
+      );
+
+      if (existingCodeDetailIndex !== -1) {
+        // If code details with Contract_Id exist, update existing details
+        const updatedContract: ContractDetailsData = {
+          ...selectedContract,
+          name,
+          symbol,
+          codeDetails: [
+            ...selectedContract.codeDetails.slice(0, existingCodeDetailIndex),
+            {
+              ...selectedContract.codeDetails[existingCodeDetailIndex],
+              fileName: `${name}${Contract_Id}`,
+              code: finalContract,
+            },
+            ...selectedContract.codeDetails.slice(existingCodeDetailIndex + 1),
+          ],
+          argumentsDetails:
+            selectedContract.argumentsDetails &&
+            selectedContract.argumentsDetails.length > 0
+              ? selectedContract.argumentsDetails.map((argDetail) => ({
+                  ...argDetail,
+                  fileName: `${name}${Contract_Id}`,
+                }))
+              : [
+                  {
+                    id: Contract_Id,
+                    fileName: `${name}${Contract_Id}`,
+                    arguments:
+                      constructorArgs && constructorArgs.length > 0
+                        ? Array(constructorArgs.length).fill("")
+                        : [],
+                  },
+                ],
+        };
+
+        // Update the contract details using the context
+        updateContractDetails(updatedContract);
+      } else {
+        // No existing code details found, add new details
+        const newCodeDetail = {
+          id: Contract_Id,
+          fileName: `${name}${Contract_Id}`,
+          code: finalContract,
+        };
+
+        const newArgumentsDetail = {
+          id: Contract_Id,
+          fileName: `${name}${Contract_Id}`,
+          arguments:
+            constructorArgs && constructorArgs.length > 0
+              ? Array(constructorArgs.length).fill("")
+              : [],
+        };
+
+        const updatedContract: ContractDetailsData = {
+          ...selectedContract,
+          name,
+          symbol,
+          codeDetails: [...selectedContract.codeDetails, newCodeDetail],
+          argumentsDetails: [
+            ...(selectedContract.argumentsDetails || []),
+            newArgumentsDetail,
+          ],
+        };
+
+        // Update the contract details using the context
+        updateContractDetails(updatedContract);
+      }
+    } else {
+      // If no contract with selectedChain exists, add new contract details
+      const addContractDetails: ContractDetailsData = {
+        name,
+        symbol: symbol !== "" ? symbol : "",
+        codeDetails: [
+          {
+            id: Contract_Id,
+            fileName: `${name}${Contract_Id}`,
+            code: finalContract,
+          },
+        ],
+        argumentsDetails: [
+          {
+            id: Contract_Id,
+            fileName: `${name}${Contract_Id}`,
+            arguments:
+              constructorArgs && constructorArgs.length > 0
+                ? Array(constructorArgs.length).fill("")
+                : [],
+          },
+        ],
+        chain: selectedChain,
+        gasPrice: "~0.0002",
+        type: userDetails.type,
+      };
+
+      // Update the contract details using the context
+      updateContractDetails(addContractDetails);
+    }
+
+    // Find the templateContract with the selected chain
+    const selectedTemplateContractIndex =
+      erc20TemplateContractDetails.contracts.findIndex(
+        (contract) => contract.chain === selectedChain,
+      );
+
+    if (selectedTemplateContractIndex !== -1) {
+      // If template contract with selectedChain exists, update existing details
+      const updatedTemplateContracts = [
+        ...erc20TemplateContractDetails.contracts,
+      ];
+      updatedTemplateContracts[selectedTemplateContractIndex] = {
+        ...updatedTemplateContracts[selectedTemplateContractIndex],
+        name,
+        symbol
+      };
+
+      // Update the template contract details using the context
+      updateErc20TemplateContractDetail(
+        selectedChain,
+        updatedTemplateContracts[selectedTemplateContractIndex],
+      );
+    }
+
+    setIsEditing(false);
+  }, [name, symbol, selectedChain]);
+
+  // useEffect(() => {
+  //   const erc20Options: ETHERC20ContractParams = {
+  //     id: Contract_Id,
+  //     name,
+  //     symbol,
+  //   };
+  //   const finalContract = GetETHERC20Contract(erc20Options);
+  //   setContract(finalContract);
+  //   displayCode(finalContract);
+  // }, []);
+
+  // useEffect(() => {
+  //   setMissingAllInputs(false);
+  //   setIsEditing(true);
+  //   const erc20Options: ETHERC20ContractParams = {
+  //     id: Contract_Id,
+  //     name,
+  //     symbol,
+  //   };
+  //   const finalContract = GetETHERC20Contract(erc20Options);
+  //   setContract(finalContract);
+  //   displayCode(finalContract);
+
+  //   // Find the contract with the selected chain
+  //   const selectedContract = contractsData.contracts.find(
+  //     (contract) => contract.chain === selectedChain,
+  //   );
+
+  //   const constructorArgs = extractConstructorArguments(contract);
+
+  //   if (selectedContract) {
+  //     // Create an updated contract with only the changed fields
+  //     const updatedContract: ContractDetailsData = {
+  //       ...selectedContract,
+  //       name,
+  //       symbol: symbol !== "" ? symbol : selectedContract.symbol,
+  //       codeDetails: (() => {
+  //         const existingCodeDetail = selectedContract.codeDetails.find(
+  //           (codeDetail) => codeDetail.id === Contract_Id,
+  //         );
+  //         if (existingCodeDetail) {
+  //           // Update existing code detail
+  //           return selectedContract.codeDetails.map((codeDetail) => {
+  //             if (codeDetail.id === Contract_Id) {
+  //               return {
+  //                 ...codeDetail,
+  //                 fileName: `${name}${Contract_Id}`,
+  //                 code: contract,
+  //               };
+  //             } else {
+  //               return codeDetail;
+  //             }
+  //           });
+  //         } else {
+  //           // Add new code detail
+  //           return [
+  //             ...selectedContract.codeDetails,
+  //             {
+  //               id: Contract_Id,
+  //               fileName: `${name}${Contract_Id}`,
+  //               code: contract,
+  //             },
+  //           ];
+  //         }
+  //       })(),
+
+  //       argumentsDetails: (() => {
+  //         if (
+  //           selectedContract.argumentsDetails &&
+  //           selectedContract.argumentsDetails.length > 0
+  //         ) {
+  //           const existingArgDetail = selectedContract.argumentsDetails.find(
+  //             (argDetail) => argDetail.id === Contract_Id,
+  //           );
+  //           if (existingArgDetail) {
+  //             // Update existing arguments detail
+  //             selectedContract.argumentsDetails.map((argDetail) => {
+  //               if (argDetail.id === Contract_Id) {
+  //                 return {
+  //                   id: argDetail.id,
+  //                   fileName: `${name}${Contract_Id}`,
+  //                   arguments:
+  //                     constructorArgs && constructorArgs.length > 0
+  //                       ? Array(constructorArgs.length).fill("")
+  //                       : existingArgDetail,
+  //                 };
+  //               } else {
+  //                 return argDetail;
+  //               }
+  //             });
+  //           } else {
+  //             // Add new arguments detail
+  //             return [
+  //               ...selectedContract.argumentsDetails,
+  //               {
+  //                 id: Contract_Id,
+  //                 fileName: `${name}${Contract_Id}`,
+  //                 arguments:
+  //                   constructorArgs && constructorArgs.length > 0
+  //                     ? Array(constructorArgs.length).fill("")
+  //                     : [],
+  //               },
+  //             ];
+  //           }
+  //         } else {
+  //           // Add new arguments detail
+  //           return [
+  //             {
+  //               id: Contract_Id,
+  //               fileName: `${name}${Contract_Id}`,
+  //               arguments:
+  //                 constructorArgs && constructorArgs.length > 0
+  //                   ? Array(constructorArgs.length).fill("")
+  //                   : [],
+  //             },
+  //           ];
+  //         }
+  //       })(),
+  //     };
+
+  //     // Update the contract details using the context
+  //     updateContractDetails(updatedContract);
+  //   } else {
+  //     // Create an updated contract with only the changed fields
+  //     const updatedContract: ContractDetailsData = {
+  //       name,
+  //       symbol: symbol !== "" ? symbol : "",
+  //       codeDetails: [
+  //         {
+  //           id: Contract_Id,
+  //           fileName: `${name}${Contract_Id}`,
+  //           code: contract,
+  //         },
+  //       ],
+  //       argumentsDetails: [
+  //         {
+  //           id: Contract_Id,
+  //           fileName: `${name}${Contract_Id}`,
+  //           arguments:
+  //             constructorArgs && constructorArgs.length > 0
+  //               ? Array(constructorArgs.length).fill("")
+  //               : [],
+  //         },
+  //       ],
+  //       chain: selectedChain,
+  //       gasPrice: "~0.0002",
+  //       type: userDetails.type,
+  //     };
+
+  //     // Update the contract details using the context
+  //     updateContractDetails(updatedContract);
+  //   }
+
+  //   // Find the templateContract with the selected chain
+  //   const selectedTemplateContract =
+  //     erc20TemplateContractDetails.contracts.find(
+  //       (contract) => contract.chain === selectedChain,
+  //     );
+
+  //   if (selectedTemplateContract) {
+  //     // Create an updated contract with only the changed fields
+  //     const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
+  //       ...selectedTemplateContract,
+  //       name,
+  //       symbol,
+  //     };
+
+  //     // Update the contract details using the context
+  //     updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
+  //   }
+  // }, [displayCode, name, symbol]);
 
   function saveDetails() {
     setIsSaving(true);
@@ -176,66 +478,66 @@ export default function EthereumErc20TemplateView({
       return;
     }
 
-    // Find the contract with the selected chain
-    const selectedContract = contractsData.contracts.find(
-      (contract) => contract.chain === selectedChain,
-    );
+    // // Find the contract with the selected chain
+    // const selectedContract = contractsData.contracts.find(
+    //   (contract) => contract.chain === selectedChain,
+    // );
 
-    const constructorArgs = extractConstructorArguments(contract);
+    // const constructorArgs = extractConstructorArguments(contract);
 
-    if (selectedContract) {
-      // Create an updated contract with only the changed fields
-      const updatedContract: ContractDetailsData = {
-        ...selectedContract,
-        name,
-        symbol: symbol !== "" ? symbol : selectedContract.symbol,
-        code: contract,
-        arguments:
-          constructorArgs && constructorArgs.length > 0
-            ? Array(constructorArgs.length).fill("")
-            : selectedContract.arguments,
-      };
+    // if (selectedContract) {
+    //   // Create an updated contract with only the changed fields
+    //   const updatedContract: ContractDetailsData = {
+    //     ...selectedContract,
+    //     name,
+    //     symbol: symbol !== "" ? symbol : selectedContract.symbol,
+    //     code: contract,
+    //     arguments:
+    //       constructorArgs && constructorArgs.length > 0
+    //         ? Array(constructorArgs.length).fill("")
+    //         : selectedContract.arguments,
+    //   };
 
-      // Update the contract details using the context
-      updateContractDetails(updatedContract);
-    } else {
-      // Create an updated contract with only the changed fields
-      const updatedContract: ContractDetailsData = {
-        name,
-        symbol: symbol !== "" ? symbol : "",
-        code: contract,
-        arguments:
-          constructorArgs && constructorArgs.length > 0
-            ? Array(constructorArgs.length).fill("")
-            : [],
-        chain: selectedChain,
-        gasPrice: "~0.0002",
-        type: userDetails.type,
-      };
+    //   // Update the contract details using the context
+    //   updateContractDetails(updatedContract);
+    // } else {
+    //   // Create an updated contract with only the changed fields
+    //   const updatedContract: ContractDetailsData = {
+    //     name,
+    //     symbol: symbol !== "" ? symbol : "",
+    //     code: contract,
+    //     arguments:
+    //       constructorArgs && constructorArgs.length > 0
+    //         ? Array(constructorArgs.length).fill("")
+    //         : [],
+    //     chain: selectedChain,
+    //     gasPrice: "~0.0002",
+    //     type: userDetails.type,
+    //   };
 
-      // Update the contract details using the context
-      updateContractDetails(updatedContract);
-    }
+    //   // Update the contract details using the context
+    //   updateContractDetails(updatedContract);
+    // }
 
-    // Find the templateContract with the selected chain
-    const selectedTemplateContract =
-      erc20TemplateContractDetails.contracts.find(
-        (contract) => contract.chain === selectedChain,
-      );
+    // // Find the templateContract with the selected chain
+    // const selectedTemplateContract =
+    //   erc20TemplateContractDetails.contracts.find(
+    //     (contract) => contract.chain === selectedChain,
+    //   );
 
-    if (selectedTemplateContract) {
-      // Create an updated contract with only the changed fields
-      const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
-        ...selectedTemplateContract,
-        name,
-        symbol,
-      };
+    // if (selectedTemplateContract) {
+    //   // Create an updated contract with only the changed fields
+    //   const updatedTemplateContract: Erc20TemplateSaveContractDetailsData = {
+    //     ...selectedTemplateContract,
+    //     name,
+    //     symbol,
+    //   };
 
-      // Update the contract details using the context
-      updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
-    }
+    //   // Update the contract details using the context
+    //   updateErc20TemplateContractDetail(selectedChain, updatedTemplateContract);
+    // }
     setIsSaving(false);
-    setIsEditing(false);
+    // setIsEditing(false);
   }
 
   return (

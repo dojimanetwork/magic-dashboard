@@ -12,8 +12,8 @@ import * as EVMContractsUI from "./evm";
 
 const componentMapping = {
   dojima: {
-    erc20: EVMContractsUI.DojimaErc20TemplateView,
-    nft: EVMContractsUI.DojimaNftTemplateView,
+    erc20: EVMContractsUI.DojimaErc20TemplateComponent,
+    nft: EVMContractsUI.DojimaNftTemplateComponent,
   },
   ethereum: {
     erc20: EVMContractsUI.EthereumErc20TemplateView,
