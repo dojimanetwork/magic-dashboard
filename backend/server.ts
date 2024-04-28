@@ -13,7 +13,9 @@ import {
   DeployChainScript,
   DeployDOJChainScript,
   DeployETHChainScript,
+  DeployOmniChainScript,
 } from "./scripts";
+import { OmniChainDeployableData } from "./scripts/types";
 
 const logger = winston.createLogger({
   level: "info",
@@ -251,6 +253,28 @@ app.post("/deploy/bsc", async (req, res) => {
 
     // Log the result before sending it
     logger.info("bsc Deployment result:", result);
+
+    res.send(result);
+  } catch (error) {
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
+
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/omnichain/deploy", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    // Log the received data
+    logger.info("POST request to /omnichain/deploy with data:", data);
+
+    const result = await DeployOmniChainScript(data as Array<OmniChainDeployableData>);
+
+    // Log the result before sending it
+    logger.info("Deployment result:", result);
 
     res.send(result);
   } catch (error) {

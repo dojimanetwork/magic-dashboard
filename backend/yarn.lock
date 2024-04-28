@@ -97,10 +97,10 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@dojimanetwork/dojima-contracts@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@dojimanetwork/dojima-contracts/-/dojima-contracts-0.1.1.tgz#392d6ff5bf472ca96de122f98a1fc887e12bd48b"
-  integrity sha512-HMo6QczRILsDxJDPz7uVQUWdC1M7mu0k35eNPzI4sJ/TH21mooLHZbjLUat/bwdbPYyr7zaAdwplqdajaXlX7g==
+"@dojimanetwork/dojima-contracts@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@dojimanetwork/dojima-contracts/-/dojima-contracts-0.1.2.tgz#ba194d510426e5224bf0a06998771d78f0d27fec"
+  integrity sha512-D2keEoreniP1IlvAnCPO+yKQyNnCpYSWNBRlzy8vsBfXf1rCQDv1OlRsH9n1+yyo/6oalKGtQhFduAhQw4Q3TQ==
   dependencies:
     "@ethersproject/providers" "^5.7.2"
     "@openzeppelin/contracts" "^4.9.3"

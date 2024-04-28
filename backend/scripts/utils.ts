@@ -1,4 +1,4 @@
-import { unlinkSync, writeFileSync } from "fs";
+import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import { exec } from "child_process";
 import { promisify } from "util";
 
@@ -68,4 +68,40 @@ export function formatSolidityCode(code: string): string {
   const indentedCode = lines.map((line) => `    ${line}`).join("\n");
   // Add a Solidity file preamble
   return `\n${indentedCode}\n`;
+}
+
+export const generateDeployedConfigFolder = "Deployed-Config";
+
+export function readDeployedContractAddresses(filename: string) {
+  return JSON.parse(
+    readFileSync(
+      `${process.cwd()}/${generateDeployedConfigFolder}/${filename}.json`,
+    ).toString(),
+  );
+}
+
+export function writeDeployedContractAddresses(data: Object, filename: string) {
+  // join filename with .json extension
+  const directory = `${generateDeployedConfigFolder}/${filename}.json`;
+
+  writeFileSync(
+    `${process.cwd()}/${directory}`,
+    JSON.stringify(data, null, 2), // Indent 2 spaces
+  );
+}
+
+export function parseDeployedDetails(detail: string) {
+  // Regular expression to extract the substring between "Deployed details:" and ":Closed"
+  const regex = /Deployed details:\s*(.*?),\s*":Closed/;
+  const match = detail.match(regex);
+
+  console.log('Match : ', match);
+
+  if (match) {
+    const extractedData = match[1].trim(); // Trim to remove extra whitespaces
+    console.log("Extracted data : ", extractedData);
+    return extractedData;
+  } else {
+    console.error("No match found.");
+  }
 }

@@ -1,7 +1,7 @@
 /** Chains supported by dashboard
  * Note: Might increase in future
  */
-export type AvailableChains = "dojima" | "ethereum" | "bsc";
+export type AvailableChains = "dojima" | "ethereum" | "bsc" | "avalanche";
 
 /** EVM Template types supported by dashboard */
 
@@ -26,7 +26,7 @@ export type UserContractsObject = {
   ethereum: ChainContractsData[];
 };
 
-export type ContractsChain = "dojima" | "ethereum";
+export type ContractsChain = "dojima" | "ethereum" | "bsc" | "avalanche";
 
 export type ChainContractsObject = {
   chain: ContractsChain;
@@ -62,4 +62,27 @@ export type ProjectDataObject = {
   deploymentData?: ElementsDeploymentData[];
   dateCreated?: Date;
   lastUpdated?: Date;
+};
+
+export type EVMCompileParams = {
+  fileName: string;
+  code: string;
+};
+
+export type OmnichainCompileParams = Array<EVMCompileParams>;
+
+export type OmnichainContractsData = {
+  fileName: string;
+  contractCode: Array<EVMCompileParams>;
+  contractName: string;
+  contractSymbol?: string;
+  args: {
+    fileName: string;
+    arguments: any;
+  }[];
+};
+
+export type OmniChainDeployableData = {
+  chainName: AvailableChains;
+  contracts: OmnichainContractsData;
 };

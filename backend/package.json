@@ -23,7 +23,7 @@
     "docker:run": "docker run --name magic-dashboard-server -p 3010:3010 -d magic-dashboard-server"
   },
   "dependencies": {
-    "@dojimanetwork/dojima-contracts": "0.1.1",
+    "@dojimanetwork/dojima-contracts": "0.1.2",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",

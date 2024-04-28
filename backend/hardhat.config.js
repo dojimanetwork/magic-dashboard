@@ -29,6 +29,15 @@ module.exports = {
         "ae1d058b9c5713848e7ac4c1901fac9a737729a34c10c997991c861dd7705ac0",
       ],
     },
+    holesky_ethereum: {
+      url: 'https://eth-dev.h4s.dojima.network/',
+      chainId: 17000,
+      // gas: 5000000, //units of gas you are willing to pay, aka gas limit
+      gasPrice: 2000000000, // gas is typically in units of gwei, but you must enter it as wei here
+      accounts: [
+        "ae1d058b9c5713848e7ac4c1901fac9a737729a34c10c997991c861dd7705ac0",
+      ],
+    },
     ethereum: {
       url: `https://eth-goerli.g.alchemy.com/v2/TIMeEU-fdUdyD-YijUoB_AbdtlVfEcl2`,
       // url: process.env.VITE_APP_ETH_GOERLI_ALCHEMY_URL,
@@ -41,7 +50,8 @@ module.exports = {
       ],
     },
     avalanche: {
-      url: "http://127.0.0.1:9650/ext/bc/C/rpc",
+      // url: "http://127.0.0.1:9650/ext/bc/C/rpc",
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
       chainId: 43112,
       gas: 5000000, // units of gas you are willing to pay, aka gas limit
       gasPrice: 225000000000, // gas is typically in units of gwei, but you must enter it as wei here
