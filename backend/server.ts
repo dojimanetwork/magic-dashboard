@@ -16,6 +16,8 @@ import {
   DeployOmniChainScript,
 } from "./scripts";
 import { OmniChainDeployableData } from "./scripts/types";
+import { SolDojTokenTemplate } from "./setup/sol-evm-token/deployTemplate";
+import { SolDojTokenTemplateParams } from "./setup/sol-evm-token/types";
 
 const logger = winston.createLogger({
   level: "info",
@@ -272,6 +274,28 @@ app.post("/omnichain/deploy", async (req, res) => {
     logger.info("POST request to /omnichain/deploy with data:", data);
 
     const result = await DeployOmniChainScript(data as Array<OmniChainDeployableData>);
+
+    // Log the result before sending it
+    logger.info("Deployment result:", result);
+
+    res.send(result);
+  } catch (error) {
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
+
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/sol-doj-token/deploy", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    // Log the received data
+    logger.info("POST request to /sol-doj-token/deploy with data:", data);
+
+    const result = await SolDojTokenTemplate(data as SolDojTokenTemplateParams);
 
     // Log the result before sending it
     logger.info("Deployment result:", result);

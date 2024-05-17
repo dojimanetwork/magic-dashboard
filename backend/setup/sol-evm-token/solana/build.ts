@@ -6,9 +6,9 @@ export async function build(programName: string) {
   const originalPath = process.cwd();
   const pathNew = path.join(
     originalPath,
-    "scripts",
+    "setup",
+    "sol-evm-token",
     "solana",
-    "solana-setup",
     `${programName}`
   );
 

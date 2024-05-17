@@ -5,14 +5,6 @@ import { processCreate, processInstallNodeModules } from "./create";
 
 const SOLIDITY_VERSION = "0.8.20";
 
-const DEFAULT_KEYPAIR_PATH = path.join(
-  process.cwd(),
-  "scripts",
-  "solana",
-  "solana-setup",
-  "id.json"
-);
-
 export const processCreateHardhat = async (contractName: string, contractSymbol: string, totalSupply: number) => {
   // Get the name of the project
   // const name = await getProjectName();
@@ -284,7 +276,7 @@ contract ${contractName} {
       [
         PATHS.FILES.PACKAGE_JSON,
         `{
-          "name": "x-chain-token",
+          "name": "${contractName}",
           "version": "1.0.0",
           "main": "index.js",
           "scripts": {

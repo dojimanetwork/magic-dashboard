@@ -7,6 +7,7 @@ export async function compile(contractName: string) {
   const pathNew = path.join(
     originalPath,
     "setup",
+    "sol-evm-token",
     "dojima",
     `${contractName}`
   );

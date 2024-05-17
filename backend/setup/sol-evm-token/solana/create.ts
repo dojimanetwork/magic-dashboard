@@ -14,9 +14,9 @@ interface CreateProps {
 export async function processCreate({ name, files }: CreateProps) {
   const baseDirPath = path.join(
     process.cwd(),
-    "scripts",
+    "setup",
+    "sol-evm-token",
     "solana",
-    "solana-setup"
   );
   fs.mkdirSync(path.join(baseDirPath, name));
 
@@ -34,9 +34,9 @@ export async function processCreate({ name, files }: CreateProps) {
 export async function processInstallNodeModules(name: string) {
   const cwd = path.join(
     process.cwd(),
-    "scripts",
+    "setup",
+    "sol-evm-token",
     "solana",
-    "solana-setup",
     name
   );
   const promisifiedExec = promisify(exec);

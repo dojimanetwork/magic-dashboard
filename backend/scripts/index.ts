@@ -174,9 +174,6 @@ export async function DeployOmniChainScript(
     chain: AvailableChains;
     details: EVMContractDeployedObject[];
   }> = [];
-
-  console.log("Deploy omni chain script : ", contractsData);
-  console.log("Deploy omni chain script type : ", typeof contractsData);
   
   // let res = [];
 

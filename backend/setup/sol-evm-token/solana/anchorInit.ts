@@ -8,9 +8,9 @@ const ANCHOR_VERSION = "0.29.0";
 
 const DEFAULT_KEYPAIR_PATH = path.join(
   process.cwd(),
-  "scripts",
+  "setup",
+  "sol-evm-token",
   "solana",
-  "solana-setup",
   "id.json"
 );
 

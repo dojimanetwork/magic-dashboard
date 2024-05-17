@@ -9,6 +9,7 @@ export async function deploy(contractName: string) {
   const pathNew = path.join(
     originalPath,
     "setup",
+    "sol-evm-token",
     "dojima",
     `${contractName}`
   );

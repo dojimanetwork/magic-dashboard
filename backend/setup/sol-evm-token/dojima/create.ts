@@ -15,6 +15,7 @@ export async function processCreate({ name, files }: CreateProps) {
   const baseDirPath = path.join(
     process.cwd(),
     "setup",
+    "sol-evm-token",
     "dojima",
   );
   fs.mkdirSync(path.join(baseDirPath, name));
@@ -34,6 +35,7 @@ export async function processInstallNodeModules(name: string) {
   const cwd = path.join(
     process.cwd(),
     "setup",
+    "sol-evm-token",
     "dojima",
     name
   );
