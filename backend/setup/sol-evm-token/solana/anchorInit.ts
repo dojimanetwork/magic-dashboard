@@ -380,7 +380,7 @@ test-ledger
 seeds = false
 skip-lint = false
 [programs.localnet]
-default = "${programKeypair.publicKey.toBase58()}"
+${_.camelCase(name)} = "${programKeypair.publicKey.toBase58()}"
 
 [registry]
 url = "${process.env.NEXT_PUBLIC_SOL_API_URL}"
