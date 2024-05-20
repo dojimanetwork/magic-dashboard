@@ -18,6 +18,8 @@ import {
 import { OmniChainDeployableData } from "./scripts/types";
 import { SolDojTokenTemplate } from "./setup/sol-evm-token/deployTemplate";
 import { SolDojTokenTemplateParams } from "./setup/sol-evm-token/types";
+import { DojSolDataTransferTemplate } from "./setup/evm-sol-data-transfer/deployTemplate";
+import { DojSolDataTransferTemplateParams } from "./setup/evm-sol-data-transfer/types";
 
 const logger = winston.createLogger({
   level: "info",
@@ -296,6 +298,28 @@ app.post("/sol-doj-token/deploy", async (req, res) => {
     logger.info("POST request to /sol-doj-token/deploy with data:", data);
 
     const result = await SolDojTokenTemplate(data as SolDojTokenTemplateParams);
+
+    // Log the result before sending it
+    logger.info("Deployment result:", result);
+
+    res.send(result);
+  } catch (error) {
+    // Log any errors that occurred during the process
+    logger.error("Error during deployment:", error);
+
+    // Handle the error and send an appropriate response
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/doj-sol-data-transfer/deploy", async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    // Log the received data
+    logger.info("POST request to /doj-sol-data-transfer/deploy with data:", data);
+
+    const result = await DojSolDataTransferTemplate(data as DojSolDataTransferTemplateParams);
 
     // Log the result before sending it
     logger.info("Deployment result:", result);
