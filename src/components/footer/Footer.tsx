@@ -16,6 +16,7 @@ import { UIAppState } from "../../types";
 import { DeployButton } from "../DeployButton";
 import { actionDeploy } from "../../actions";
 import { useContractDetails } from "../../context/contract-appState";
+import { useUserDetails } from "../../context/user-appState";
 /** Footer component with zoom in, out, deploy and help buttons */
 const Footer = ({
   appState,
@@ -33,7 +34,8 @@ const Footer = ({
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
-  const { contractsData } = useContractDetails();
+  const { contractsData, solEvmTokenContractsData } = useContractDetails();
+  const { userDetails } = useUserDetails();
 
   return (
     <footer
@@ -81,10 +83,17 @@ const Footer = ({
         })}
       >
         <div style={{ position: "relative" }}>
-          <DeployButton
-            enable={contractsData.contracts.length > 0}
-            onClick={() => actionManager.executeAction(actionDeploy)}
-          />
+          {userDetails.type === "solEvmTokenTemplate" ? (
+            <DeployButton
+              enable={solEvmTokenContractsData.solEvmTokenContracts.length > 0}
+              onClick={() => actionManager.executeAction(actionDeploy)}
+            />
+          ) : (
+            <DeployButton
+              enable={contractsData.contracts.length > 0}
+              onClick={() => actionManager.executeAction(actionDeploy)}
+            />
+          )}
         </div>
         {/*<div style={{ position: "relative" }}>*/}
         {/*  {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}*/}

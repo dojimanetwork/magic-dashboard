@@ -46,6 +46,23 @@ export function formatSolidityCode(code: string): string {
   return `\n${indentedCode}\n`;
 }
 
+export function formatRustCode(code: string): string {
+  // Add newline after 'use' statements
+  code = code.replace(/(use\s+[^;]+;)/g, "$1\n");
+  // Add newline after semicolons
+  code = code.replace(/;/g, ";\n");
+  // Add newline after opening curly braces and indent the content
+  code = code.replace(/{/g, "{\n");
+  // Add newline before closing curly braces
+  code = code.replace(/}/g, "\n}");
+  // Split the code into lines
+  const lines = code.split("\n");
+  // Indent each line with 4 spaces
+  const indentedCode = lines.map((line) => `    ${line.trim()}`).join("\n");
+  // Add a Rust file preamble
+  return `\n${indentedCode}\n`;
+}
+
 function ContractView({
   element,
   setAppState,
@@ -230,7 +247,7 @@ function ContractView({
 
             <div className="contract-view-content h-full w-full">
               <SyntaxHighlighter
-                language="solidity"
+                language={`${selectedElementChain === "solana" ? "rust" : "solidity"}`}
                 style={monokai}
                 wrapLongLines={true}
                 customStyle={{
@@ -238,7 +255,9 @@ function ContractView({
                   color: "white",
                 }}
               >
-                {formatSolidityCode(contractCode)}
+                {selectedElementChain === "solana"
+                    ? formatRustCode(contractCode)
+                    : formatSolidityCode(contractCode)}
               </SyntaxHighlighter>
             </div>
           </div>

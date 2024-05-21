@@ -22,6 +22,15 @@ export interface ContractDetailsData {
   }[];
 }
 
+export interface SolEvmTokenContractDetailsData {
+  name: string;
+  chain: AvailableChains;
+  type: templateType;
+  gasPrice: string;
+  symbol?: string;
+  supply?: number;
+}
+
 export interface ContractArguments {
   argument1: string;
   argument2: string;
@@ -31,10 +40,17 @@ export interface InitialContractDetails {
   contracts: Array<ContractDetailsData>;
 }
 
+export interface InitialSolEvmTokenContractDetails {
+  solEvmTokenContracts: Array<SolEvmTokenContractDetailsData>;
+}
+
 export interface ContractDetailsContextProps {
   contractsData: InitialContractDetails;
   updateContractDetails: (updatedContract: ContractDetailsData) => void;
   resetContractDetails: () => void;
+  solEvmTokenContractsData: InitialSolEvmTokenContractDetails;
+  updateSolEvmTokenContractDetails: (updatedContract: SolEvmTokenContractDetailsData) => void;
+  resetSolEvmTokenContractDetails: () => void;
 }
 
 export const ContractDetailsContext =
@@ -49,6 +65,11 @@ export const ContractDetailsProvider: React.FC<{
   const [contractsData, setContractsData] =
     React.useState<InitialContractDetails>({
       contracts: [],
+    });
+  
+  const [solEvmTokenContractsData, setSolEvmTokenContractsData] =
+    React.useState<InitialSolEvmTokenContractDetails>({
+      solEvmTokenContracts: [],
     });
 
   const updateContractDetails = (updatedContract: ContractDetailsData) => {
@@ -76,10 +97,38 @@ export const ContractDetailsProvider: React.FC<{
     });
   };
 
+  const updateSolEvmTokenContractDetails = (updatedContract: SolEvmTokenContractDetailsData) => {
+    // Find the index of the contract with the same chain in the contracts array
+    const index = solEvmTokenContractsData.solEvmTokenContracts.findIndex(
+      (contract) => contract.chain === updatedContract.chain,
+    );
+
+    if (index !== -1) {
+      // If the contract with the same chain exists, update it
+      const updatedContracts = [...solEvmTokenContractsData.solEvmTokenContracts];
+      updatedContracts[index] = updatedContract;
+      setSolEvmTokenContractsData({ solEvmTokenContracts: updatedContracts });
+    } else {
+      // If the contract with the same chain doesn't exist, add the new contract
+      setSolEvmTokenContractsData((prevContracts) => ({
+        solEvmTokenContracts: [...prevContracts.solEvmTokenContracts, updatedContract],
+      }));
+    }
+  };
+
+  const resetSolEvmTokenContractDetails = () => {
+    setSolEvmTokenContractsData({
+      solEvmTokenContracts: [],
+    });
+  };
+
   const contextValue: ContractDetailsContextProps = {
     contractsData,
     updateContractDetails,
     resetContractDetails,
+    solEvmTokenContractsData,
+    updateSolEvmTokenContractDetails,
+    resetSolEvmTokenContractDetails
   };
 
   return (

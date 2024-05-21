@@ -8,6 +8,8 @@ import { AppState } from "../types";
 import { extractMainElementFromId } from "./utils/getElementData";
 import { AvailableChains } from "../../excalidraw-app/dojima-templates/types";
 import ContractView from "./ui/ContractView";
+import { useUserDetails } from "../context/user-appState";
+import SolEvmTokenContractView from "./ui/ContractViews/SolEvmToken";
 
 export default function ContractDialog({
   element,
@@ -18,6 +20,7 @@ export default function ContractDialog({
 }) {
   const [, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [chainSelected, setChainSelected] = useState<AvailableChains>(null!);
+  const { userDetails } = useUserDetails();
 
   useEffect(() => {
     const elementSelected = extractMainElementFromId(element.id);
@@ -31,11 +34,19 @@ export default function ContractDialog({
 
   return (
     <Island ref={setIslandNode}>
-      <ContractView
-        element={element}
-        setAppState={setAppState}
-        selectedElementChain={chainSelected}
-      />
+      {userDetails.type === "solEvmTokenTemplate" ? (
+        <SolEvmTokenContractView
+          element={element}
+          setAppState={setAppState}
+          selectedElementChain={chainSelected}
+        />
+      ) : (
+        <ContractView
+          element={element}
+          setAppState={setAppState}
+          selectedElementChain={chainSelected}
+        />
+      )}
     </Island>
   );
 }

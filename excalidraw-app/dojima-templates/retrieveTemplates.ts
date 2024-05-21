@@ -5,6 +5,7 @@ import * as DojimaTemplates from "./dojima";
 import * as EthereumTemplates from "./ethereum";
 // import * as SolanaTemplates from "./solana";
 import * as BscTemplates from "./bsc";
+import SolEvmTokenTemplateElements from "./sol-evm-token";
 
 type TemplatesMap = {
   erc20: {
@@ -17,6 +18,10 @@ type TemplatesMap = {
     bsc: ExcalidrawElement[];
     default: ExcalidrawElement[];
   };
+  solEvmTokenTemplate: {
+    solana: ExcalidrawElement[];
+    default: ExcalidrawElement[];
+  }
 };
 
 function getChainTemplate(
@@ -34,6 +39,10 @@ function getChainTemplate(
       bsc: BscTemplates.nftTemplate,
       default: DojimaTemplates.nftTemplate,
     },
+    solEvmTokenTemplate: {
+      solana: SolEvmTokenTemplateElements.solanaTokenTemplate,
+      default: SolEvmTokenTemplateElements.dojimaTokenTemplate
+    }
   };
 
   return (
@@ -48,7 +57,7 @@ export function retrieveTemplates(
   type: templateType,
 ): ExcalidrawElement[] {
   const templates: ExcalidrawElement[] = [];
-
+  
   chain.forEach((chainName) => {
     const chainTemplate = getChainTemplate(chainName, type);
     templates.push(...chainTemplate);
