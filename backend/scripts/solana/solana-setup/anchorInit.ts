@@ -383,10 +383,10 @@ skip-lint = false
 default = "${programKeypair.publicKey.toBase58()}"
 
 [registry]
-url = "${process.env.NEXT_PUBLIC_SOL_API_URL}"
+url = "${process.env.VITE_APP_SOL_API_URL}"
 
 [provider]
-cluster = "${process.env.NEXT_PUBLIC_SOL_CLUSTER}"
+cluster = "${process.env.VITE_APP_SOL_CLUSTER}"
 wallet = "${DEFAULT_KEYPAIR_PATH}"
 
 [scripts]
