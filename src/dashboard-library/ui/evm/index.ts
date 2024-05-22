@@ -6,6 +6,7 @@ import {
 } from "./dojima";
 import { EthereumErc20TemplateView, EthereumNftTemplateView } from "./ethereum";
 import { BscErc20TemplateView, BscNftTemplateView, BscBep20View } from "./bsc";
+import { AvalancheErc20TemplateView, AvalancheNftTemplateView } from "./avalanche";
 
 export {
   DojimaErc20TemplateView,
@@ -17,4 +18,6 @@ export {
   BscErc20TemplateView,
   BscNftTemplateView,
   BscBep20View,
+  AvalancheErc20TemplateView,
+  AvalancheNftTemplateView,
 };

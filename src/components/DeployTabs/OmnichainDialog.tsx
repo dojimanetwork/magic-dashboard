@@ -20,6 +20,8 @@ import ErrorIcon from "../ErrorIcon";
 import DojimaImg from "../../static/dojima.png";
 import BinanceImg from "../../static/binance.svg";
 import EthereumImg from "../../static/ethereum.svg";
+import SolanaImg from "../../static/solana.svg";
+import AvalancheImg from "../../static/avalanche.svg";
 import FailIcon from "../FailIcon";
 import CircleCancleIcon from "../circlecancleIcon";
 import CopyIcon from "../copyIcon";
@@ -312,6 +314,7 @@ export const OmnichainDialog = ({ onClose }: { onClose?: () => void }) => {
     switch (chain) {
       case "dojima":
       case "DOJ":
+      default:
         return DojimaImg;
       case "ethereum":
       case "ETH":
@@ -320,6 +323,10 @@ export const OmnichainDialog = ({ onClose }: { onClose?: () => void }) => {
       case "binance":
       case "BSC":
         return BinanceImg;
+      case "avax":
+        case "avalanche":
+        case "AVAX":
+          return AvalancheImg;
     }
   }
 
@@ -335,6 +342,10 @@ export const OmnichainDialog = ({ onClose }: { onClose?: () => void }) => {
       case "binance":
       case "BSC":
         return import.meta.env.VITE_APP_BSC_TESTNET_EXPLORER_URL;
+        case "avax":
+          case "avalanche":
+          case "AVAX":
+            return import.meta.env.VITE_APP_BSC_TESTNET_EXPLORER_URL;
     }
   }
 

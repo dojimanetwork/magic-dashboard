@@ -65,7 +65,7 @@ interface ContractContextProps {
 const TemplateContractContext = createContext<ContractContextProps>(null!);
 
 function generateErc20InitialDetails(): Erc20TemplateSaveContractDetails {
-  const chains: AvailableChains[] = ["dojima", "ethereum", "bsc"];
+  const chains: AvailableChains[] = ["dojima", "ethereum", "bsc", "avalanche"];
 
   const initialDetails: Erc20TemplateSaveContractDetails = {
     contracts: chains.map((chain) => ({
@@ -79,7 +79,7 @@ function generateErc20InitialDetails(): Erc20TemplateSaveContractDetails {
 }
 
 function generateErc721InitialDetails(): Erc721TemplateSaveContractDetails {
-  const chains: AvailableChains[] = ["dojima", "ethereum", "bsc"];
+  const chains: AvailableChains[] = ["dojima", "ethereum", "bsc", "avalanche"];
 
   const initialDetails: Erc721TemplateSaveContractDetails = {
     contracts: chains.map((chain) => ({

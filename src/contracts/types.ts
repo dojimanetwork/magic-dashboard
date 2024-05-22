@@ -17,7 +17,7 @@ export type UserContractsObject = {
   ethereum: ChainContractsData[];
 };
 
-export type ContractsChain = "dojima" | "ethereum";
+export type ContractsChain = "dojima" | "ethereum" | "bsc" | "avalanche" | "solana";
 
 export type ChainContractsObject = {
   chain: ContractsChain;

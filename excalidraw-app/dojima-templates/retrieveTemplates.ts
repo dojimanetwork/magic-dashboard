@@ -5,17 +5,20 @@ import * as DojimaTemplates from "./dojima";
 import * as EthereumTemplates from "./ethereum";
 // import * as SolanaTemplates from "./solana";
 import * as BscTemplates from "./bsc";
+import * as AvalancheTemplates from "./avalanche";
 import SolEvmTokenTemplateElements from "./sol-evm-token";
 
 type TemplatesMap = {
   erc20: {
     ethereum: ExcalidrawElement[];
     bsc: ExcalidrawElement[];
+    avalanche: ExcalidrawElement[];
     default: ExcalidrawElement[];
   };
   nft: {
     ethereum: ExcalidrawElement[];
     bsc: ExcalidrawElement[];
+    avalanche: ExcalidrawElement[];
     default: ExcalidrawElement[];
   };
   solEvmTokenTemplate: {
@@ -32,11 +35,13 @@ function getChainTemplate(
     erc20: {
       ethereum: EthereumTemplates.erc20Template,
       bsc: BscTemplates.bep20Template,
+      avalanche: AvalancheTemplates.erc20Template,
       default: DojimaTemplates.erc20Template,
     },
     nft: {
       ethereum: EthereumTemplates.nftTemplate,
       bsc: BscTemplates.nftTemplate,
+      avalanche: AvalancheTemplates.nftTemplate,
       default: DojimaTemplates.nftTemplate,
     },
     solEvmTokenTemplate: {

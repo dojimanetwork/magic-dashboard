@@ -5,7 +5,7 @@ export type AvailableChains = "dojima" | "ethereum" | "bsc" | "avalanche" | "sol
 
 /** EVM Template types supported by dashboard */
 
-export type templateType = "erc20" | "nft";
+export type templateType = "erc20" | "nft" | "solEvmTokenTemplate";
 
 export type EVMContractDeployedObject = {
   contractAddress: string;
@@ -26,7 +26,7 @@ export type UserContractsObject = {
   ethereum: ChainContractsData[];
 };
 
-export type ContractsChain = "dojima" | "ethereum" | "bsc" | "avalanche";
+export type ContractsChain = "dojima" | "ethereum" | "bsc" | "avalanche" | "solana";
 
 export type ChainContractsObject = {
   chain: ContractsChain;

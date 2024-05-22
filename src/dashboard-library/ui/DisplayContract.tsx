@@ -38,6 +38,10 @@ const componentMapping: Record<
     erc20: EVMContractsUI.BscErc20TemplateView,
     nft: EVMContractsUI.BscNftTemplateView,
   },
+  avalanche: {
+    erc20: EVMContractsUI.AvalancheErc20TemplateView,
+    nft: EVMContractsUI.AvalancheNftTemplateView,
+  },
   solana: {
     solEvmTokenTemplate: SolEvmTokenTemplatesUI.SolanaSolEvmTokenTemplateView,
   },
