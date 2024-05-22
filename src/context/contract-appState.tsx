@@ -31,6 +31,13 @@ export interface SolEvmTokenContractDetailsData {
   supply?: number;
 }
 
+export interface EvmSolDataTransferContractDetailsData {
+  name: string;
+  chain: AvailableChains;
+  type: templateType;
+  gasPrice: string;
+}
+
 export interface ContractArguments {
   argument1: string;
   argument2: string;
@@ -44,6 +51,10 @@ export interface InitialSolEvmTokenContractDetails {
   solEvmTokenContracts: Array<SolEvmTokenContractDetailsData>;
 }
 
+export interface InitialEvmSolDataTransferContractDetails {
+  evmSolDataTransferContracts: Array<EvmSolDataTransferContractDetailsData>;
+}
+
 export interface ContractDetailsContextProps {
   contractsData: InitialContractDetails;
   updateContractDetails: (updatedContract: ContractDetailsData) => void;
@@ -51,6 +62,9 @@ export interface ContractDetailsContextProps {
   solEvmTokenContractsData: InitialSolEvmTokenContractDetails;
   updateSolEvmTokenContractDetails: (updatedContract: SolEvmTokenContractDetailsData) => void;
   resetSolEvmTokenContractDetails: () => void;
+  evmSolDataTransferContractsData: InitialEvmSolDataTransferContractDetails;
+  updateEvmSolDataTransferContractDetails: (updatedContract: EvmSolDataTransferContractDetailsData) => void;
+  resetEvmSolDataTransferContractDetails: () => void;
 }
 
 export const ContractDetailsContext =
@@ -70,6 +84,11 @@ export const ContractDetailsProvider: React.FC<{
   const [solEvmTokenContractsData, setSolEvmTokenContractsData] =
     React.useState<InitialSolEvmTokenContractDetails>({
       solEvmTokenContracts: [],
+    });
+
+  const [evmSolDataTransferContractsData, setEvmSolDataTransferContractsData] =
+    React.useState<InitialEvmSolDataTransferContractDetails>({
+      evmSolDataTransferContracts: [],
     });
 
   const updateContractDetails = (updatedContract: ContractDetailsData) => {
@@ -122,13 +141,41 @@ export const ContractDetailsProvider: React.FC<{
     });
   };
 
+  const updateEvmSolDataTransferContractDetails = (updatedContract: EvmSolDataTransferContractDetailsData) => {
+    // Find the index of the contract with the same chain in the contracts array
+    const index = evmSolDataTransferContractsData.evmSolDataTransferContracts.findIndex(
+      (contract) => contract.chain === updatedContract.chain,
+    );
+
+    if (index !== -1) {
+      // If the contract with the same chain exists, update it
+      const updatedContracts = [...evmSolDataTransferContractsData.evmSolDataTransferContracts];
+      updatedContracts[index] = updatedContract;
+      setEvmSolDataTransferContractsData({ evmSolDataTransferContracts: updatedContracts });
+    } else {
+      // If the contract with the same chain doesn't exist, add the new contract
+      setEvmSolDataTransferContractsData((prevContracts) => ({
+        evmSolDataTransferContracts: [...prevContracts.evmSolDataTransferContracts, updatedContract],
+      }));
+    }
+  };
+
+  const resetEvmSolDataTransferContractDetails = () => {
+    setEvmSolDataTransferContractsData({
+      evmSolDataTransferContracts: [],
+    });
+  };
+
   const contextValue: ContractDetailsContextProps = {
     contractsData,
     updateContractDetails,
     resetContractDetails,
     solEvmTokenContractsData,
     updateSolEvmTokenContractDetails,
-    resetSolEvmTokenContractDetails
+    resetSolEvmTokenContractDetails,
+    evmSolDataTransferContractsData,
+    updateEvmSolDataTransferContractDetails,
+    resetEvmSolDataTransferContractDetails
   };
 
   return (

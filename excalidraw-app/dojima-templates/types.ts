@@ -5,4 +5,4 @@ export type AvailableChains = "dojima" | "ethereum" | "bsc" | "solana" | "avalan
 
 /** EVM Template types supported by dashboard */
 
-export type templateType = "erc20" | "nft" | "solEvmTokenTemplate";
+export type templateType = "erc20" | "nft" | "solEvmTokenTemplate" | "evmSolDataTransferTemplate";

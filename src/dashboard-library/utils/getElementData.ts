@@ -1,7 +1,7 @@
 export function extractMainElementFromId(elementId: string): string {
   // Define the regex pattern to match strings starting with ethereum-, dojima-, solana-, etc.
   const regex =
-    /(dojima|ethereum|solana|avalanche|polkadot|bsc)-(nft|erc20|dex|defi|nftMarketPlace|erc721|bep20|solEvmTokenTemplate)\b/g;
+    /(dojima|ethereum|solana|avalanche|polkadot|bsc)-(nft|erc20|dex|defi|nftMarketPlace|erc721|bep20|solEvmTokenTemplate|evmSolDataTransferTemplate)\b/g;
 
   // Use the regex pattern to find matches in the input string
   const matches = elementId.match(regex);

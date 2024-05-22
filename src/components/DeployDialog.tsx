@@ -1025,6 +1025,7 @@ import { useUserDetails } from "../context/user-appState";
 import "./HelpDialog.scss";
 import { SolEvmTokenDialog } from "./DeployTabs/SolEvmTokenDialog";
 import { OmnichainDialog } from "./DeployTabs/OmnichainDialog";
+import { EvmSolDataTransferDialog } from "./DeployTabs/EvmSolDataTransferDialog";
 
 export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
   const { userDetails } = useUserDetails();
@@ -1033,6 +1034,8 @@ export const DeployDialog = ({ onClose }: { onClose?: () => void }) => {
     <>
       {userDetails.type === "solEvmTokenTemplate" ? (
         <SolEvmTokenDialog onClose={onClose} />
+      ) : userDetails.type === "evmSolDataTransferTemplate" ? (
+        <EvmSolDataTransferDialog onClose={onClose} />
       ) : (
         <OmnichainDialog onClose={onClose} />
       )}

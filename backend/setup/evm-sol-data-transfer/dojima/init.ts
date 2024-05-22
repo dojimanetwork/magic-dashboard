@@ -56,7 +56,7 @@ export const processCreateHardhat = async (contractName: string) => {
                 return msg.sender == stateSyncer;
             }
 
-            // Payload should coontain all necessary information required to process 'TokenTransfer'
+            // Payload should coontain all necessary information required to process 'DataTransfer'
             // on destination chain
             function xChainDataTransfer( 
                 bytes32 destinationChain,

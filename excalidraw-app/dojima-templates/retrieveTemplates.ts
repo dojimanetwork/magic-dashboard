@@ -7,6 +7,7 @@ import * as EthereumTemplates from "./ethereum";
 import * as BscTemplates from "./bsc";
 import * as AvalancheTemplates from "./avalanche";
 import SolEvmTokenTemplateElements from "./sol-evm-token";
+import DojSolDataTransferTemplateElements from "./evm-sol-data-transfer";
 
 type TemplatesMap = {
   erc20: {
@@ -22,6 +23,10 @@ type TemplatesMap = {
     default: ExcalidrawElement[];
   };
   solEvmTokenTemplate: {
+    solana: ExcalidrawElement[];
+    default: ExcalidrawElement[];
+  };
+  evmSolDataTransferTemplate: {
     solana: ExcalidrawElement[];
     default: ExcalidrawElement[];
   }
@@ -47,6 +52,10 @@ function getChainTemplate(
     solEvmTokenTemplate: {
       solana: SolEvmTokenTemplateElements.solanaTokenTemplate,
       default: SolEvmTokenTemplateElements.dojimaTokenTemplate
+    },
+    evmSolDataTransferTemplate: {
+      solana: DojSolDataTransferTemplateElements.solanaDataTransferTemplate,
+      default: DojSolDataTransferTemplateElements.dojimaDataTransferTemplate
     }
   };
 

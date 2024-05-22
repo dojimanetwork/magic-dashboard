@@ -34,7 +34,7 @@ const Footer = ({
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
-  const { contractsData, solEvmTokenContractsData } = useContractDetails();
+  const { contractsData, solEvmTokenContractsData, evmSolDataTransferContractsData } = useContractDetails();
   const { userDetails } = useUserDetails();
 
   return (
@@ -86,6 +86,11 @@ const Footer = ({
           {userDetails.type === "solEvmTokenTemplate" ? (
             <DeployButton
               enable={solEvmTokenContractsData.solEvmTokenContracts.length > 0}
+              onClick={() => actionManager.executeAction(actionDeploy)}
+            />
+          ) : userDetails.type === "evmSolDataTransferTemplate" ? (
+            <DeployButton
+              enable={evmSolDataTransferContractsData.evmSolDataTransferContracts.length > 0}
               onClick={() => actionManager.executeAction(actionDeploy)}
             />
           ) : (

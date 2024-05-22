@@ -1,8 +1,9 @@
 import { useUserDetails } from "../../context/user-appState";
-import { AvailableChains } from "../../../excalidraw-app/dojima-templates/types";
+import { AvailableChains, templateType } from "../../../excalidraw-app/dojima-templates/types";
 import * as EVMContractsUI from "./evm";
 // import SolanaContract from "./solana/solana";
 import SolEvmTokenTemplatesUI from "./templates/sol-evm-token";
+import EvmSolDataTransferTemplatesUI from "./templates/evm-sol-data-transfer";
 
 // const componentMapping = {
 //   erc20: EVMContractsUI.Erc20,
@@ -11,13 +12,11 @@ import SolEvmTokenTemplatesUI from "./templates/sol-evm-token";
 //   // defi: EVMContractsUI.Defi,
 // };
 
-type TemplateType = "erc20" | "nft" | "solEvmTokenTemplate";
-
 const componentMapping: Record<
   AvailableChains,
   Partial<
     Record<
-      TemplateType,
+      templateType,
       React.FC<{
         displayCode: (code: string) => void;
         selectedChain: AvailableChains;
@@ -29,6 +28,7 @@ const componentMapping: Record<
     erc20: EVMContractsUI.DojimaErc20TemplateComponent,
     nft: EVMContractsUI.DojimaNftTemplateComponent,
     solEvmTokenTemplate: SolEvmTokenTemplatesUI.DojimaSolEvmTokenTemplateView,
+    evmSolDataTransferTemplate: EvmSolDataTransferTemplatesUI.DojimaEvmSolDataTransferTemplateView,
   },
   ethereum: {
     erc20: EVMContractsUI.EthereumErc20TemplateView,
@@ -44,6 +44,7 @@ const componentMapping: Record<
   },
   solana: {
     solEvmTokenTemplate: SolEvmTokenTemplatesUI.SolanaSolEvmTokenTemplateView,
+    evmSolDataTransferTemplate: EvmSolDataTransferTemplatesUI.SolanaEvmSolDataTransferTemplateView,
   },
   // Add mappings for other chains as needed
 };

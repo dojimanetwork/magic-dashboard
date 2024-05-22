@@ -10,6 +10,7 @@ import { AvailableChains } from "../../excalidraw-app/dojima-templates/types";
 import ContractView from "./ui/ContractView";
 import { useUserDetails } from "../context/user-appState";
 import SolEvmTokenContractView from "./ui/ContractViews/SolEvmToken";
+import EvmSolDataTransferContractView from "./ui/ContractViews/EvmSolDataTransfer";
 
 export default function ContractDialog({
   element,
@@ -36,6 +37,12 @@ export default function ContractDialog({
     <Island ref={setIslandNode}>
       {userDetails.type === "solEvmTokenTemplate" ? (
         <SolEvmTokenContractView
+          element={element}
+          setAppState={setAppState}
+          selectedElementChain={chainSelected}
+        />
+      ) : userDetails.type === "evmSolDataTransferTemplate" ? (
+        <EvmSolDataTransferContractView
           element={element}
           setAppState={setAppState}
           selectedElementChain={chainSelected}
